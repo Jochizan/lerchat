@@ -1,1 +1,1 @@
-# Proyecto de chat clone de dicord
+# Proyecto de chat clone de discord
