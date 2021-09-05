@@ -1,16 +1,152 @@
-html,
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,400;0,600;0,700;0,800;1,200;1,300;1,400;1,600;1,700&display=swap');
+
+/*********** Custom Properties *************/
+
+:root {
+  --primary-color: #18bb54;
+  --primary-75-color: #18bb54bf;
+  --primary-50-color: #1db95480;
+
+  --second-color: #4274f4;
+  --second-75-color: #4274f4bf;
+  --second-50-color: #4274f480;
+
+  --gray-light: #b2b2b2;
+  --gray-normal: #777777;
+  --gray-dark: #535353;
+
+  --white-01: #ffffff;
+  --white-02: #fcfcfc;
+  --white-03: #f4f4f4;
+
+  --black-01: #000000;
+  --black-02: #121212;
+  --black-03: #242424;
+
+  --font: 'Nunito', sans-serif;
+  --max-width: 1280px;
+  --header-height: 4rem;
+}
+
+/************** Reset ***************/
+
+html {
+  box-sizing: border-box;
+  font-family: var(--font);
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
 body {
-  padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  overflow-x: hidden;
+  color: var(--text-color);
+  font-family: var(--font);
+  background-color: var(--white-bg-color);
 }
 
 a {
-  color: inherit;
+  color: var(--link-color);
+  transition: all 0.5s ease-out;
   text-decoration: none;
 }
 
-* {
-  box-sizing: border-box;
+a:hover {
+  opacity: 0.8;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font);
+  font-weight: 600;
+  margin: 0;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+}
+
+h4 {
+  font-size: 1rem;
+}
+
+h5 {
+  font-size: 0.85rem;
+}
+
+h6 {
+  font-size: 0.7rem;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+p {
+  font-family: var(--font);
+  font-size: 20px;
+  font-weight: 400;
+}
+
+/* Background color */
+.bg-primary {
+  background-color: var(--primary-color) !important;
+}
+
+.bg-secondary {
+  background-color: var(--second-color) !important;
+}
+
+.bg-dark-chat {
+  background-color: var(--black-03) !important;
+}
+
+.bg-light-chat {
+  background-color: var(--white-03) !important;
+}
+
+.bg-dark {
+  background-color: var(--black-01) !important;
+}
+
+.bg-light {
+  background-color: var(--white-01) !important;
+}
+
+/* Text color */
+.tx-wlight {
+  color: var(--white-03);
+}
+
+.tx-wdark {
+  color: var(--black-01);
+}
+
+.tx-nlight {
+  color: var(--gray-light);
+}
+
+.tx-ndark {
+  color: var(--black-03);
+}
+
+.tl-light {
+  color: var(--white-02);
+}
+
+.tl-dark {
+  color: var(--black-02);
 }
