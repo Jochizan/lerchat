@@ -101,6 +101,10 @@ p {
   font-weight: 400;
 }
 
+.vh-72 {
+  max-height: 72vh;
+}
+
 /* Background color */
 .bg-primary {
   background-color: var(--primary-color) !important;
@@ -118,35 +122,73 @@ p {
   background-color: var(--white-03) !important;
 }
 
-.bg-dark {
+.bg-ndark {
   background-color: var(--black-01) !important;
 }
 
-.bg-light {
+.bg-nlight {
   background-color: var(--white-01) !important;
 }
 
 /* Text color */
 .tx-wlight {
-  color: var(--white-03);
+  color: var(--white-03) !important;
 }
 
 .tx-wdark {
-  color: var(--black-01);
+  color: var(--black-01) !important;
 }
 
 .tx-nlight {
-  color: var(--gray-light);
+  color: var(--gray-light) !important;
 }
 
 .tx-ndark {
-  color: var(--black-03);
+  color: var(--black-03) !important;
 }
 
 .tl-light {
-  color: var(--white-02);
+  color: var(--white-02) !important;
 }
 
 .tl-dark {
-  color: var(--black-02);
+  color: var(--black-02) !important;
+}
+
+/* Text size */
+
+/* Reset Buttons bootstrap */
+
+.primary__btn,
+.secondary__btn,
+.danger__btn {
+  letter-spacing: 0.1rem;
+}
+
+.primary__btn {
+  background: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+.secondary__btn {
+  background: var(--second-color) !important;
+  border-color: var(--second-color) !important;
+}
+
+.danger__btn {
+  background: var(--bs-red) !important;
+  border-color: var(--bs-red) !important;
+}
+
+.primary__btn:hover,
+.secondary__btn:hover,
+.danger__btn:hover {
+  opacity: 0.8;
+  color: var(--white-01);
+}
+
+.primary__btn p,
+.secondary__btn p,
+.danger__btn p {
+  color: var(--white-03);
 }

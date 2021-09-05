@@ -1,0 +1,9 @@
+.asideContainer {
+  min-width: 64px;
+}
+
+@media screen and (min-width: 992px) {
+  .asideContainer {
+    min-width: 176px;
+  }
+}
