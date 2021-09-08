@@ -1,5 +1,6 @@
 import { Schema } from 'mongoose';
 import { Errors } from '../../utils/errors.joi';
+import Message from '../../models/Message';
 import IMessage from '@/source/interfaces/message';
 
 abstract class CrudRepository<T, ID> {
@@ -7,7 +8,7 @@ abstract class CrudRepository<T, ID> {
   abstract getById(id: ID): Promise<T>;
   abstract create(entity: T, id?: ID): Promise<void>;
   abstract deleteById(id: ID): Promise<void>;
-  abstract updateById(id: ID, entity: T): Promise<T>;
+  abstract updateById(entity: T, id?: ID): Promise<T>;
 }
 
 export type MessageID = Schema.Types.ObjectId;
@@ -34,11 +35,11 @@ export class InMemoryMessageRepository extends MessageRepository {
   }
 
   create(entity: IMessage, id: MessageID): Promise<void> {
-    this.messages.set(id, entity);
-    return Promise.resolve();
+    console.log(entity);
+    return Promise.resolve(Message.create(entity));
   }
 
-  updateById(id: MessageID, entity: IMessage): Promise<IMessage> {
+  updateById(entity: IMessage, id: MessageID): Promise<IMessage> {
     if (this.messages.has(id)) {
       this.messages.set(id, entity);
       return Promise.resolve(this.messages.get(id)!);

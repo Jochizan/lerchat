@@ -1,9 +1,10 @@
+import type { NextPage } from 'next';
 import ChatForm from '../../components/ChatForm';
 import CardMessage from '../../components/CardMessage/CardMessage';
 import { useMessages } from '../../store/message.store';
 
-const ChatPage = () => {
-  const [messages, addMessage] = useMessages();
+const ChatPage: NextPage = () => {
+  const { messages, addMessage } = useMessages();
 
   return (
     <section className='vh-100 d-flex flex-column justify-content-between'>

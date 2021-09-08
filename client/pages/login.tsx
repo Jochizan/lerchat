@@ -1,13 +1,13 @@
 import type { NextPage } from 'next';
 
-const HomePage: NextPage = () => {
+const LoginPage: NextPage = () => {
   return (
     <div className='container'>
       <div className='row'>
-        <h1 className='text-center tx-wlight'>Home Page</h1>
+        <h1 className='text-center tx-wlight'>Login Page</h1>
       </div>
     </div>
   );
 };
 
-export default HomePage;
+export default LoginPage;

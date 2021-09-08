@@ -5,4 +5,11 @@ interface Message {
   message: string;
 }
 
+interface User {
+  id: Schema.Types.ObjectId;
+  names: string;
+  surnames: string;
+  email: string;
+}
+
 export type { Message };

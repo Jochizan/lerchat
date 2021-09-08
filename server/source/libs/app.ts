@@ -1,8 +1,8 @@
 import { Server as HttpServer } from 'http';
 import { Server, ServerOptions } from 'socket.io';
 import { ClientEvents, ServerEvents } from './events/message.events';
-import { MessageRepository } from './message-management/message.repository';
-import createMessageHandlers from './message-management/message.handlers';
+import { MessageRepository } from './messages/message.repository';
+import createMessageHandlers from './messages/message.handlers';
 
 export interface Components {
   messageRepository: MessageRepository;

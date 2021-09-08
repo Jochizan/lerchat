@@ -25,10 +25,9 @@ export const useMessages = () => {
       socket.emit('message:list', (res) => {
         if ('error' in res) {
           // handle the error
-          console.log(res);
-          return;
+          return console.log(res);
         }
-        setMessages(res.data.map((el) => el));
+        setMessages(res.data);
       });
     });
 
@@ -84,13 +83,12 @@ export const useMessages = () => {
     socket.emit('message:create', { message }, (res) => {
       if ('error' in res) {
         // handle the error
-        console.log(res);
-        return;
+        return console.log(res);
       }
 
       setMessages([...messages, { id: res.data, message }]);
     });
   };
 
-  return [messages, addMessage];
+  return { messages, addMessage };
 };

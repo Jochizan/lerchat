@@ -8,7 +8,7 @@ const options: ConnectOptions = {
 
 (async () => {
   try {
-    const db = await connect(config.DB_URL, options);
+    const db = await connect(config.UC_DB, options);
 
     console.log('Mongodb connection SUCCESS ✔');
     console.log('Database is connected to:', db.connection.name);

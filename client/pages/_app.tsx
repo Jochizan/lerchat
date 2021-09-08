@@ -1,14 +1,25 @@
-import '../styles/globals.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import type { AppProps } from 'next/app';
-import Aside from '../layouts/Aside';
 import Head from 'next/head';
+import '../styles/globals.css';
+import Aside from '../layouts/Aside';
+import type { AppProps } from 'next/app';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-function MyApp({ Component, pageProps }: AppProps) {
+const App = ({ Component, pageProps, router: { route } }: AppProps) => {
+  if (route === '/login' || route === '/register') {
+    return (
+      <>
+        <Head>
+          <title>{route.slice(1)}</title>
+        </Head>
+        <Component {...pageProps} />;
+      </>
+    );
+  }
+
   return (
     <>
       <Head>
-        <title>ULChat Project</title>
+        <title>ULChat</title>
       </Head>
       <Aside>
         <Component {...pageProps} />
@@ -17,4 +28,4 @@ function MyApp({ Component, pageProps }: AppProps) {
   );
 }
 
-export default MyApp;
+export default App;
