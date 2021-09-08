@@ -2,14 +2,13 @@ import { createConnection } from 'mongoose';
 import { Request, Response } from 'express';
 import Message from '../models/Message';
 import UserSchema from '../models/User';
+import config from '../config/config';
 
 export const getMessageWithUser = async (req: Request, res: Response) => {
   const _messages = await Message.find();
   const _usersId = _messages.map((el) => el.author);
 
-  const connection = createConnection(
-    'mongodb://localhost:27017/uncle-liquor?readPreference=primary'
-  );
+  const connection = createConnection(config.UL_DB);
 
   const UserModel = connection.model('Users', UserSchema);
 

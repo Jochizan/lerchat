@@ -1,4 +1,4 @@
-import { MessageID } from '../message-management/message.repository';
+import { MessageID } from '../messages/message.repository';
 import IMessage from '@/source/interfaces/message';
 import { ValidationErrorItem } from 'joi';
 

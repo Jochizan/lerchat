@@ -12,8 +12,8 @@ const ChatForm = ({
   addMessage: (message: string) => void;
 }) => {
   const {
-    register,
     reset,
+    register,
     handleSubmit,
     formState: { errors }
   } = useForm<Message>();
@@ -24,9 +24,7 @@ const ChatForm = ({
   };
 
   const handleKeyPress = (e: KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSubmit(onSubmit);
-    }
+    if (e.key === 'Enter') handleSubmit(onSubmit);
   };
 
   return (
