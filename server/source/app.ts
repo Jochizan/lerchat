@@ -1,12 +1,17 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import app from './index';
 import cors from 'cors';
 import path from 'path';
 import logger from 'morgan';
 import httpServer from 'http';
 
-// controllers chat
-import chatController from './controllers/chat.controller';
+// libs
+
+// routes
+import messageRouter from './routes/message.routes';
+import config from './config/config';
+import { InMemoryMessageRepository } from './libs/message-management/message.repository';
+import { createApplication } from './libs/app';
 
 const http = httpServer.createServer(app);
 
@@ -21,12 +26,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/api', (req: Request, res: Response) => {
-  res.send({ data: 'Hello from nodejs api' });
-});
+app.use('/api/message', messageRouter);
 
 http.listen(app.get('PORT'), () =>
   console.log(`Listen on port http://localhost:${app.get('PORT')}`)
 );
 
-chatController(http);
+createApplication(
+  http,
+  {
+    messageRepository: new InMemoryMessageRepository()
+  },
+  {
+    cors: {
+      origin: [config.FRONT_URL]
+    }
+  }
+);

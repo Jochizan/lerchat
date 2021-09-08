@@ -1,23 +1,32 @@
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { Message } from '../../interfaces/form.interfaces';
-import { io } from 'socket.io-client';
 import { KeyboardEvent } from 'react';
 
-const socket = io('http://localhost:5500');
+interface Message {
+  message: string;
+}
 
-const ChatForm = () => {
-  const { register, reset, handleSubmit, formState: { errors } } = useForm<Message>();
+const ChatForm = ({
+  addMessage
+}: {
+  addMessage: (message: string) => void;
+}) => {
+  const {
+    register,
+    reset,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<Message>();
+
+  const onSubmit: SubmitHandler<Message> = (data) => {
+    addMessage(data.message);
+    reset();
+  };
 
   const handleKeyPress = (e: KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSubmit(onSubmit);
     }
-  };
-
-  const onSubmit: SubmitHandler<Message> = (data) => {
-    socket.emit('send-message', data.message);
-    reset();
   };
 
   return (
@@ -43,7 +52,9 @@ const ChatForm = () => {
 
         <Row>
           <Form.Text className='tx-nlight my-sm-1'>
-            {!errors.message ? 'Never send sensitive data.' : 'The message is required to continue.'}
+            {!errors.message
+              ? 'Never send sensitive data.'
+              : 'The message is required to continue.'}
           </Form.Text>
         </Row>
       </Container>

@@ -1,4 +1,4 @@
-import mongoose, { ConnectOptions } from 'mongoose';
+import { connect, ConnectOptions } from 'mongoose';
 import config from './config/config';
 
 const options: ConnectOptions = {
@@ -8,8 +8,7 @@ const options: ConnectOptions = {
 
 (async () => {
   try {
-    //mongoose.set('useCreateIndex', true);
-    const db = await mongoose.connect(config.DB_URL, options);
+    const db = await connect(config.DB_URL, options);
 
     console.log('Mongodb connection SUCCESS ✔');
     console.log('Database is connected to:', db.connection.name);
