@@ -1,42 +1,49 @@
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { KeyboardEvent } from 'react';
-
-interface Message {
-  message: string;
-}
+// import { SubmitHandler, useForm } from 'react-hook-form';
+import { ChangeEvent, KeyboardEvent, SyntheticEvent, useState } from 'react';
+import { Message } from '../../interfaces/props.interfaces';
 
 const ChatForm = ({
   addMessage
 }: {
-  addMessage: (message: string) => void;
+  addMessage: (message: Message) => void;
 }) => {
-  const {
-    reset,
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm<Message>();
+  // const {
+  //   reset,
+  //   register,
+  //   handleSubmit,
+  //   formState: { errors }
+  // } = useForm<Message>();
+  const [message, setMessage] = useState<Message>({
+    message: '',
+    namespace: ''
+  });
 
-  const onSubmit: SubmitHandler<Message> = (data) => {
-    addMessage(data.message);
-    reset();
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setMessage({ ...message, [e.target.name]: [e.target.value] });
   };
 
-  const handleKeyPress = (e: KeyboardEvent) => {
-    if (e.key === 'Enter') handleSubmit(onSubmit);
+  const onSubmit = (e: SyntheticEvent) => {
+    e.preventDefault();
+    addMessage(message);
+    setMessage({ message: '', namespace: '' });
   };
+
+  const handleKeyPress = (e: KeyboardEvent) => e.key === 'Enter' && onSubmit(e);
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)} autoComplete='off'>
-      <Container>
+    <Form onSubmit={onSubmit} autoComplete='off'>
+      <Container fluid={true}>
         <Row>
           <Col className='d-flex' xs='auto' sm={12}>
             <Form.Control
               type='text'
               placeholder='Send Message'
               onKeyPress={handleKeyPress}
-              {...register('message', { required: true })}
+              value={message.message}
+              name='message'
+              onChange={handleChange}
+              // {...register('message', { required: true })}
             />
             <Button
               className='ms-3 fw-bold primary__btn'
@@ -50,9 +57,9 @@ const ChatForm = ({
 
         <Row>
           <Form.Text className='tx-nlight my-sm-1'>
-            {!errors.message
+            {/* {!errors.message
               ? 'Never send sensitive data.'
-              : 'The message is required to continue.'}
+              : 'The message is required to continue.'} */}
           </Form.Text>
         </Row>
       </Container>

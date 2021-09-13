@@ -1,10 +1,11 @@
 import React from 'react';
+import { Form } from 'react-bootstrap';
 
 const FormGroup = () => {
   return (
-      <div>
-        {1 + 1}
-      </div>
+    <div>
+      <Form.Control>{1 + 1}</Form.Control>
+    </div>
   );
 };
 

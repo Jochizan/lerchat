@@ -1,10 +1,10 @@
 import { Components } from '../app';
 import { Socket } from 'socket.io';
 import { sanitizeErrorMessage } from '../../utils/errors.joi';
-import IMessage from '@/source/interfaces/message';
 import { MessageID } from '../messages/message.repository';
 import { ClientEvents, Response, ServerEvents } from '../events/message.events';
-import { Schema } from 'mongoose';
+import IMessage from '@/source/interfaces/message';
+// import INamespace from '@/source/interfaces/namespace';
 
 const handlerMessages = (
   components: Components,
@@ -14,23 +14,23 @@ const handlerMessages = (
 
   return {
     createMessage: async (
-      payload: Omit<IMessage, 'id'>,
+      payload: IMessage,
       callback: (res: Response<MessageID>) => void
     ) => {
-      const id = new Schema.Types.ObjectId(new Date().toString());
-
       // persist the entity
+      payload.namespace = socket.nsp.name as string;
+      let _message: IMessage;
       try {
-        await messageRepository.create(payload, id);
-      } catch (e) {
+        _message = await messageRepository.create(payload);
+      } catch (err) {
         return callback({
-          error: sanitizeErrorMessage(e as string)
+          error: sanitizeErrorMessage(err as string)
         });
       }
 
       // acknowledge the creation
       callback({
-        data: id
+        data: _message.id
       });
 
       // notify the other users
@@ -47,9 +47,9 @@ const handlerMessages = (
         callback({
           data: message
         });
-      } catch (e) {
+      } catch (err) {
         callback({
-          error: sanitizeErrorMessage(e as string)
+          error: sanitizeErrorMessage(err as string)
         });
       }
     },
@@ -59,10 +59,10 @@ const handlerMessages = (
       callback: (res?: Response<void>) => void
     ) => {
       try {
-        await messageRepository.create(payload);
-      } catch (e) {
+        await messageRepository.updateById(payload, payload.id);
+      } catch (err) {
         return callback({
-          error: sanitizeErrorMessage(e as string)
+          error: sanitizeErrorMessage(err as string)
         });
       }
 
@@ -76,9 +76,9 @@ const handlerMessages = (
     ) => {
       try {
         await messageRepository.deleteById(id);
-      } catch (e) {
+      } catch (err) {
         return callback({
-          error: sanitizeErrorMessage(e as string)
+          error: sanitizeErrorMessage(err as string)
         });
       }
 
@@ -89,14 +89,26 @@ const handlerMessages = (
     listMessage: async (callback: (res: Response<IMessage[]>) => void) => {
       try {
         callback({
-          data: await messageRepository.getAll()
+          data: await messageRepository.getAll(socket.nsp.name as string)
         });
-      } catch (e) {
+      } catch (err) {
         callback({
-          error: sanitizeErrorMessage(e as string)
+          error: sanitizeErrorMessage(err as string)
         });
       }
     }
+
+    // typing: async (callback: (res: Response<User[]>) => void) => {
+    //   try {
+    //     callback({
+    //       data: await messageRepository.typing(id)
+    //     });
+    //   } catch (err) {
+    //     callback({
+    //       error: sanitizeErrorMessage(err as string)
+    //     });
+    //   }
+    // }
   };
 };
 

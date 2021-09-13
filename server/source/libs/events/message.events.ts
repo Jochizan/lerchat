@@ -1,6 +1,7 @@
+import { ValidationErrorItem } from 'joi';
 import { MessageID } from '../messages/message.repository';
 import IMessage from '@/source/interfaces/message';
-import { ValidationErrorItem } from 'joi';
+import INamespace from '@/source/interfaces/namespace';
 
 interface Error {
   error: string;
@@ -23,7 +24,7 @@ export interface ClientEvents {
   'message:list': (callback: (res: Response<IMessage[]>) => void) => void;
 
   'message:create': (
-    payload: Omit<IMessage, 'id'>,
+    payload: IMessage,
     callback: (res: Response<MessageID>) => void
   ) => void;
 

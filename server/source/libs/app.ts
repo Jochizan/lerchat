@@ -15,7 +15,11 @@ export function createApplication(
 ): Server<ClientEvents, ServerEvents> {
   const io = new Server<ClientEvents, ServerEvents>(httpServer, serverOptions);
 
-  io.on('connection', (socket) => {
+  io.of(/[0-9]/).on('connection', (socket) => {
+    socket.prependAny((event) => {
+      console.log(event);
+    });
+
     const {
       createMessage,
       updateMessage,
