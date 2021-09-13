@@ -1,57 +1,59 @@
-import { Schema } from 'mongoose';
-import { Errors } from '../../utils/errors.joi';
+import { Errors } from '../errors/message.errors';
+import { ObjectId } from 'mongoose';
 import Message from '../../models/Message';
-import IMessage from '@/source/interfaces/message';
+import IMessage from '../../interfaces/message';
 
-abstract class CrudRepository<T, ID> {
-  abstract getAll(): Promise<T[]>;
+abstract class CrudRepository<T, SID, ID> {
+  abstract getAll(namespace: SID): Promise<T[]>;
   abstract getById(id: ID): Promise<T>;
-  abstract create(entity: T, id?: ID): Promise<void>;
+  abstract create(entity: T): Promise<T>;
   abstract deleteById(id: ID): Promise<void>;
-  abstract updateById(entity: T, id?: ID): Promise<T>;
+  abstract updateById(entity: T, id: ID): Promise<T>;
 }
 
-export type MessageID = Schema.Types.ObjectId;
+export type MessageID = ObjectId;
+export type NamespaceID = ObjectId;
 
-export abstract class MessageRepository extends CrudRepository<
+export abstract class Repository extends CrudRepository<
   IMessage,
+  NamespaceID,
   MessageID
 > {}
 
-export class InMemoryMessageRepository extends MessageRepository {
-  private readonly messages: Map<MessageID, IMessage> = new Map();
-
-  getAll(): Promise<IMessage[]> {
-    const entities = Array.from(this.messages.values());
-    return Promise.resolve(entities);
+export class MessageRepository extends Repository {
+  getAll(namespace: NamespaceID): Promise<IMessage[]> {
+    return Promise.resolve(Message.find({ namespace }));
   }
 
-  getById(id: MessageID): Promise<IMessage> {
-    if (this.messages.has(id)) {
-      return Promise.resolve(this.messages.get(id)!);
+  async getById(id: MessageID): Promise<IMessage> {
+    const _message = await Message.findById(id);
+    if (_message) {
+      return Promise.resolve(_message);
     } else {
       return Promise.reject(Errors.ENTITY_NOT_FOUND);
     }
   }
 
-  create(entity: IMessage, id: MessageID): Promise<void> {
+  create(entity: IMessage): Promise<IMessage> {
     console.log(entity);
     return Promise.resolve(Message.create(entity));
   }
 
-  updateById(entity: IMessage, id: MessageID): Promise<IMessage> {
-    if (this.messages.has(id)) {
-      this.messages.set(id, entity);
-      return Promise.resolve(this.messages.get(id)!);
+  async updateById(entity: IMessage, id: MessageID): Promise<IMessage> {
+    const _message = await Message.findById(id);
+    if (_message) {
+      return Promise.resolve(
+        Message.findByIdAndUpdate(id, entity, { new: true })
+      );
     } else {
       return Promise.reject(Errors.ENTITY_NOT_FOUND);
     }
   }
 
-  deleteById(id: MessageID): Promise<void> {
-    const deleted = this.messages.delete(id);
-    if (deleted) {
-      return Promise.resolve();
+  async deleteById(id: MessageID): Promise<void> {
+    const _message = await Message.findByIdAndDelete(id);
+    if (_message) {
+      return Promise.resolve(_message);
     } else {
       return Promise.reject(Errors.ENTITY_NOT_FOUND);
     }

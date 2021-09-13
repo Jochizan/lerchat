@@ -1,10 +1,9 @@
-import { MessageID } from '../messages/message.repository';
-import IMessage from '@/source/interfaces/message';
-import { ValidationErrorItem } from 'joi';
+import { MessageID, NamespaceID } from '../messages/message.repository';
+import IMessage from '../../interfaces/message';
 
 interface Error {
   error: string;
-  errorDetails?: ValidationErrorItem[];
+  errorDetails?: Error[];
 }
 
 interface Success<T> {
@@ -20,10 +19,13 @@ export interface ServerEvents {
 }
 
 export interface ClientEvents {
-  'message:list': (callback: (res: Response<IMessage[]>) => void) => void;
+  'message:list': (
+    namespace: NamespaceID,
+    callback: (res: Response<IMessage[]>) => void
+  ) => void;
 
   'message:create': (
-    payload: Omit<IMessage, 'id'>,
+    payload: IMessage,
     callback: (res: Response<MessageID>) => void
   ) => void;
 

@@ -1,15 +1,21 @@
-import { Schema } from 'mongoose';
+import { ObjectId } from 'mongoose';
 
-interface Message {
-  id: Schema.Types.ObjectId;
+interface IMessage {
+  _id: ObjectId;
   message: string;
+  namespace: string;
 }
 
-interface User {
-  id: Schema.Types.ObjectId;
+interface INamespace {
+  _id: ObjectId;
+  name: string;
+}
+
+interface IUser {
+  _id: ObjectId;
   names: string;
   surnames: string;
   email: string;
 }
 
-export type { Message };
+export type { IUser, IMessage, INamespace };

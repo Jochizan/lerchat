@@ -1,13 +1,14 @@
-import { Message as IMessage } from '../interfaces/store.interfaces';
-import { ValidationErrorItem } from 'joi';
-import { Schema } from 'mongoose';
+import { IMessage } from '../interfaces/store.interfaces';
+import { Message } from '../interfaces/props.interfaces';
+import { ObjectId } from 'mongoose';
 
 interface Error {
   error: string;
-  errorDetails?: ValidationErrorItem[];
+  errorDetails?: Error[];
 }
 
-export type MessageID = Schema.Types.ObjectId;
+export type MessageID = ObjectId;
+export type NamespaceID = string;
 
 interface Success<T> {
   data: T;
@@ -22,10 +23,13 @@ export interface ServerEvents {
 }
 
 export interface ClientEvents {
-  'message:list': (callback: (res: Response<IMessage[]>) => void) => void;
+  'message:list': (
+    id: NamespaceID,
+    callback: (res: Response<IMessage[]>) => void
+  ) => void;
 
   'message:create': (
-    payload: Omit<IMessage, 'id'>,
+    payload: Message,
     callback: (res: Response<MessageID>) => void
   ) => void;
 
@@ -35,7 +39,7 @@ export interface ClientEvents {
   ) => void;
 
   'message:update': (
-    payload: IMessage,
+    payload: Message,
     callback: (res?: Response<void>) => void
   ) => void;
 

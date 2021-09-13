@@ -1,10 +1,9 @@
 import { Components } from '../app';
 import { Socket } from 'socket.io';
-import { sanitizeErrorMessage } from '../../utils/errors.joi';
-import IMessage from '@/source/interfaces/message';
-import { MessageID } from '../messages/message.repository';
+import IMessage from '../../interfaces/message';
+import { sanitizeErrors } from '../errors/message.errors';
+import { MessageID, NamespaceID } from '../messages/message.repository';
 import { ClientEvents, Response, ServerEvents } from '../events/message.events';
-import { Schema } from 'mongoose';
 
 const handlerMessages = (
   components: Components,
@@ -14,27 +13,22 @@ const handlerMessages = (
 
   return {
     createMessage: async (
-      payload: Omit<IMessage, 'id'>,
+      payload: IMessage,
       callback: (res: Response<MessageID>) => void
     ) => {
-      const id = new Schema.Types.ObjectId(new Date().toString());
-
-      // persist the entity
       try {
-        await messageRepository.create(payload, id);
-      } catch (e) {
+        const _message = await messageRepository.create(payload);
+
+        callback({
+          data: _message.id
+        });
+
+        socket.broadcast.emit('message:created', _message);
+      } catch (err) {
         return callback({
-          error: sanitizeErrorMessage(e as string)
+          error: sanitizeErrors(err as string)
         });
       }
-
-      // acknowledge the creation
-      callback({
-        data: id
-      });
-
-      // notify the other users
-      socket.broadcast.emit('message:created', payload);
     },
 
     readMessage: async (
@@ -47,9 +41,9 @@ const handlerMessages = (
         callback({
           data: message
         });
-      } catch (e) {
+      } catch (err) {
         callback({
-          error: sanitizeErrorMessage(e as string)
+          error: sanitizeErrors(err as string)
         });
       }
     },
@@ -59,14 +53,15 @@ const handlerMessages = (
       callback: (res?: Response<void>) => void
     ) => {
       try {
-        await messageRepository.create(payload);
-      } catch (e) {
+        await messageRepository.updateById(payload, payload.id);
+      } catch (err) {
         return callback({
-          error: sanitizeErrorMessage(e as string)
+          error: sanitizeErrors(err as string)
         });
       }
 
       callback();
+
       socket.broadcast.emit('message:updated', payload);
     },
 
@@ -76,27 +71,45 @@ const handlerMessages = (
     ) => {
       try {
         await messageRepository.deleteById(id);
-      } catch (e) {
+      } catch (err) {
         return callback({
-          error: sanitizeErrorMessage(e as string)
+          error: sanitizeErrors(err as string)
         });
       }
 
       callback();
+
       socket.broadcast.emit('message:deleted', id);
     },
 
-    listMessage: async (callback: (res: Response<IMessage[]>) => void) => {
+    listMessage: async (
+      id: NamespaceID,
+      callback: (res: Response<IMessage[]>) => void
+    ) => {
       try {
+        const data = await messageRepository.getAll(id);
         callback({
-          data: await messageRepository.getAll()
+          data
         });
-      } catch (e) {
+      } catch (err) {
+        console.log(err);
         callback({
-          error: sanitizeErrorMessage(e as string)
+          error: sanitizeErrors(err as string)
         });
       }
     }
+
+    // typing: async (callback: (res: Response<User[]>) => void) => {
+    //   try {
+    //     callback({
+    //       data: await messageRepository.typing(id)
+    //     });
+    //   } catch (err) {
+    //     callback({
+    //       error: sanitizeErrorMessage(err as string)
+    //     });
+    //   }
+    // }
   };
 };
 
