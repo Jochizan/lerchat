@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router';
 import { NextPage } from 'next';
-import { useMessages } from '../../store/message.store';
-import CardMessage from '../../components/CardMessage/CardMessage';
-import ChatForm from '../../components/ChatForm';
+import { useMessages } from '@store/message.store';
+import CardMessage from '@components/CardMessage';
+import ChatForm from '@components/ChatForm';
 
 const Namespace: NextPage = () => {
   const router = useRouter();

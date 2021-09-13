@@ -1,10 +1,9 @@
 import { Components } from '../app';
 import { Socket } from 'socket.io';
-import { sanitizeErrorMessage } from '../../utils/errors.joi';
-import { MessageID } from '../messages/message.repository';
+import IMessage from '../../interfaces/message';
+import { sanitizeErrors } from '../errors/message.errors';
+import { MessageID, NamespaceID } from '../messages/message.repository';
 import { ClientEvents, Response, ServerEvents } from '../events/message.events';
-import IMessage from '@/source/interfaces/message';
-// import INamespace from '@/source/interfaces/namespace';
 
 const handlerMessages = (
   components: Components,
@@ -17,24 +16,19 @@ const handlerMessages = (
       payload: IMessage,
       callback: (res: Response<MessageID>) => void
     ) => {
-      // persist the entity
-      payload.namespace = socket.nsp.name as string;
-      let _message: IMessage;
       try {
-        _message = await messageRepository.create(payload);
+        const _message = await messageRepository.create(payload);
+
+        callback({
+          data: _message.id
+        });
+
+        socket.broadcast.emit('message:created', _message);
       } catch (err) {
         return callback({
-          error: sanitizeErrorMessage(err as string)
+          error: sanitizeErrors(err as string)
         });
       }
-
-      // acknowledge the creation
-      callback({
-        data: _message.id
-      });
-
-      // notify the other users
-      socket.broadcast.emit('message:created', payload);
     },
 
     readMessage: async (
@@ -49,7 +43,7 @@ const handlerMessages = (
         });
       } catch (err) {
         callback({
-          error: sanitizeErrorMessage(err as string)
+          error: sanitizeErrors(err as string)
         });
       }
     },
@@ -62,11 +56,12 @@ const handlerMessages = (
         await messageRepository.updateById(payload, payload.id);
       } catch (err) {
         return callback({
-          error: sanitizeErrorMessage(err as string)
+          error: sanitizeErrors(err as string)
         });
       }
 
       callback();
+
       socket.broadcast.emit('message:updated', payload);
     },
 
@@ -78,22 +73,28 @@ const handlerMessages = (
         await messageRepository.deleteById(id);
       } catch (err) {
         return callback({
-          error: sanitizeErrorMessage(err as string)
+          error: sanitizeErrors(err as string)
         });
       }
 
       callback();
+
       socket.broadcast.emit('message:deleted', id);
     },
 
-    listMessage: async (callback: (res: Response<IMessage[]>) => void) => {
+    listMessage: async (
+      id: NamespaceID,
+      callback: (res: Response<IMessage[]>) => void
+    ) => {
       try {
+        const data = await messageRepository.getAll(id);
         callback({
-          data: await messageRepository.getAll(socket.nsp.name as string)
+          data
         });
       } catch (err) {
+        console.log(err);
         callback({
-          error: sanitizeErrorMessage(err as string)
+          error: sanitizeErrors(err as string)
         });
       }
     }

@@ -3,7 +3,9 @@ import { Server, ServerOptions } from 'socket.io';
 import { ClientEvents, ServerEvents } from './events/message.events';
 import { MessageRepository } from './messages/message.repository';
 import createMessageHandlers from './messages/message.handlers';
+import { isValidObjectId } from 'mongoose';
 
+isValidObjectId;
 export interface Components {
   messageRepository: MessageRepository;
 }
@@ -15,7 +17,7 @@ export function createApplication(
 ): Server<ClientEvents, ServerEvents> {
   const io = new Server<ClientEvents, ServerEvents>(httpServer, serverOptions);
 
-  io.of(/[0-9]/).on('connection', (socket) => {
+  io.of(/\w/).on('connection', (socket) => {
     socket.prependAny((event) => {
       console.log(event);
     });

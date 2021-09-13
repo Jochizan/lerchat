@@ -6,6 +6,11 @@ interface IMessage {
   namespace: string;
 }
 
+interface INamespace {
+  _id: ObjectId;
+  name: string;
+}
+
 interface IUser {
   _id: ObjectId;
   names: string;
@@ -13,4 +18,4 @@ interface IUser {
   email: string;
 }
 
-export type { IUser, IMessage };
+export type { IUser, IMessage, INamespace };

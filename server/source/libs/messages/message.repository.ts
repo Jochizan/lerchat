@@ -1,36 +1,28 @@
-import { Schema } from 'mongoose';
-import { Errors } from '../../utils/errors.joi';
+import { Errors } from '../errors/message.errors';
+import { ObjectId } from 'mongoose';
 import Message from '../../models/Message';
-import IMessage from '@/source/interfaces/message';
-// import INamespace from '@/source/interfaces/namespace';
+import IMessage from '../../interfaces/message';
 
-abstract class CrudRepository<T, S, ID> {
-  abstract getAll(namespace: S): Promise<T[]>;
+abstract class CrudRepository<T, SID, ID> {
+  abstract getAll(namespace: SID): Promise<T[]>;
   abstract getById(id: ID): Promise<T>;
   abstract create(entity: T): Promise<T>;
   abstract deleteById(id: ID): Promise<void>;
   abstract updateById(entity: T, id: ID): Promise<T>;
 }
 
-export type MessageID = Schema.Types.ObjectId;
+export type MessageID = ObjectId;
+export type NamespaceID = ObjectId;
 
-export abstract class MessageRepository extends CrudRepository<
+export abstract class Repository extends CrudRepository<
   IMessage,
-  string,
+  NamespaceID,
   MessageID
 > {}
 
-export class InMemoryMessageRepository extends MessageRepository {
-  async getAll(namespace: string): Promise<IMessage[]> {
-    const _messages = await Message.find({ namespace });
-    const _newMessages = _messages.map((message) => {
-      console.log(message);
-      return {
-        message: message.message,
-        namespace: message.namespace
-      } as IMessage;
-    });
-    return Promise.resolve(_newMessages);
+export class MessageRepository extends Repository {
+  getAll(namespace: NamespaceID): Promise<IMessage[]> {
+    return Promise.resolve(Message.find({ namespace }));
   }
 
   async getById(id: MessageID): Promise<IMessage> {
@@ -43,7 +35,7 @@ export class InMemoryMessageRepository extends MessageRepository {
   }
 
   create(entity: IMessage): Promise<IMessage> {
-    entity.message = entity.message[0];
+    console.log(entity);
     return Promise.resolve(Message.create(entity));
   }
 
@@ -60,7 +52,6 @@ export class InMemoryMessageRepository extends MessageRepository {
 
   async deleteById(id: MessageID): Promise<void> {
     const _message = await Message.findByIdAndDelete(id);
-    console.log(_message);
     if (_message) {
       return Promise.resolve(_message);
     } else {

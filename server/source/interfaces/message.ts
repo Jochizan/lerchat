@@ -1,8 +1,8 @@
 import { Document, ObjectId } from 'mongoose';
 
 export default interface IMessage extends Document {
-  // id: ObjectId;
+  _id: ObjectId;
   message: string;
-  namespace: string;
+  namespace: ObjectId;
   //author: Schema.Types.ObjectId;
 }
