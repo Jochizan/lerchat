@@ -1,8 +1,8 @@
 import { Server as HttpServer } from 'http';
 import { Server, ServerOptions } from 'socket.io';
 import { ClientEvents, ServerEvents } from './events/message.events';
-import { MessageRepository } from './messages/message.repository';
-import createMessageHandlers from './messages/message.handlers';
+import { MessageRepository } from './messages/repository';
+import createMessageHandlers from './messages/handlers';
 import { isValidObjectId } from 'mongoose';
 
 isValidObjectId;
@@ -20,6 +20,10 @@ export function createApplication(
   io.of(/\w/).on('connection', (socket) => {
     socket.prependAny((event) => {
       console.log(event);
+    });
+
+    socket.on('testing:list', ({ username, romname }: any) => {
+      console.log(username, romname);
     });
 
     const {

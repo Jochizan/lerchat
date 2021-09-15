@@ -1,8 +1,8 @@
 import { Document, ObjectId } from 'mongoose';
 
-export default interface IMessage extends Document {
+export default interface IServer extends Document {
   _id: ObjectId;
   message: string;
   namespace: ObjectId;
-  author: ObjectId;
+  creator: ObjectId;
 }

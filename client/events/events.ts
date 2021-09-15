@@ -23,6 +23,8 @@ export interface ServerEvents {
 }
 
 export interface ClientEvents {
+  'testing:list': (res: any) => void;
+
   'message:list': (
     id: NamespaceID,
     callback: (res: Response<IMessage[]>) => void

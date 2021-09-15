@@ -2,7 +2,7 @@ import { Components } from '../app';
 import { Socket } from 'socket.io';
 import IMessage from '../../interfaces/message';
 import { sanitizeErrors } from '../errors/message.errors';
-import { MessageID, NamespaceID } from '../messages/message.repository';
+import { MessageID, NamespaceID } from './repository';
 import { ClientEvents, Response, ServerEvents } from '../events/message.events';
 
 const handlerMessages = (
@@ -54,15 +54,15 @@ const handlerMessages = (
     ) => {
       try {
         await messageRepository.updateById(payload, payload.id);
+
+        callback();
+
+        socket.broadcast.emit('message:updated', payload);
       } catch (err) {
         return callback({
           error: sanitizeErrors(err as string)
         });
       }
-
-      callback();
-
-      socket.broadcast.emit('message:updated', payload);
     },
 
     deleteMessage: async (
@@ -71,15 +71,15 @@ const handlerMessages = (
     ) => {
       try {
         await messageRepository.deleteById(id);
+
+        callback();
+
+        socket.broadcast.emit('message:deleted', id);
       } catch (err) {
         return callback({
           error: sanitizeErrors(err as string)
         });
       }
-
-      callback();
-
-      socket.broadcast.emit('message:deleted', id);
     },
 
     listMessage: async (
@@ -88,6 +88,7 @@ const handlerMessages = (
     ) => {
       try {
         const data = await messageRepository.getAll(id);
+
         callback({
           data
         });

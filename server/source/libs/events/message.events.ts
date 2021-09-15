@@ -1,4 +1,4 @@
-import { MessageID, NamespaceID } from '../messages/message.repository';
+import { MessageID, NamespaceID } from '../messages/repository';
 import IMessage from '../../interfaces/message';
 
 interface Error {
@@ -19,6 +19,8 @@ export interface ServerEvents {
 }
 
 export interface ClientEvents {
+  'testing:list': (res: any) => void;
+
   'message:list': (
     namespace: NamespaceID,
     callback: (res: Response<IMessage[]>) => void

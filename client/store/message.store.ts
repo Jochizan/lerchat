@@ -12,8 +12,10 @@ export const useMessages = (namespace: string) => {
   socket.on('disconnect', () => {});
 
   socket.on('message:created', (message) => {
+    // console.log(messages);
     setMessages([...messages, message]);
   });
+  console.log(messages);
 
   socket.on('message:updated', (message) => {
     const existingMessage = messages.find((t) => t._id === message._id);
@@ -35,13 +37,7 @@ export const useMessages = (namespace: string) => {
 
   useEffect(() => {
     socket.on('connect', () => {
-      socket.emit('message:list', namespace, (res) => {
-        if ('error' in res) {
-          // handle the error
-          return console.log(res);
-        }
-        setMessages(res.data);
-      });
+      socket.emit('testing:list', namespace);
     });
 
     return () => {
@@ -52,7 +48,7 @@ export const useMessages = (namespace: string) => {
       socket.off('message');
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [namespace]);
+  }, []);
 
   const addMessage = (message: string) => {
     socket.emit('message:create', { message, namespace }, (res) => {

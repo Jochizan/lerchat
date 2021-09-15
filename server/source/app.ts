@@ -1,11 +1,9 @@
 import app from './index';
 import cors from 'cors';
 import httpServer from 'http';
-import config from './config/config';
 import { createApplication } from './libs/app';
-import { MessageRepository } from './libs/messages/message.repository';
-import { Request, Response } from 'express';
-import Namespace from './models/Namespace';
+import { MessageRepository } from './libs/messages/repository';
+import indexRoutes from './routes/index.routes';
 
 const http = httpServer.createServer(app);
 
@@ -15,16 +13,10 @@ app.use(
     credentials: true
   })
 );
-
-app.use('/namespaces', async (req: Request, res: Response) => {
-  const _namespaces = await Namespace.find();
-
-  res.send({ msg: 'SucessFully namespaces', _namespaces });
-});
-// app.use(express.static(path.join(__dirname, 'public')));
+app.use(indexRoutes);
 
 http.listen(app.get('PORT'), () =>
-  console.log(`Listen on port http://localhost:${app.get('PORT')}`)
+  console.log(`Listen on port ${app.get('BACK')}`)
 );
 
 createApplication(
@@ -34,7 +26,7 @@ createApplication(
   },
   {
     cors: {
-      origin: [config.FRONT_URL]
+      origin: [app.get('FRONT')]
     }
   }
 );
