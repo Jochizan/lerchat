@@ -14,9 +14,19 @@ export const createServer = asyncHandler(
 
 export const getAllServers = asyncHandler(
   async (req: Request, res: Response) => {
-    const _server = await Server.find();
+    const _servers = await Server.find();
 
-    res.status(200).send({ msg: 'Get all servers', _server });
+    res.status(200).send({ msg: 'Get all servers', _servers });
+  }
+);
+
+export const getServersByCreator = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    const _servers = await Server.find({ creator: id });
+
+    res.status(200).send({ msg: `Get all servers by creator ${id}`, _servers });
   }
 );
 

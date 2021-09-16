@@ -1,42 +1,23 @@
-import { Errors } from '../errors/message.errors';
-import { ObjectId } from 'mongoose';
+import { Errors } from '../errors/errors';
+import { CrudRepository } from '../class/main';
 import Message from '../../models/Message';
 import IMessage from '../../interfaces/message';
-
-abstract class CrudRepository<T, SID, ID> {
-  abstract getAll(namespace: SID): Promise<T[]>;
-  abstract getById(id: ID): Promise<T>;
-  abstract create(entity: T): Promise<T>;
-  abstract deleteById(id: ID): Promise<void>;
-  abstract updateById(entity: T, id: ID): Promise<T>;
-}
-
-export type MessageID = ObjectId;
-export type NamespaceID = ObjectId;
+import { MessageID, NamespaceID } from '../types';
 
 export abstract class Repository extends CrudRepository<
   IMessage,
-  NamespaceID,
+  string,
   MessageID
 > {}
 
 export class MessageRepository extends Repository {
-  getAll(namespace: NamespaceID): Promise<IMessage[]> {
-    return Promise.resolve(Message.find({ namespace }));
+  create(entity: IMessage, namespace?: string): Promise<IMessage> {
+    return Promise.resolve(Message.create({ ...entity, namespace }));
   }
 
-  async getById(id: MessageID): Promise<IMessage> {
-    const _message = await Message.findById(id);
-    if (_message) {
-      return Promise.resolve(_message);
-    } else {
-      return Promise.reject(Errors.ENTITY_NOT_FOUND);
-    }
-  }
-
-  create(entity: IMessage): Promise<IMessage> {
-    console.log(entity);
-    return Promise.resolve(Message.create(entity));
+  readById(id: MessageID): Promise<IMessage> {
+    console.log(id);
+    return Promise.resolve(Message.findById(id));
   }
 
   async updateById(entity: IMessage, id: MessageID): Promise<IMessage> {

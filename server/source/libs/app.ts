@@ -1,11 +1,10 @@
 import { Server as HttpServer } from 'http';
 import { Server, ServerOptions } from 'socket.io';
-import { ClientEvents, ServerEvents } from './events/message.events';
+import { ClientEvents, ServerEvents } from './events/events';
 import { MessageRepository } from './messages/repository';
 import createMessageHandlers from './messages/handlers';
 import { isValidObjectId } from 'mongoose';
 
-isValidObjectId;
 export interface Components {
   messageRepository: MessageRepository;
 }
@@ -22,23 +21,13 @@ export function createApplication(
       console.log(event);
     });
 
-    socket.on('testing:list', ({ username, romname }: any) => {
-      console.log(username, romname);
-    });
-
-    const {
-      createMessage,
-      updateMessage,
-      deleteMessage,
-      readMessage,
-      listMessage
-    } = createMessageHandlers(components, socket);
+    const { createMessage, updateMessage, deleteMessage, readMessage } =
+      createMessageHandlers(components, socket);
 
     socket.on('message:create', createMessage);
     socket.on('message:read', readMessage);
     socket.on('message:update', updateMessage);
     socket.on('message:delete', deleteMessage);
-    socket.on('message:list', listMessage);
   });
 
   return io;

@@ -3,6 +3,7 @@ import '../styles/globals.css';
 import Aside from '../layouts/Aside';
 import type { AppProps } from 'next/app';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { ServerProvider } from '@store/server.context';
 
 const App = ({ Component, pageProps, router: { route } }: AppProps) => {
   if (route === '/login' || route === '/register') {
@@ -17,15 +18,15 @@ const App = ({ Component, pageProps, router: { route } }: AppProps) => {
   }
 
   return (
-    <>
+    <ServerProvider>
       <Head>
         <title>ULChat</title>
       </Head>
       <Aside>
         <Component {...pageProps} />
       </Aside>
-    </>
+    </ServerProvider>
   );
-}
+};
 
 export default App;

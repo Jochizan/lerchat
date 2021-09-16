@@ -20,6 +20,18 @@ export const getAllNamespaces = asyncHandler(
   }
 );
 
+export const getNamespacesByServer = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    const _namespaces = await Namespace.find({ server: id });
+
+    res
+      .status(200)
+      .send({ msg: `Get all namespaces by ${id} server`, _namespaces });
+  }
+);
+
 export const updateNamespace = asyncHandler(
   async (req: Request, res: Response) => {}
 );

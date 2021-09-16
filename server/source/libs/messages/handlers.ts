@@ -1,9 +1,9 @@
 import { Components } from '../app';
 import { Socket } from 'socket.io';
 import IMessage from '../../interfaces/message';
-import { sanitizeErrors } from '../errors/message.errors';
-import { MessageID, NamespaceID } from './repository';
-import { ClientEvents, Response, ServerEvents } from '../events/message.events';
+import { sanitizeErrors } from '../errors/errors';
+import { MessageID } from '../types';
+import { ClientEvents, Response, ServerEvents } from '../events/events';
 
 const handlerMessages = (
   components: Components,
@@ -17,16 +17,17 @@ const handlerMessages = (
       callback: (res: Response<MessageID>) => void
     ) => {
       try {
-        const _message = await messageRepository.create(payload);
+        const namespace = socket.nsp.name.slice(1);
+        const _message = await messageRepository.create(payload, namespace);
 
         callback({
           data: _message.id
         });
 
         socket.broadcast.emit('message:created', _message);
-      } catch (err) {
+      } catch (error) {
         return callback({
-          error: sanitizeErrors(err as string)
+          msg: sanitizeErrors(error as string)
         });
       }
     },
@@ -36,14 +37,14 @@ const handlerMessages = (
       callback: (res: Response<IMessage>) => void
     ) => {
       try {
-        const message = await messageRepository.getById(id);
+        const message = await messageRepository.readById(id);
 
         callback({
           data: message
         });
-      } catch (err) {
+      } catch (error) {
         callback({
-          error: sanitizeErrors(err as string)
+          msg: sanitizeErrors(error as string)
         });
       }
     },
@@ -58,9 +59,9 @@ const handlerMessages = (
         callback();
 
         socket.broadcast.emit('message:updated', payload);
-      } catch (err) {
+      } catch (error) {
         return callback({
-          error: sanitizeErrors(err as string)
+          msg: sanitizeErrors(error as string)
         });
       }
     },
@@ -75,27 +76,9 @@ const handlerMessages = (
         callback();
 
         socket.broadcast.emit('message:deleted', id);
-      } catch (err) {
+      } catch (error) {
         return callback({
-          error: sanitizeErrors(err as string)
-        });
-      }
-    },
-
-    listMessage: async (
-      id: NamespaceID,
-      callback: (res: Response<IMessage[]>) => void
-    ) => {
-      try {
-        const data = await messageRepository.getAll(id);
-
-        callback({
-          data
-        });
-      } catch (err) {
-        console.log(err);
-        callback({
-          error: sanitizeErrors(err as string)
+          msg: sanitizeErrors(error as string)
         });
       }
     }

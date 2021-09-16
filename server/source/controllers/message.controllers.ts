@@ -16,13 +16,11 @@ export const getAllMessages = asyncHandler(
 
 export const getMessagesByNamespace = asyncHandler(
   async (req: Request, res: Response) => {
-    const { namespace } = req.params;
+    const { id } = req.params;
 
-    const _messages = await Message.find({ namespace });
+    const _messages = await Message.find({ namespace: id });
 
-    res
-      .status(200)
-      .send({ msg: `Messages obtained from ${namespace}`, _messages });
+    res.status(200).send({ msg: `Messages obtained from ${id}`, _messages });
   }
 );
 

@@ -9,19 +9,12 @@ const asyncHandler =
     ) => Promise<void>
   ) =>
   (req: Request, res: Response, next?: NextFunction) =>
-    Promise.resolve(controllerFunc(req, res, next))
-      .catch(
-        next ||
-          ((err: any) => {
-            console.error(err);
-            res
-              .status(500)
-              .type('json')
-              .send({ msg: err.message || 'Internal Error', err });
-          })
-      )
-      .finally(() =>
-        console.info(req.url, req.headers.host, req.body, req.params, req.query)
-      );
+    Promise.resolve(controllerFunc(req, res, next)).catch(
+      next ||
+        ((err: any) => {
+          console.error(err);
+          res.status(500).send({ msg: err.message, err });
+        })
+    );
 
 export default asyncHandler;

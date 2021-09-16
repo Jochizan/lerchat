@@ -1,9 +1,14 @@
 import { Router } from 'express';
-import { getAllMessages } from '../controllers/message.controllers';
+import {
+  getAllMessages,
+  getMessagesByNamespace
+} from '../controllers/message.controllers';
 
 const router = Router();
 
 router.get('/messages', getAllMessages);
+
+router.get('/messages/:id', getMessagesByNamespace);
 
 router.post('/messages');
 

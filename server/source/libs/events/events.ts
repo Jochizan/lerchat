@@ -1,8 +1,9 @@
-import { IMessage, INamespace } from '../interfaces/store.interfaces';
-import { ObjectId } from 'mongoose';
+import { MessageID, NamespaceID, UserID } from '../types';
+import IMessage from '../../interfaces/message';
+import INamespace from '../../interfaces/namespace';
 
-interface HandleError {
-  message: string;
+interface handleError {
+  msg: string;
   error?: Error;
 }
 
@@ -10,11 +11,8 @@ interface Success<T> {
   data: T;
 }
 
-export type MessageID = ObjectId | string;
-export type UserID = ObjectId | string;
-export type NamespaceID = ObjectId | string;
+export type Response<T> = handleError | Success<T>;
 
-export type Response<T> = HandleError | Success<T>;
 export interface ServerEvents {
   'message:created': (message: IMessage) => void;
   'message:updated': (message: IMessage) => void;
@@ -65,8 +63,8 @@ export interface ClientEvents {
     callback: (res?: Response<void>) => void
   ) => void;
 
-  'user:connect': (id: UserID) => void;
-  'user:disconnect': (id: UserID) => void;
-  'user:typing': (id: UserID) => void;
-  'user:stop-typing': (id: UserID) => void;
+  'user:connect': (id: UserID, callback: () => void) => void;
+  'user:disconnect': (id: UserID, callback: () => void) => void;
+  'user:typing': (id: UserID, callback: () => void) => void;
+  'user:stop-typing': (id: UserID, callback: () => void) => void;
 }

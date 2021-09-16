@@ -1,18 +1,18 @@
-import { useRouter } from 'next/router';
-import { NextPage } from 'next';
-import { useMessages } from '@store/message.store';
+import type { NextPage } from 'next';
 import CardMessage from '@components/CardMessage';
 import ChatForm from '@components/ChatForm';
+import { useRouter } from 'next/router';
+import { useMessages } from '@store/message.store';
 
-const Namespace: NextPage = () => {
+const Namespaces: NextPage = () => {
   const router = useRouter();
-  const { id } = router.query;
-  const { messages, addMessage } = useMessages(id as string);
+  const { namespace } = router.query;
+  const { messages, addMessage } = useMessages(namespace as string);
 
   return (
     <section className='vh-100 d-flex flex-column justify-content-between'>
       <h1 className='text-center m-0 py-3 display-1 fw-normal tx-wlight'>
-        NameSpace {id}
+        NameSpace {namespace}
       </h1>
       <div className='d-flex h-100 flex-column justify-content-end mx-3'>
         <section className='vh-72 overflow-auto'>
@@ -31,4 +31,4 @@ const Namespace: NextPage = () => {
   );
 };
 
-export default Namespace;
+export default Namespaces;
