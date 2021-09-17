@@ -20,12 +20,16 @@ export const useMessages = (
   };
 
   useEffect(() => {
-    socket.on('connect', () => {
-      socket.emit('user:connect', author);
+    socket.on('message:created', (message) => {
+      setMessages([...messages, message]);
     });
 
-    socket.on('message:created', (message) => {
-      getMessages();
+    console.log(messages);
+  }, [messages]);
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      socket.emit('user:connect', author);
     });
 
     if (namespace !== undefined) getMessages();
@@ -65,15 +69,7 @@ export const useMessages = (
         return new Error('Error in create Message');
       }
 
-      setMessages([
-        ...messages,
-        {
-          _id: res.data,
-          message,
-          namespace,
-          author
-        }
-      ]);
+      setMessages([...messages, { _id: res.data, message, author }]);
     });
   };
 
