@@ -1,7 +1,8 @@
 import { IMessage, INamespace } from '../interfaces/store.interfaces';
 import { ObjectId } from 'mongoose';
 
-interface HandleError {
+interface Error {
+  data: MessageID;
   message: string;
   error?: Error;
 }
@@ -10,11 +11,12 @@ interface Success<T> {
   data: T;
 }
 
-export type MessageID = ObjectId | string;
-export type UserID = ObjectId | string;
-export type NamespaceID = ObjectId | string;
+export type MessageID = ObjectId | string | undefined;
+export type UserID = ObjectId | string | undefined;
+export type NamespaceID = ObjectId | string | undefined;
 
-export type Response<T> = HandleError | Success<T>;
+export type Response<T> = Success<T> | Error;
+
 export interface ServerEvents {
   'message:created': (message: IMessage) => void;
   'message:updated': (message: IMessage) => void;
