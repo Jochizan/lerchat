@@ -6,7 +6,7 @@ mongoose.Promise = global.Promise;
 const NamespaceSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
-    // public: { type: Boolean, required: true }
+    server: { type: Schema.Types.ObjectId, required: true },
     state: { type: Boolean, default: true }
   },
   {

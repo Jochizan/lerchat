@@ -1,11 +1,6 @@
 import type { NextPage } from 'next';
-// import ChatForm from '../../components/ChatForm';
-// import CardMessage from '../../components/CardMessage/CardMessage';
-// import { useMessages } from '../../store/message.store';
 
 const ChatPage: NextPage = () => {
-  // const { messages, addMessage } = useMessages();
-
   return (
     <section className='vh-100 d-flex flex-column justify-content-between'>
       <h1 className='text-center m-0 py-3 display-1 fw-normal tx-wlight'>
@@ -18,12 +13,8 @@ const ChatPage: NextPage = () => {
             The global chat starts here
           </p>
           <hr className='bg-light-chat mt-1 mb-3' />
-          {/* {messages.map((el, idx) => (
-            <CardMessage key={idx} text={el.message} />
-          ))} */}
         </section>
       </div>
-      {/* <ChatForm addMessage={addMessage} /> */}
     </section>
   );
 };

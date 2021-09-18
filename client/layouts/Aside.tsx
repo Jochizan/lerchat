@@ -1,28 +1,20 @@
 import { FC, useEffect, useState } from 'react';
 import Link from 'next/link';
 import style from '../styles/aside.module.css';
-import { INamespace } from '@interfaces/store.interfaces';
+import { useContext } from 'react';
+import ServerContext from '@store/server.context';
 
 const Aside: FC = ({ children }) => {
-  const [namespaces, setNamespaces] = useState<INamespace[]>([]);
-  const getNamespaces = async () => {
-    const res = await fetch('http://localhost:5500/namespaces');
-    const data = await res.json();
-    setNamespaces(data._namespaces);
-  };
-
-  useEffect(() => {
-    getNamespaces();
-  }, []);
+  const { servers } = useContext(ServerContext);
 
   return (
     <section className='vh-100 d-flex'>
       <aside
         className={'bg-ndark d-flex flex-column p-3 ' + style.asideContainer}
       >
-        {namespaces.map((namespace, idx) => (
-          <Link key={idx} href={`/chat/${namespace._id}`}>
-            {namespace.name}
+        {servers?.map((server, idx) => (
+          <Link key={idx} href={`/server/${server._id}`}>
+            {server.name}
           </Link>
         ))}
       </aside>
