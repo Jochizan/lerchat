@@ -10,7 +10,7 @@ export const ServerProvider: FC = ({ children }) => {
 
   const getServers = async () => {
     const res = await fetch(
-      'http://localhost:5500/api/servers/614263ff66b38891263bb846'
+      'http://localhost:5000/api/servers/614263ff66b38891263bb846'
     );
     const data = await res.json();
     setServers(data._servers);
