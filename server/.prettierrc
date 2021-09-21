@@ -1,8 +1,0 @@
-{
-  "trailingComma": "none",
-  "arrowParens": "always",
-  "htmlWhitespaceSensitivity": "css",
-  "bracketSpacing": true,
-  "singleQuote": true,
-  "tabWidth": 2
-}
