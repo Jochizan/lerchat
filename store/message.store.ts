@@ -21,10 +21,14 @@ export const useMessages = (
 
   useEffect(() => {
     socket.on('message:created', (message) => {
+      console.log(messages);
       setMessages([...messages, message]);
     });
 
-    console.log(messages);
+    return () => {
+      socket.off();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 
   useEffect(() => {
@@ -40,7 +44,7 @@ export const useMessages = (
         setMessages([]);
         socket.emit('user:disconnect', author);
       });
-      socket.off('message');
+      socket.off();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [namespace]);

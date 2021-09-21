@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import '../styles/globals.css';
+import '../styles/global.css';
 import Aside from '../layouts/Aside';
 import type { AppProps } from 'next/app';
 import 'bootstrap/dist/css/bootstrap.min.css';
