@@ -12,6 +12,7 @@ interface Success<T> {
 }
 
 export type MessageID = ObjectId | string | undefined;
+export type ServerID = ObjectId | string | undefined;
 export type UserID = ObjectId | string | undefined;
 export type NamespaceID = ObjectId | string | undefined;
 
@@ -26,6 +27,10 @@ export interface ServerEvents {
   'namespace:updated': (namespace: INamespace) => void;
   'namespace:deleted': (id: NamespaceID) => void;
 
+  // 'server:created': (server: IServer) => void;
+  // 'server:updated': (server: IServer) => void;
+  // 'server:deleted': (id: ServerID) => void;
+
   'user:connect': (id: UserID) => void;
   'user:disconnect': (id: UserID) => void;
   'user:typing': (id: UserID) => void;
@@ -35,40 +40,63 @@ export interface ServerEvents {
 export interface ClientEvents {
   'message:create': (
     payload: IMessage,
-    callback: (res: Response<MessageID>) => void
+    callback: (res: Response<void>) => void
   ) => void;
   'message:read': (
     id: MessageID,
-    callback: (res: Response<IMessage>) => void
+    callback: (res: Response<void>) => void
   ) => void;
   'message:update': (
     payload: IMessage,
-    callback: (res?: Response<void>) => void
+    callback: (res: Response<void>) => void
   ) => void;
   'message:delete': (
     id: MessageID,
-    callback: (res?: Response<void>) => void
+    callback: (res: Response<void>) => void
   ) => void;
 
   'namespace:create': (
     payload: INamespace,
-    callback: (res: Response<NamespaceID>) => void
+    callback: (res: Response<void>) => void
   ) => void;
   'namespace:read': (
     id: NamespaceID,
-    callback: (res: Response<INamespace>) => void
+    callback: (res: Response<void>) => void
   ) => void;
   'namespace:update': (
     payload: INamespace,
-    callback: (res?: Response<void>) => void
+    callback: (res: Response<void>) => void
   ) => void;
   'namespace:delete': (
-    payload: INamespace,
-    callback: (res?: Response<void>) => void
+    id: NamespaceID,
+    callback: (res: Response<void>) => void
   ) => void;
 
-  'user:connect': (id: UserID) => void;
-  'user:disconnect': (id: UserID) => void;
-  'user:typing': (id: UserID) => void;
-  'user:stop-typing': (id: UserID) => void;
+  // 'server:create': (
+  //   payload: IServer,
+  //   callback: (res: Response<void>) => void
+  // ) => void;
+  // 'server:read': (
+  //   id: ServerID,
+  //   callback: (res: Response<void>) => void
+  // ) => void;
+  // 'server:update': (
+  //   payload: IServer,
+  //   callback: (res: Response<void>) => void
+  // ) => void;
+  // 'server:delete': (
+  //   id: ServerID,
+  //   callback: (res: Response<void>) => void
+  // ) => void;
+
+  'user:connect': (id: UserID, callback: (res: Response<void>) => void) => void;
+  'user:disconnect': (
+    id: UserID,
+    callback: (res: Response<void>) => void
+  ) => void;
+  'user:typing': (id: UserID, callback: (res: Response<void>) => void) => void;
+  'user:stop-typing': (
+    id: UserID,
+    callback: (res: Response<void>) => void
+  ) => void;
 }

@@ -3,8 +3,8 @@ import { ObjectId } from 'mongoose';
 interface IMessage {
   _id?: ObjectId | string;
   author: string;
-  message: string;
-  namespace?: string;
+  content: string;
+  namespace: string;
 }
 
 interface IServer {
