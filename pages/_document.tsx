@@ -1,6 +1,6 @@
 import Document, { Head, Html, Main, NextScript } from 'next/document';
 
-class ULChat extends Document {
+class LerChat extends Document {
   render() {
     return (
       <Html lang='en'>
@@ -29,4 +29,4 @@ class ULChat extends Document {
   }
 }
 
-export default ULChat;
+export default LerChat;

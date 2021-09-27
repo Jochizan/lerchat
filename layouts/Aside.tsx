@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
 import Link from 'next/link';
 import style from '../styles/aside.module.css';
 import { useContext } from 'react';
@@ -12,9 +12,9 @@ const Aside: FC = ({ children }) => {
       <aside
         className={'bg-ndark d-flex flex-column p-3 ' + style.asideContainer}
       >
-        {servers?.map((server, idx) => (
-          <Link key={idx} href={`/server/${server._id}`}>
-            {server.name}
+        {servers?.map(({ _id, name }, idx) => (
+          <Link key={idx} href={`/server/${_id}`}>
+            {name}
           </Link>
         ))}
       </aside>
