@@ -2,26 +2,29 @@ import { useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { IMessage } from '../interfaces/store.interfaces';
 import { ClientEvents, ServerEvents } from '../events/events';
+import { EXPRESS, SOCKET } from '@services/enviroments';
 
 export const useMessages = (
   namespace: string,
-  author: string = '614263ff66b38891263bb846'
+  author: string = '61512a876e4ecd13a1836597'
 ) => {
   const socket: Socket<ServerEvents, ClientEvents> = io(
-    `http://localhost:5500/${namespace}`
+    `${SOCKET}/${namespace}`
   );
 
   const [messages, setMessages] = useState<IMessage[]>([]);
 
   const getMessages = async () => {
-    const res = await fetch(`http://localhost:5500/api/messages/${namespace}`);
+    const res = await fetch(`${EXPRESS}/api/messages/${namespace}`);
     const data = await res.json();
-    setMessages(data._messages);
+    console.log(data);
+    setMessages(data.docs);
   };
+
+  console.log(messages);
 
   useEffect(() => {
     socket.on('message:created', (message) => {
-      console.log(messages);
       setMessages([...messages, message]);
     });
 
@@ -33,16 +36,18 @@ export const useMessages = (
 
   useEffect(() => {
     socket.on('connect', () => {
-      socket.emit('user:connect', author);
+      //   socket.emit('user:connect', author);
     });
 
-    if (namespace !== undefined) getMessages();
+    if (!namespace) return;
+
+    getMessages();
 
     return () => {
       socket.off('connect');
       socket.off('disconnect', () => {
         setMessages([]);
-        socket.emit('user:disconnect', author);
+        // socket.emit('user:disconnect', author);
       });
       socket.off();
     };
@@ -67,13 +72,21 @@ export const useMessages = (
   //   }
   // });
 
-  const addMessage = (message: string) => {
-    socket.emit('message:create', { message, author }, (res) => {
+  const addMessage = async (content: string) => {
+    const res = await fetch(`${EXPRESS}/api/messages`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ content, namespace, author })
+    });
+    const data: { msg: string; _message: IMessage } = await res.json();
+    console.log(data);
+
+    socket.emit('message:create', data._message, (res) => {
       if ('error' in res) {
         return new Error('Error in create Message');
+      } else {
+        setMessages([...messages, data._message]);
       }
-
-      setMessages([...messages, { _id: res.data, message, author }]);
     });
   };
 

@@ -13,7 +13,7 @@ const Aside: FC = ({ children }) => {
         className={'bg-ndark d-flex flex-column p-3 ' + style.asideContainer}
       >
         {servers?.map(({ _id, name }, idx) => (
-          <Link key={idx} href={`/server/${_id}`}>
+          <Link key={idx} href={`/servers/${_id}`}>
             {name}
           </Link>
         ))}

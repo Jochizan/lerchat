@@ -1,7 +1,12 @@
-import { IServer } from './store.interfaces';
+import { INamespace, IServer } from './store.interfaces';
 
 interface IServerContext {
   servers: IServer[];
 }
 
-export type { IServerContext };
+interface INamespaceContext {
+  namespaces: INamespace[];
+  getNamespaces: (server: string) => Promise<void>;
+}
+
+export type { IServerContext, INamespaceContext };
