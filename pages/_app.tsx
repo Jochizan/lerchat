@@ -20,7 +20,7 @@ const App = ({ Component, pageProps, router: { route } }: AppProps) => {
   return (
     <ServerProvider>
       <Head>
-        <title>ULChat</title>
+        <title>LerChat</title>
       </Head>
       <Aside>
         <Component {...pageProps} />

@@ -1,5 +1,6 @@
 import { IServerContext } from '@interfaces/context.interfaces';
 import { createContext, useState, FC, useEffect } from 'react';
+import { EXPRESS } from '@services/enviroments';
 
 const defaultState = {} as IServerContext;
 
@@ -9,11 +10,13 @@ export const ServerProvider: FC = ({ children }) => {
   const [servers, setServers] = useState([]);
 
   const getServers = async () => {
-    const res = await fetch(
-      'http://localhost:5500/api/servers/614263ff66b38891263bb846'
-    );
-    const data = await res.json();
-    setServers(data._servers);
+    try {
+      const res = await fetch(`${EXPRESS}/api/servers`);
+      const data = await res.json();
+      setServers(data._servers);
+    } catch (err: any) {
+      console.error(err);
+    }
   };
 
   useEffect(() => {
