@@ -8,6 +8,7 @@
       "@interfaces/*": ["interfaces/*"],
       "@services/*": ["services/*"],
       "@store/*": ["store/*"],
+      "@styles/*": ["styles/*"]
     },
     "allowJs": true,
     "skipLibCheck": true,

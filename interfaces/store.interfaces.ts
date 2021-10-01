@@ -1,25 +1,23 @@
-import { ObjectId } from 'mongoose';
-
 interface IMessage {
-  _id?: ObjectId | string;
+  _id: string;
   author: string;
   content: string;
   namespace: string;
 }
 
 interface IServer {
-  _id?: ObjectId | string;
+  _id: string;
   name: string;
-  creator: ObjectId;
+  creator: string;
 }
 
 interface INamespace {
-  _id?: ObjectId | string;
+  _id: string;
   name: string;
 }
 
 interface IUser {
-  _id?: ObjectId | string;
+  _id: string;
   names: string;
   surnames: string;
   email: string;
