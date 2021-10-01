@@ -1,22 +1,40 @@
-import { FC } from 'react';
+import { FC, useEffect, useContext } from 'react';
 import Link from 'next/link';
-import style from '../styles/aside.module.css';
-import { useContext } from 'react';
 import ServerContext from '@store/server.context';
+import NamespaceContext from '@store/namespace.context';
+import { Button } from 'react-bootstrap';
 
 const Aside: FC = ({ children }) => {
-  const { servers } = useContext(ServerContext);
+  const { servers, idServer, handleIdServer } = useContext(ServerContext);
+  const { namespaces, getNamespaces } = useContext(NamespaceContext);
+
+  useEffect(() => {
+    if (servers.length) handleIdServer(servers[0]._id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [servers]);
+
+  useEffect(() => {
+    if (idServer) getNamespaces(idServer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idServer]);
 
   return (
     <section className='vh-100 d-flex'>
-      <aside
-        className={'bg-ndark d-flex flex-column p-3 ' + style.asideContainer}
-      >
-        {servers?.map(({ _id, name }, idx) => (
-          <Link key={idx} href={`/servers/${_id}`}>
-            {name}
-          </Link>
-        ))}
+      <aside className='bg-ndark d-flex flex-column p-3 aside-container'>
+        <div className='d-flex flex-column justify-content-around h-25'>
+          {servers?.map(({ _id, name }) => (
+            <Button key={_id} onClick={() => handleIdServer(_id)}>
+              {name}
+            </Button>
+          ))}
+        </div>
+        <div className='pt-5 d-flex flex-column'>
+          {namespaces?.map(({ _id, name }) => (
+            <Link key={_id} href={`/namespaces/${_id}`}>
+              {name}
+            </Link>
+          ))}
+        </div>
       </aside>
       <main className='flex-grow-1'>{children}</main>
     </section>

@@ -1,9 +1,9 @@
-.asideContainer {
+.aside-container {
   min-width: 64px;
 }
 
 @media screen and (min-width: 992px) {
-  .asideContainer {
+  .aside-container {
     min-width: 176px;
   }
 }
