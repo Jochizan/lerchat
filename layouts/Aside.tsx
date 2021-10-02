@@ -19,8 +19,8 @@ const Aside: FC = ({ children }) => {
   }, [idServer]);
 
   return (
-    <section className='vh-100 d-flex'>
-      <aside className='bg-ndark d-flex flex-column p-3 aside-container'>
+    <section className='vh-100 h-100 d-flex'>
+      <aside className='bg-ndark h-100 d-flex flex-column p-3 aside-container'>
         <div className='d-flex flex-column justify-content-around h-25'>
           {servers?.map(({ _id, name }) => (
             <Button key={_id} onClick={() => handleIdServer(_id)}>

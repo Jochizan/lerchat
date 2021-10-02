@@ -16,20 +16,20 @@ export const ServerProvider: FC = ({ children }) => {
   const getServers = async () => {
     try {
       const res = await fetch(
-        `${EXPRESS}/api/servers/@me/615622f2f60fa527ebca8778`
+        `${EXPRESS}/api/servers/61579e16ac77be1cf67c1d38`
       );
-      const data: { msg: string; _servers: IServer[] } = await res.json();
+      const data: { msg: string; _server: IServer } = await res.json();
 
-      const mapServers = data._servers.reduce<{ [key: string]: IServer }>(
-        (acc, el) => {
-          acc[el._id] = el;
-          return acc;
-        },
-        {}
-      );
+      // const mapServers = data._servers.reduce<{ [key: string]: IServer }>(
+      //   (acc, el) => {
+      //     acc[el._id] = el;
+      //     return acc;
+      //   },
+      //   {}
+      // );
 
-      setServers(data._servers);
-      setMapServers(mapServers);
+      setServers([data._server]);
+      setMapServers({ [data._server._id]: data._server });
     } catch (err) {
       console.error(err);
     }

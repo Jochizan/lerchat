@@ -1,22 +1,29 @@
 import type { NextPage } from 'next';
-import { useSession, signIn, signOut } from 'next-auth/client';
+import { Button } from 'react-bootstrap';
+import Link from 'next/link';
+import Router from 'next/router';
+import { useSession, signIn } from 'next-auth/client';
+import { useEffect } from 'react';
 
 const LoginPage: NextPage = () => {
   const [session, loading] = useSession();
-  if (session) {
-    return (
-      <>
-        Signed in as {session.user?.email} <br />
-        <button onClick={() => signOut()}>Sign out</button>
-      </>
-    );
-  }
+
+  useEffect(() => {
+    if (session && !loading) Router.push('/namespaces');
+  }, [session, loading]);
 
   return (
-    <>
-      Not signed in <br />
-      <button onClick={() => signIn()}>Sign in</button>
-    </>
+    <section className='w-100 vh-100 d-flex flex-column align-items-center justify-content-center tx-wlight'>
+      <div className='py-3'>
+        <Link href='/auth/privacy'>Politica de Privacidad</Link>
+      </div>
+
+      <div className='py-3'>
+        <Link href='/auth/terms'>Condiciones del servicio</Link>
+      </div>
+
+      <Button onClick={() => signIn()}>Sign in</Button>
+    </section>
   );
 };
 
