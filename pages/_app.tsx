@@ -13,13 +13,16 @@ const App = ({
   pageProps: { session, ...pageProps },
   router: { route }
 }: AppProps) => {
-  if (route === '/login' || route === '/register' || route === '/') {
+  if (
+    (route.startsWith('/') && !route.startsWith('/namespace')) ||
+    route.includes('/auth')
+  ) {
     return (
       <SessionProvider session={session}>
         <Head>
           <title>{route.slice(1)}</title>
         </Head>
-        <Component {...pageProps} />;
+        <Component {...pageProps} />
       </SessionProvider>
     );
   }
