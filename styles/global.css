@@ -1,4 +1,7 @@
 /*********** Custom Properties *************/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --primary-color: #18bb54;
@@ -46,6 +49,24 @@ a {
   color: var(--link-color);
   transition: all 0.5s ease-out;
   text-decoration: none;
+  font-family: var(--font);
+}
+
+button {
+  font-family: var(--font) !important;
+}
+input,
+input:focus,
+input:active,
+input:target,
+input:hover,
+input::placeholder {
+  font-family: var(--font) !important;
+  caret-color: var(--white-03) !important;
+}
+
+div input + label {
+  width: 83.3333% !important;
 }
 
 a:hover {
@@ -93,9 +114,13 @@ img {
 }
 
 p {
-  font-family: var(--font);
+  font-family: var(--font) !important;
   font-size: 20px;
   font-weight: 400;
+}
+
+span {
+  font-family: var(--font) !important;
 }
 
 .vh-72 {
@@ -103,12 +128,56 @@ p {
 }
 
 /* Background color */
+.bg-dark-03 {
+  background: var(--black-03);
+}
+
 .bg-primary {
   background-color: var(--primary-color) !important;
+  background: var(--primary-color) !important;
+  border-color: var(--primary-color);
 }
 
 .bg-secondary {
   background-color: var(--second-color) !important;
+  background: var(--second-color) !important;
+  border-color: var(--second-color);
+}
+
+.bg-primary-50 {
+  background-color: var(--primary-50-color) !important;
+  background: var(--primary-50-color) !important;
+  border-color: var(--primary-50-color) !important;
+}
+
+.bg-secondary-50 {
+  background-color: var(--second-50-color) !important;
+  background: var(--second-50-color) !important;
+  border-color: var(--second-50-color) !important;
+}
+
+.br-primary {
+  border-color: var(--primary-color);
+}
+
+.br-secondary {
+  border-color: var(--second-color);
+}
+
+.br-primary-75 {
+  border-color: var(--primary-75-color);
+}
+
+.br-secondary-75 {
+  border-color: var(--secondary-75-color);
+}
+
+.br-white-03 {
+  border-color: var(--white-03) !important;
+}
+
+.br-dark-03 {
+  border-color: var(--black-03) !important;
 }
 
 .bg-dark-chat {
@@ -152,29 +221,37 @@ p {
   color: var(--black-02) !important;
 }
 
+.medias-absolute {
+  width: 1000px;
+  height: 700px;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  /* border: 1px solid #253341; */
+  -webkit-text-fill-color: var(--white-03);
+  -webkit-box-shadow: 0 0 0px 1000px var(--black-03) inset;
+  box-shadow: 0 0 0px 1000px var(--black-03) inset;
+  transition: background-color 5s ease-in-out 0s;
+  color: var(--white-03);
+  font-family: var(--font) !important;
+}
+
 /* Text size */
 
-/* Reset Buttons bootstrap */
+/* utilities tailwindcss */
 
 .primary__btn,
 .secondary__btn,
 .danger__btn {
   letter-spacing: 0.1rem;
-}
-
-.primary__btn {
-  background: var(--primary-color) !important;
-  border-color: var(--primary-color) !important;
-}
-
-.secondary__btn {
-  background: var(--second-color) !important;
-  border-color: var(--second-color) !important;
-}
-
-.danger__btn {
-  background: var(--bs-red) !important;
-  border-color: var(--bs-red) !important;
 }
 
 .primary__btn:hover,
@@ -187,5 +264,6 @@ p {
 .primary__btn p,
 .secondary__btn p,
 .danger__btn p {
+  opacity: 0.8;
   color: var(--white-03);
 }

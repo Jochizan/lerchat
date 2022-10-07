@@ -16,7 +16,7 @@ export const ServerProvider: FC = ({ children }) => {
   const getServers = async () => {
     try {
       const res = await fetch(
-        `${EXPRESS}/api/servers/61579e16ac77be1cf67c1d38`
+        `${EXPRESS}/api/servers/63378fdbc0ce7c76746d99a3`
       );
       const data: { msg: string; _server: IServer } = await res.json();
 

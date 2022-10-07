@@ -2,7 +2,7 @@ import { FC, useEffect, useContext } from 'react';
 import Link from 'next/link';
 import ServerContext from '@store/server.context';
 import NamespaceContext from '@store/namespace.context';
-import { Button } from 'react-bootstrap';
+import { Button } from '@material-tailwind/react';
 
 const Aside: FC = ({ children }) => {
   const { servers, idServer, handleIdServer } = useContext(ServerContext);
