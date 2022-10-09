@@ -16,6 +16,45 @@ async function Auth(req: NextApiRequest, res: NextApiResponse) {
       Providers.Facebook({
         clientId: process.env.FACEBOOK_ID + '',
         clientSecret: process.env.FACEBOOK_SECRET + ''
+      }),
+      Providers.Credentials({
+        // The name to display on the sign in form (e.g. 'Sign in with...')
+        name: 'credentials',
+        // type: 'credentials',
+        // The credentials is used to generate a suitable form on the sign in page.
+        // You can specify whatever fields you are expecting to be submitted.
+        // e.g. domain, username, password, 2FA token, etc.
+        // You can pass any HTML attribute to the <input> tag through the object.
+        credentials: {
+          email: { label: 'Email', type: 'email' },
+          password: { label: 'Password', type: 'password' },
+          id: { type: 'text' }
+        },
+        async authorize(credentials) {
+          const res = await fetch(
+            `${process.env.NEXTAUTH_URL}/api/auth/credentials`,
+            {
+              method: 'POST',
+              body: JSON.stringify(credentials),
+              headers: { 'Content-Type': 'application/json' }
+            }
+          );
+
+          const user = await res.json();
+          // console.log(user);
+          if (res.ok && user) {
+            console.log(user);
+            return user;
+          }
+
+          return null;
+          // You need to provide your own logic here that takes the credentials
+          // submitted and returns either a object representing a user or value
+          // that is false/null if the credentials are invalid.
+          // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
+          // You can also use the `req` object to obtain additional parameters
+          // (i.e., the request IP address)
+        }
       })
     ],
     // The secret should be set to a reasonably long random string.
@@ -66,9 +105,9 @@ async function Auth(req: NextApiRequest, res: NextApiResponse) {
     // pages is not specified for that route.
     // https://next-auth.js.org/configuration/pages
     pages: {
-      // signIn: '/auth/signin',  // Displays signin buttons
-      // signOut: '/auth/signout', // Displays form with sign out button
-      // error: '/auth/error' // Error code passed in query string as ?error=
+      signIn: '/auth/signin', // Displays signin buttons
+      signOut: '/auth/signout', // Displays form with sign out button
+      error: '/auth/error' // Error code passed in query string as ?error=
       // verifyRequest: '/auth/verify-request', // Used for check email page
       // newUser: null // If set, new users will be directed here on first sign in
     },
@@ -77,10 +116,17 @@ async function Auth(req: NextApiRequest, res: NextApiResponse) {
     // when an action is performed.
     // https://next-auth.js.org/configuration/callbacks
     callbacks: {
-      // async signIn(user, account, profile) { return true },
+      // async signIn(user, account, profile) { return true; }
       // async redirect(url, baseUrl) { return baseUrl },
-      // async session(session, user) { return session },
-      // async jwt(token, user, account, profile, isNewUser) { return token }
+      session: async (session, token) => {
+        (session.user && token.user) && (session.user = token.user);
+
+        return session;
+      },
+      jwt: async (token, user, account, profile, isNewUser) => {
+        user && (token.user = user);
+        return token;
+      }
     },
 
     // Events are useful for logging

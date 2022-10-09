@@ -17,26 +17,31 @@ const Aside: FC = ({ children }) => {
     if (idServer) getNamespaces(idServer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idServer]);
+  // console.log(servers);
 
   return (
-    <section className='vh-100 h-100 d-flex'>
-      <aside className='bg-ndark h-100 d-flex flex-column p-3 aside-container'>
-        <div className='d-flex flex-column justify-content-around h-25'>
-          {servers?.map(({ _id, name }) => (
-            <Button key={_id} onClick={() => handleIdServer(_id)}>
-              {name}
-            </Button>
-          ))}
+    <section className='flex min-h-screen'>
+      <aside className='bg-ndark min-h-full flex flex-col p-8 aside-container'>
+        <div className='d-flex flex-col justify-around h-24'>
+          {servers.length ? (
+            servers.map(({ _id, name }) => (
+              <Button key={_id} onClick={() => handleIdServer(_id)}>
+                {name}
+              </Button>
+            ))
+          ) : (
+            <span className='tx-wlight'>Sin servidores</span>
+          )}
         </div>
-        <div className='pt-5 d-flex flex-column'>
+        <div className='pt-12 flex flex-col'>
           {namespaces?.map(({ _id, name }) => (
-            <Link key={_id} href={`/namespaces/${_id}`}>
-              {name}
+            <Link key={_id} href={`/namespaces/${_id}`} passHref>
+              <span className='tx-wlight'>{name}</span>
             </Link>
           ))}
         </div>
       </aside>
-      <main className='flex-grow-1'>{children}</main>
+      <main className='grow flex flex-col min-h-screen'>{children}</main>
     </section>
   );
 };

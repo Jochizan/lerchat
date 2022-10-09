@@ -6,17 +6,18 @@ import {
   Button,
   IconButton
 } from '@material-tailwind/react';
+import { useSession, signOut } from 'next-auth/client';
 import Link from 'next/link';
 
 const MainNavbar: FC = ({ children }) => {
   const [openNav, setOpenNav] = useState(false);
+  const [session, status] = useSession();
 
   useEffect(() => {
     window.addEventListener(
       'resize',
       () => window.innerWidth >= 960 && setOpenNav(false)
     );
-    console.log(window.innerWidth);
   }, []);
 
   const navList = (
@@ -77,16 +78,27 @@ const MainNavbar: FC = ({ children }) => {
             <span>LerChat</span>
           </Typography>
           <div className='hidden lg:block'>{navList}</div>
-          <Link href='/login' passHref>
+          {session ? (
             <Button
               variant='outlined'
               size='sm'
               className='hidden br-secondary-50 lg:inline-block rounded-2xl tx-wlight capitalize font-medium text-sm'
-              ripple
+              onClick={() => signOut()}
             >
-              Iniciar Sesión
+              Cerrar Sesión
             </Button>
-          </Link>
+          ) : (
+            <Link href='/auth/signin' passHref>
+              <Button
+                variant='outlined'
+                size='sm'
+                className='hidden br-secondary-50 lg:inline-block rounded-2xl tx-wlight capitalize font-medium text-sm'
+                ripple
+              >
+                Iniciar Sesión
+              </Button>
+            </Link>
+          )}
           <IconButton
             variant='text'
             className='ml-auto h-6 w-6 text-inherit hover:bg-transparent focus:bg-transparent active:bg-transparent lg:hidden'
@@ -133,7 +145,7 @@ const MainNavbar: FC = ({ children }) => {
             className='hidden lg:inline-block rounded-2xl bg-primary text-xs capitalizes backdrop-opacity-50 tx-wlight'
             ripple
           >
-            <Link href='/login' passHref>
+            <Link href='/auth/signin' passHref>
               Inicar Sesión
             </Link>
           </Button>

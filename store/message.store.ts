@@ -6,7 +6,7 @@ import { EXPRESS, SOCKET } from '@services/enviroments';
 
 export const useMessages = (
   namespace: string,
-  author: string = '63379080c0ce7c76746d99a5'
+  author: string | null | undefined
 ) => {
   const socket: Socket<ServerEvents, ClientEvents> = io(
     `${SOCKET}/${namespace}`

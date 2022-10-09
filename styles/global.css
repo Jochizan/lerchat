@@ -62,11 +62,19 @@ input:target,
 input:hover,
 input::placeholder {
   font-family: var(--font) !important;
-  caret-color: var(--white-03) !important;
+  caret-color: var(--white-03);
 }
 
-div input + label {
+input.tx-wdark {
+  caret-color: var(--black-03);
+}
+
+div.flex .relative.w-full input + label {
   width: 83.3333% !important;
+}
+
+div.mt-6 .relative.w-full input + label {
+  width: 91.6666% !important;
 }
 
 a:hover {
@@ -128,32 +136,50 @@ span {
 }
 
 /* Background color */
+.bg-dark-01 {
+  background: var(--black-01) !important;
+  border-color: var(--black-02) !important;
+}
+
 .bg-dark-03 {
-  background: var(--black-03);
+  background: var(--black-03) !important;
+  border-color: var(--black-02) !important;
+}
+
+.bg-white-03 {
+  background-color: var(--white-03) !important;
+  border-color: var(--white-02) !important;
+}
+
+.bg-white-01 {
+  background-color: var(--white-01) !important;
+  border-color: var(--white-02) !important;
 }
 
 .bg-primary {
-  background-color: var(--primary-color) !important;
   background: var(--primary-color) !important;
   border-color: var(--primary-color);
 }
 
 .bg-secondary {
-  background-color: var(--second-color) !important;
   background: var(--second-color) !important;
   border-color: var(--second-color);
 }
 
 .bg-primary-50 {
-  background-color: var(--primary-50-color) !important;
   background: var(--primary-50-color) !important;
   border-color: var(--primary-50-color) !important;
 }
 
 .bg-secondary-50 {
-  background-color: var(--second-50-color) !important;
   background: var(--second-50-color) !important;
   border-color: var(--second-50-color) !important;
+}
+
+.bg-primary:hover {
+  box-shadow: var(--primary-color) 0px 6px 7px,
+    var(--primary-75-color) 0px -6px 15px, var(--primary-75-color) 0px 2px 3px,
+    var(--primary-75-color) 0px 6px 7px, var(--primary-50-color) 0px -2px 3px !important;
 }
 
 .br-primary {
@@ -176,8 +202,24 @@ span {
   border-color: var(--white-03) !important;
 }
 
+.br-white-02 {
+  border-color: var(--white-02) !important;
+}
+
+.br-white-01 {
+  border-color: var(--white-01) !important;
+}
+
 .br-dark-03 {
   border-color: var(--black-03) !important;
+}
+
+.br-dark-02 {
+  border-color: var(--black-02) !important;
+}
+
+.br-dark-01 {
+  border-color: var(--black-01) !important;
 }
 
 .bg-dark-chat {
@@ -203,6 +245,20 @@ span {
 
 .tx-wdark {
   color: var(--black-01) !important;
+}
+
+input.tx-wlight + label {
+  color: var(--white-03) !important;
+  border: none;
+}
+
+input.tx-wdark + label {
+  color: var(--black-01) !important;
+  border: none !important;
+}
+
+.tx-wdark::placeholder {
+  color: var(--black-02) !important;
 }
 
 .tx-nlight {

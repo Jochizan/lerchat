@@ -1,4 +1,4 @@
-import { Button, Col, Container, Form, Row } from 'react-bootstrap';
+import { Button, Typography } from '@material-tailwind/react';
 import { KeyboardEvent } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
@@ -30,35 +30,33 @@ const ChatForm = ({
   };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)} autoComplete='off'>
-      <Container fluid={true}>
-        <Row>
-          <Col className='d-flex' xs='auto' sm={12}>
-            <Form.Control
-              type='text'
-              placeholder='Send Message'
-              {...onKeyPress}
-              {...register('message', { required: true })}
-            />
-            <Button
-              className='ms-3 fw-bold primary__btn'
-              variant='primary'
-              type='submit'
-            >
-              Send
-            </Button>
-          </Col>
-        </Row>
+    <form onSubmit={handleSubmit(onSubmit)} autoComplete='off'>
+      <section className='container fluid'>
+        <div className='flex'>
+          <input
+            type='text'
+            placeholder='Send Message'
+            {...onKeyPress}
+            {...register('message', { required: true })}
+          />
+          <Button
+            className='ms-3 fw-bold primary__btn'
+            variant='filled'
+            type='submit'
+          >
+            Send
+          </Button>
+        </div>
 
-        <Row>
-          <Form.Text className='tx-nlight my-sm-1'>
+        <div>
+          <Typography className='tx-nlight my-sm-1'>
             {!errors.message
               ? 'Never send sensitive data.'
               : 'The message is required to continue.'}
-          </Form.Text>
-        </Row>
-      </Container>
-    </Form>
+          </Typography>
+        </div>
+      </section>
+    </form>
   );
 };
 

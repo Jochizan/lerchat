@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@material-tailwind/react": "^1.2.4",
-    "mongodb": "^3.5.9",
+    "bcryptjs": "^2.4.3",
+    "mongodb": "^4.10.0",
     "next": "12.1.0",
     "next-auth": "^3.29.10",
     "react": "17.0.2",
@@ -19,7 +20,10 @@
     "socket.io-client": "^4.2.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/mongodb": "^4.0.7",
     "@types/next-auth": "^3.15.0",
+    "@types/node": "^18.8.3",
     "@types/react": "17.0.19",
     "autoprefixer": "^10.4.12",
     "eslint": "7.32.0",

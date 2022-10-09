@@ -8,17 +8,18 @@ import { NamespaceProvider } from '@store/namespace.context';
 import { Provider as SessionProvider } from 'next-auth/client';
 import { ThemeProvider } from '@material-tailwind/react';
 import MainNavbar from 'layouts/Navbar';
+import ChatNavbar from 'layouts/ChatNavbar';
 
 const App = ({
   Component,
   pageProps: { session, ...pageProps },
   router: { route }
 }: AppProps) => {
-  if (route.startsWith('/log')) {
+  if (route.includes('/sign') && !route.includes('/out')) {
     return (
       <SessionProvider session={session}>
         <Head>
-          <title>{route.slice(1)}</title>
+          <title>{route.slice(1).toUpperCase()} | LerChat</title>
         </Head>
         <ThemeProvider>
           <Component {...pageProps} />
@@ -26,15 +27,11 @@ const App = ({
       </SessionProvider>
     );
   }
-
-  if (
-    (route.startsWith('/') && !route.startsWith('/namespace')) ||
-    route.includes('/auth')
-  ) {
+  if (!route.includes('/home') && !route.includes('/namespaces')) {
     return (
       <SessionProvider session={session}>
         <Head>
-          <title>{route.slice(1)}</title>
+          <title>{route.slice(1).toUpperCase()} | LerChat</title>
         </Head>
         <ThemeProvider>
           <MainNavbar>
@@ -54,7 +51,9 @@ const App = ({
           </Head>
           <ThemeProvider>
             <Aside>
-              <Component {...pageProps} />
+              <ChatNavbar>
+                <Component {...pageProps} />
+              </ChatNavbar>
             </Aside>
           </ThemeProvider>
         </NamespaceProvider>

@@ -12,6 +12,7 @@ export const NamespaceProvider: FC = ({ children }) => {
   const [mapNamespaces, setMapNamespaces] = useState({});
 
   const getNamespaces = async (server: string) => {
+    if (!server) return;
     try {
       const res = await fetch(`${EXPRESS}/api/namespaces/@server/${server}`);
       const data: { msg: string; docs: INamespace[] } = await res.json();
