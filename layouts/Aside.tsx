@@ -1,47 +1,71 @@
-import { FC, useEffect, useContext } from 'react';
+import { FC, useEffect, useContext, useState } from 'react';
 import Link from 'next/link';
 import ServerContext from '@store/server.context';
 import NamespaceContext from '@store/namespace.context';
 import { Button } from '@material-tailwind/react';
+import { useRouter } from 'next/router';
 
 const Aside: FC = ({ children }) => {
   const { servers, idServer, handleIdServer } = useContext(ServerContext);
   const { namespaces, getNamespaces } = useContext(NamespaceContext);
+  const [click, setClick] = useState(false);
+  const router = useRouter();
+  const id = router.query;
 
   useEffect(() => {
-    if (servers.length) handleIdServer(servers[0]._id);
+    if (idServer && servers.length && (click || id)) {
+      getNamespaces(idServer, click);
+      setClick(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [servers]);
+  }, [idServer, servers, click]);
 
-  useEffect(() => {
-    if (idServer) getNamespaces(idServer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idServer]);
-  // console.log(servers);
+  // console.log(servers, click);
 
   return (
-    <section className='flex min-h-screen'>
-      <aside className='bg-ndark min-h-full flex flex-col p-8 aside-container'>
-        <div className='d-flex flex-col justify-around h-24'>
+    <section className='flex h-screen max-h-screen'>
+      <aside className='bg-ndark h-full  flex flex-col p-4 aside-container'>
+        <div className='mx-auto pt-2'>
+          <Link href='/home' passHref>
+            <span className='text-xl tx-wlight cursor-pointer'>LerChat</span>
+          </Link>
+        </div>
+        <div className='flex flex-col justify-start gap-2 h-full max-h-screen p-4'>
           {servers.length ? (
             servers.map(({ _id, name }) => (
-              <Button key={_id} onClick={() => handleIdServer(_id)}>
-                {name}
-              </Button>
+              <div key={_id} className='w-28 overflow-hidden'>
+                <Button
+                  className='bg-primary py-2 px-4  whitespace-nowrap truncate w-full'
+                  onClick={() => {
+                    handleIdServer(_id);
+                    setClick(true);
+                  }}
+                >
+                  {name}
+                </Button>
+              </div>
             ))
           ) : (
             <span className='tx-wlight'>Sin servidores</span>
           )}
-        </div>
-        <div className='pt-12 flex flex-col'>
-          {namespaces?.map(({ _id, name }) => (
-            <Link key={_id} href={`/namespaces/${_id}`} passHref>
-              <span className='tx-wlight'>{name}</span>
-            </Link>
-          ))}
+          <div className='mt-4 block w-28 overflow-hidden p-4'>
+            {Object.keys(id).length && namespaces.length ? (
+              namespaces?.map(({ _id, name }) => (
+                <Link key={_id} href={`/namespaces/${_id}`} passHref>
+                  <span className='tx-nlight cursor-pointer'>{name}</span>
+                </Link>
+              ))
+            ) : (
+              <span className='tx-nlight truncate'>
+                {router.route === '/namespaces' && 'Sin espacios para chatear'}
+              </span>
+            )}
+          </div>
         </div>
       </aside>
-      <main className='grow flex flex-col min-h-screen'>{children}</main>
+      <main className='grow flex flex-col max-h-screen h-screen'>
+        {children}
+      </main>
     </section>
   );
 };

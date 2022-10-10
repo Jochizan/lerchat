@@ -16,4 +16,14 @@ declare module 'next-auth' {
     };
     expires?: string | null | undefined;
   }
+
+  interface User {
+    csrfToken?: string | null | undefined;
+    name?: string | null | undefined;
+    image?: string | null | undefined;
+    email?: string | null | undefined;
+    json?: string | null | undefined;
+    callbackUrl?: string | null | undefined;
+    redirect?: string | null | undefined;
+  }
 }

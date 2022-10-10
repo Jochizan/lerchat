@@ -3,7 +3,7 @@ import { Button, Input, Typography } from '@material-tailwind/react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useSession, signIn, SignInOptions } from 'next-auth/client';
+import { useSession, signIn } from 'next-auth/client';
 import { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TypeSession } from '@interfaces/sign.interface';
@@ -21,7 +21,7 @@ const SignInPage: NextPage = () => {
 
   const onSubmit: SubmitHandler<TypeSession> = async (data) => {
     try {
-      console.log(data);
+      // console.log(data);
       signIn('credentials', {
         ...data,
         redirect: true,

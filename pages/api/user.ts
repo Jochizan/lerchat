@@ -21,18 +21,20 @@ const HandlerUser = async (req: NextApiRequest, res: NextApiResponse) => {
         //Send error response if duplicate user is found
         if (checkExisting) {
           res.status(422).json({ message: 'User already exists' });
-          connection.mongoClient.close();
+          // connection.mongoClient.close();
           return;
         }
         //Hash password
         const status = await db.collection('users').insertOne({
           ...req.body,
+          image: 'default.png',
+          avatar: 'default.png',
           password: await hash(password, 12)
         });
         //Send success response
         res.status(201).json({ message: 'User created', ...status });
         //Close DB connection
-        connection?.mongoClient.close();
+        // connection?.mongoClient.close();
       } else {
         res.status(500).json({ message: 'Database not Working' });
       }

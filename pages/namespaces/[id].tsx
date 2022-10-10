@@ -1,49 +1,72 @@
 import type { NextPage } from 'next';
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { useRouter } from 'next/router';
-// import { getSession } from 'next-auth/react';
 import ChatForm from '@components/ChatForm';
 import CardMessage from '@components/CardMessage';
 import { useMessages } from '@store/message.store';
 import NamespaceContext from '@store/namespace.context';
 import { useSession } from 'next-auth/client';
+import ServerContext from '@store/server.context';
 
 const Namespaces: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const [session, status] = useSession();
-  const { messages, addMessage } = useMessages(id as string, session?.user._id);
-  const { mapNamespaces, getNamespaces } = useContext(NamespaceContext);
-  console.log(session);
-
-  useEffect(() => {
-    if (getNamespaces) getNamespaces(id as string);
-  }, [id, session]);
+  const { messages, addMessage } = useMessages(id as string);
+  const { mapNamespaces } = useContext(NamespaceContext);
+  const { mapServers, servers } = useContext(ServerContext);
 
   if (typeof window !== 'undefined' && status) return null;
 
-  if (status) return <div className='tx-wlight'>Cargando...</div>;
+  console.log(!Object.keys(servers).length, servers, mapNamespaces);
+  if (session && !Object.keys(servers).length) {
+    return (
+      <section className='grow flex flex-col'>
+        <div className='flex h-full flex-col-reverse justify-start mx-8'>
+          <section className='overflow-auto'>
+            <p className='pr-3 pt-6 m-0 text-lg tx-wlight'>
+              Bienvenido al canal general de {id}
+            </p>
+            <hr className='bg-light-chat mt-3 mb-8' />
+            {messages?.map((el, idx) => (
+              <CardMessage key={idx} el={el} />
+            ))}
+          </section>
+        </div>
+        <ChatForm addMessage={addMessage} />
+      </section>
+    );
+  }
+
+  if (
+    status ||
+    !Object.keys(mapNamespaces).length ||
+    !Object.keys(mapServers).length
+  )
+    return <div className='tx-wlight'>Cargando...</div>;
+
+  if (!mapNamespaces[id as string]) return <div>Cargando Chat</div>;
 
   if (!session) router.push('/');
 
   return (
-    <section className='vh-100 d-flex flex-column justify-content-between'>
+    <section className='h-screen flex flex-col grow justify-between'>
       <h1 className='text-center m-0 py-3 display-1 fw-normal tx-wlight'>
         {Object.keys(mapNamespaces).length ? (
-          mapNamespaces[id as string].name
+          mapNamespaces[id as string]?.name
         ) : (
-          <>Cargando...</>
+          <div className='tx-wlight'>Cargando Chat...</div>
         )}
       </h1>
-      <div className='d-flex h-100 flex-column justify-content-end mx-3'>
-        <section className='vh-72 overflow-auto'>
-          <h2 className='ps-1 fs-1 tx-wlight'>Welcome to LerChat</h2>
-          <p className='ps-1 pt-3 m-0 fs-6 tx-wlight'>
-            The global chat starts here
+      <div className='mx-8'>
+        <section className='min-h-min vh-72 overflow-auto vh-12 flex flex-col w-full'>
+          <p className='pr-3 pt-6 m-0 text-lg tx-wlight'>
+            Bienvenido al canal general de{' '}
+            {mapServers[mapNamespaces[id as string].server].name}
           </p>
-          <hr className='bg-light-chat mt-1 mb-3' />
+          <hr className='bg-light-chat mt-3 mb-8' />
           {messages?.map((el, idx) => (
-            <CardMessage key={idx} text={el.content} />
+            <CardMessage key={idx} el={el} />
           ))}
         </section>
       </div>

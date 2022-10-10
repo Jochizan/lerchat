@@ -3,15 +3,13 @@ import { io, Socket } from 'socket.io-client';
 import { IMessage } from '../interfaces/store.interfaces';
 import { ClientEvents, ServerEvents } from '../events/events';
 import { EXPRESS, SOCKET } from '@services/enviroments';
+import { useSession } from 'next-auth/client';
 
-export const useMessages = (
-  namespace: string,
-  author: string | null | undefined
-) => {
+export const useMessages = (namespace: string) => {
   const socket: Socket<ServerEvents, ClientEvents> = io(
     `${SOCKET}/${namespace}`
   );
-
+  const [session] = useSession();
   const [messages, setMessages] = useState<IMessage[]>([]);
 
   const getMessages = async () => {
@@ -76,16 +74,21 @@ export const useMessages = (
     const res = await fetch(`${EXPRESS}/api/messages`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ content, namespace, author })
+      body: JSON.stringify({ content, namespace, author: session?.user._id })
     });
     const data: { msg: string; _message: IMessage } = await res.json();
-    // console.log(data);
+    const _message = {
+      content,
+      _id: data._message._id,
+      author: session?.user,
+      namespace: namespace
+    };
 
-    socket.emit('message:create', data._message, (res) => {
+    socket.emit('message:create', _message, (res) => {
       if ('error' in res) {
         return new Error('Error in create Message');
       } else {
-        setMessages([...messages, data._message]);
+        setMessages([...messages, _message]);
       }
     });
   };

@@ -1,6 +1,6 @@
 import { createContext, useState, FC, useEffect } from 'react';
 import { IServerContext } from '@interfaces/context.interfaces';
-import { IServer, IUser } from '@interfaces/store.interfaces';
+import { IServer } from '@interfaces/store.interfaces';
 import { EXPRESS } from '@services/enviroments';
 import { useSession } from 'next-auth/client';
 
@@ -11,44 +11,47 @@ export const ServerProvider: FC = ({ children }) => {
   const [session] = useSession();
   const [servers, setServers] = useState<IServer[]>([]);
   const [mapServers, setMapServers] = useState({});
-  const [idServer, setIdServer] = useState('');
+  const [idServer, setIdServer] = useState(
+    typeof window !== 'undefined' ? localStorage.getItem('idServer') : ''
+  );
 
-  const handleIdServer = (id: string) => setIdServer(id);
+  const handleIdServer = (id: string) => {
+    localStorage.setItem('idServer', id);
+    setIdServer(id);
+  };
 
   const getServers = async (_id: string | null | undefined) => {
     if (!_id) return;
 
     try {
-      const res = await fetch(`${EXPRESS}/api/servers/${_id}`);
-      const data: { msg: string; _server: IServer } = await res.json();
+      const res = await fetch(`${EXPRESS}/api/servers/@me/${_id}`);
+      const data: { msg: string; _servers: IServer[] } = await res.json();
 
-      // const mapServers = data._servers.reduce<{ [key: string]: IServer }>(
-      //   (acc, el) => {
-      //     acc[el._id] = el;
-      //     return acc;
-      //   },
-      //   {}
-      // );
+      const mapServers = data._servers.reduce<{ [key: string]: IServer }>(
+        (acc, el) => {
+          acc[el._id] = el;
+          return acc;
+        },
+        {}
+      );
 
-      console.log(data);
-      if (data._server) {
-        setServers([data._server]);
-        setMapServers({ [data._server._id]: data._server });
+      // console.log(data);
+      if (data._servers) {
+        setMapServers(mapServers);
+        setServers(data._servers);
       }
     } catch (err) {
       console.error(err);
     }
   };
 
-  // console.log(idServer);
-
   useEffect(() => {
-    if (session) getServers(session?.user._id);
+    if (session) getServers(session.user._id);
   }, [session]);
 
   return (
     <ServerContext.Provider
-      value={{ idServer, servers, mapServers, handleIdServer }}
+      value={{ idServer, servers, mapServers, handleIdServer, getServers }}
     >
       {children}
     </ServerContext.Provider>

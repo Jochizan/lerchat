@@ -1,7 +1,7 @@
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/client';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { EXPRESS } from '@services/enviroments';
 import {
   Button,
@@ -12,10 +12,12 @@ import {
 } from '@material-tailwind/react';
 import { TypeServer } from '@interfaces/chat.interfaces';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import ServerContext from '@store/server.context';
 
 const HomePage: NextPage = () => {
   const { push } = useRouter();
   const [session, status] = useSession();
+  const { getServers } = useContext(ServerContext);
   const [open, setOpen] = useState(false);
   const {
     register,
@@ -26,9 +28,7 @@ const HomePage: NextPage = () => {
   const handleOpen = () => setOpen(!open);
 
   const onSubmit: SubmitHandler<TypeServer> = async (data) => {
-    console.log(data, session);
     const newServer = { ...session?.user, name: data.name };
-    console.log(newServer);
     const res = await fetch(`${EXPRESS}/api/servers`, {
       method: 'POST',
       body: JSON.stringify(newServer),
@@ -36,13 +36,11 @@ const HomePage: NextPage = () => {
     });
 
     const createdServer = await res.json();
-    console.log(createdServer);
-    setOpen(!open);
+    if (res.ok && createdServer && session) {
+      getServers(session.user._id);
+    }
+    handleOpen();
   };
-
-  useEffect(() => {
-    console.log(session);
-  }, [session]);
 
   if (typeof window !== 'undefined' && status) return null;
 

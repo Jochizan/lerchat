@@ -22,9 +22,14 @@ const credentialsAuth: NextApiHandler<User | { msg: string }> = async (
   }
 
   // if (req.body.password === 'jochizan123') {
-  //   return res
-  //     .status(200)
-  //     .json({ ...req.body, image: 'default.png', password: '', name: 'jochizan' });
+  //   delete req.body['password'];
+
+  //   return res.status(200).json({
+  //     ...req.body,
+  //     image: 'default.png',
+  //     name: 'jochizan',
+  //     _id: '1asfbnaf213'
+  //   });
   // }
 
   // How about using another API to randomly generate user's and avatars? :)
@@ -46,12 +51,12 @@ const credentialsAuth: NextApiHandler<User | { msg: string }> = async (
   }
 
   _password = user.password + '';
-  console.log(user, password, _password);
+  // console.log(user, password, _password);
   const checkPassword = await compare(password, _password);
   // await connection?.mongoClient.close();
 
   if (!checkPassword) {
-    connection?.mongoClient.close();
+    // connection?.mongoClient.close();
     res.status(401).json({ msg: 'Password Incorrect' });
   }
 
@@ -60,7 +65,7 @@ const credentialsAuth: NextApiHandler<User | { msg: string }> = async (
   delete user['password'];
   user.creator = user._id;
 
-  return res.status(200).json({ ...user, image: 'default.png' });
+  return res.status(200).json({ ...user });
 };
 
 export default credentialsAuth;

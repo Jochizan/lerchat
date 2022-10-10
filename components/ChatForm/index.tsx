@@ -36,11 +36,12 @@ const ChatForm = ({
           <input
             type='text'
             placeholder='Send Message'
+            className='ml-8 mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-3xl br-white-03 focus:outline-none focus:border-none focus:ring-'
             {...onKeyPress}
             {...register('message', { required: true })}
           />
           <Button
-            className='ms-3 fw-bold primary__btn'
+            className='mx-2 text-sm bg-primary'
             variant='filled'
             type='submit'
           >
@@ -48,8 +49,8 @@ const ChatForm = ({
           </Button>
         </div>
 
-        <div>
-          <Typography className='tx-nlight my-sm-1'>
+        <div className='ml-10 mt-1'>
+          <Typography className='tx-nlight'>
             {!errors.message
               ? 'Never send sensitive data.'
               : 'The message is required to continue.'}

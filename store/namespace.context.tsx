@@ -2,16 +2,18 @@ import { INamespaceContext } from '@interfaces/context.interfaces';
 import { INamespace } from '@interfaces/store.interfaces';
 import { createContext, useState, FC } from 'react';
 import { EXPRESS } from '@services/enviroments';
+import { useRouter } from 'next/router';
 
 const defaultState = {} as INamespaceContext;
 
 const NamespaceContext = createContext(defaultState);
 
 export const NamespaceProvider: FC = ({ children }) => {
+  const { push } = useRouter();
   const [namespaces, setNamespaces] = useState<INamespace[]>([]);
   const [mapNamespaces, setMapNamespaces] = useState({});
 
-  const getNamespaces = async (server: string) => {
+  const getNamespaces = async (server: string | null, click: boolean) => {
     if (!server) return;
     try {
       const res = await fetch(`${EXPRESS}/api/namespaces/@server/${server}`);
@@ -25,12 +27,17 @@ export const NamespaceProvider: FC = ({ children }) => {
         {}
       );
 
-      setNamespaces(data.docs);
-      setMapNamespaces(mapNamespaces);
+      if (data.docs && mapNamespaces) {
+        setNamespaces(data.docs);
+        setMapNamespaces(mapNamespaces);
+        if (click) push(`/namespaces/${data.docs[0]._id}`);
+      }
     } catch (err: any) {
       console.error(err);
     }
   };
+
+  // console.log(namespaces, mapNamespaces);
 
   return (
     <NamespaceContext.Provider

@@ -43,7 +43,7 @@ async function Auth(req: NextApiRequest, res: NextApiResponse) {
           const user = await res.json();
           // console.log(user);
           if (res.ok && user) {
-            console.log(user);
+            // console.log(user);
             return user;
           }
 
@@ -119,12 +119,19 @@ async function Auth(req: NextApiRequest, res: NextApiResponse) {
       // async signIn(user, account, profile) { return true; }
       // async redirect(url, baseUrl) { return baseUrl },
       session: async (session, token) => {
-        (session.user && token.user) && (session.user = token.user);
-
+        // console.log(session, token);
+        delete token['csrfToken'];
+        delete token['callbackUrl'];
+        delete token['json'];
+        delete token['redirect'];
+        delete token['iat'];
+        delete token['exp'];
+        session.user && (session.user = token);
         return session;
       },
       jwt: async (token, user, account, profile, isNewUser) => {
-        user && (token.user = user);
+        // console.log(token);
+        user && (token = user);
         return token;
       }
     },
