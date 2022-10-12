@@ -31,7 +31,7 @@ const ChatForm = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete='off'>
-      <section className='container fluid'>
+      <section className='container'>
         <div className='flex'>
           <input
             type='text'
@@ -41,11 +41,11 @@ const ChatForm = ({
             {...register('message', { required: true })}
           />
           <Button
-            className='mx-2 text-sm bg-primary'
+            className='mx-2 text-center flex justify-center bg-primary'
             variant='filled'
             type='submit'
           >
-            Send
+            <span>Send</span>
           </Button>
         </div>
 

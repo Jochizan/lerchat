@@ -32,7 +32,6 @@ const credentialsAuth: NextApiHandler<User | { msg: string }> = async (
   //   });
   // }
 
-  // How about using another API to randomly generate user's and avatars? :)
   const DBCOLLECTION = process.env.MONGODB_COLLECTION + '';
   const connection = await connectToDatabase();
 
@@ -46,22 +45,16 @@ const credentialsAuth: NextApiHandler<User | { msg: string }> = async (
 
   if (!user) {
     res.status(401).send({ msg: 'User not found' });
-    // connection?.mongoClient.close();
     return;
   }
 
   _password = user.password + '';
-  // console.log(user, password, _password);
   const checkPassword = await compare(password, _password);
-  // await connection?.mongoClient.close();
 
   if (!checkPassword) {
-    // connection?.mongoClient.close();
     res.status(401).json({ msg: 'Password Incorrect' });
   }
 
-  // Return null if user data could not be retrieved
-  // connection?.mongoClient.close();
   delete user['password'];
   user.creator = user._id;
 

@@ -25,6 +25,7 @@
     "@types/next-auth": "^3.15.0",
     "@types/node": "^18.8.3",
     "@types/react": "17.0.19",
+    "address": "^1.2.1",
     "autoprefixer": "^10.4.12",
     "eslint": "7.32.0",
     "eslint-config-next": "11.1.2",

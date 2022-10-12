@@ -66,7 +66,7 @@ const SignInPage: NextPage = () => {
                 height={30}
                 alt='sesión con google'
               />
-              <span className='text-xs ml-2'>Crear Cuenta Con Google</span>
+              <span className='text-xs ml-2'>Registrarse con Google</span>
             </Button>
             <Button
               variant='outlined'
@@ -80,7 +80,7 @@ const SignInPage: NextPage = () => {
                 height={30}
                 alt='sesión con facebook'
               />
-              <span className='text-xs ml-2'>Crear Cuenta Con Facebook</span>
+              <span className='text-xs ml-2'>Registrarse con Facebook</span>
             </Button>
           </article>
           <article className='flex justify-center mt-12 pr-4'>
@@ -134,13 +134,13 @@ const SignInPage: NextPage = () => {
                 </Button>
                 <article className='flex justify-between items-center w-11/12 mt-4 px-2'>
                   <div className='text-xs flex'>
-                    <p className='text-xs mr-2'>Ya tienes una cuenta?</p>
+                    <p className='text-xs mr-2'>¿Ya tienes una cuenta?</p>
                     <p className='text-cyan-600 text-xs'>
                       <Link href='/auth/signin'>Iniciar Sesión</Link>
                     </p>
                   </div>
                   <Typography className='text-xs'>
-                    site designed by @jochizan
+                    sitio diseñador por @jochizan
                   </Typography>
                 </article>
               </div>

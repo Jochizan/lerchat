@@ -21,7 +21,6 @@ const SignInPage: NextPage = () => {
 
   const onSubmit: SubmitHandler<TypeSession> = async (data) => {
     try {
-      // console.log(data);
       signIn('credentials', {
         ...data,
         redirect: true,
@@ -65,7 +64,7 @@ const SignInPage: NextPage = () => {
                 height={30}
                 alt='sesión con google'
               />
-              <span className='text-xs ml-2'>Sign In with Google</span>
+              <span className='text-xs ml-2'>Iniciar Sesión con Google</span>
             </Button>
             <Button
               variant='outlined'
@@ -79,7 +78,7 @@ const SignInPage: NextPage = () => {
                 height={30}
                 alt='sesión con facebook'
               />
-              <span className='text-xs ml-2'>Sign In with Facebook</span>
+              <span className='text-xs ml-2'>Iniciar Sesión con Facebook</span>
             </Button>
           </article>
           <article className='flex justify-center mt-16 pr-4'>
@@ -116,13 +115,13 @@ const SignInPage: NextPage = () => {
                 </Button>
                 <article className='flex justify-between items-center w-11/12 mt-4 px-2'>
                   <div className='text-xs flex'>
-                    <p className='text-xs mr-2'>Don&apos;t have an account?</p>
+                    <p className='text-xs mr-2'>¿No tienes una cuenta?</p>
                     <p className='text-cyan-600 text-xs'>
-                      <Link href='/auth/signup'>Register</Link>
+                      <Link href='/auth/signup'>Resgistrarse</Link>
                     </p>
                   </div>
                   <Typography className='text-xs'>
-                    site designed by @jochizan
+                    sitio diseñador por @jochizan
                   </Typography>
                 </article>
               </div>

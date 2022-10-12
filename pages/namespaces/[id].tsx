@@ -58,8 +58,8 @@ const Namespaces: NextPage = () => {
           <div className='tx-wlight'>Cargando Chat...</div>
         )}
       </h1>
-      <div className='mx-8'>
-        <section className='min-h-min vh-72 overflow-auto vh-12 flex flex-col w-full'>
+      <div className='mx-8 flex h-full flex-col-reverse justify-start'>
+        <section className='min-h-min vh-72 overflow-auto flex flex-col w-full'>
           <p className='pr-3 pt-6 m-0 text-lg tx-wlight'>
             Bienvenido al canal general de{' '}
             {mapServers[mapNamespaces[id as string].server].name}

@@ -22,46 +22,46 @@ const MainNavbar: FC = ({ children }) => {
 
   const navList = (
     <ul className='mb-4 mt-2 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6'>
-      <Typography
-        as='li'
-        variant='paragraph'
-        color='blue-gray'
-        className='p-1 font-normal tx-wlight'
-      >
-        <a href='#' className='flex items-center'>
-          Pages
-        </a>
-      </Typography>
-      <Typography
-        as='li'
-        variant='paragraph'
-        color='blue-gray'
-        className='p-1 font-normal tx-wlight'
-      >
-        <a href='#' className='flex items-center'>
-          Account
-        </a>
-      </Typography>
-      <Typography
-        as='li'
-        variant='paragraph'
-        color='blue-gray'
-        className='p-1 font-normal tx-wlight'
-      >
-        <a href='#' className='flex items-center'>
-          Blocks
-        </a>
-      </Typography>
-      <Typography
-        as='li'
-        variant='paragraph'
-        color='blue-gray'
-        className='p-1 font-normal tx-wlight'
-      >
-        <a href='#' className='flex items-center'>
-          Docs
-        </a>
-      </Typography>
+      <Link href='/services' passHref>
+        <Typography
+          as='li'
+          variant='paragraph'
+          color='blue-gray'
+          className='p-1 font-normal tx-wlight'
+        >
+          <span className='flex items-center'>Servicios</span>
+        </Typography>
+      </Link>
+      <Link href='/@me' passHref>
+        <Typography
+          as='li'
+          variant='paragraph'
+          color='blue-gray'
+          className='p-1 font-normal tx-wlight'
+        >
+          <span className='flex items-center'>Cuenta</span>
+        </Typography>
+      </Link>
+      <Link href='/about' passHref>
+        <Typography
+          as='li'
+          variant='paragraph'
+          color='blue-gray'
+          className='p-1 font-normal tx-wlight'
+        >
+          <span className='flex items-center'>Sobre Nosotros</span>
+        </Typography>
+      </Link>
+      <Link href='/docs' passHref>
+        <Typography
+          as='li'
+          variant='paragraph'
+          color='blue-gray'
+          className='p-1 font-normal tx-wlight'
+        >
+          <span className='flex items-center'>Documentación</span>
+        </Typography>
+      </Link>
     </ul>
   );
 
@@ -69,14 +69,16 @@ const MainNavbar: FC = ({ children }) => {
     <>
       <Navbar className='mx-auto max-w-none py-1 px-3 lg:px-6 lg:py-3 rounded-none bg-secondary'>
         <div className='container mx-auto flex items-center justify-between tx-wlight'>
-          <Typography
-            as='a'
-            href='#'
-            variant='lead'
-            className='mr-4 cursor-pointer py-1.5 font-semibold'
-          >
-            <span>LerChat</span>
-          </Typography>
+          <Link href='/' passHref>
+            <Typography
+              as='a'
+              href='#'
+              variant='lead'
+              className='mr-4 cursor-pointer py-1.5 font-semibold'
+            >
+              <span>LerChat</span>
+            </Typography>
+          </Link>
           <div className='hidden lg:block'>{navList}</div>
           {session ? (
             <Button
@@ -87,12 +89,14 @@ const MainNavbar: FC = ({ children }) => {
             >
               Cerrar Sesión
             </Button>
+          ) : status ? (
+            <div className='tx-wlight'>Cargando...</div>
           ) : (
             <Link href='/auth/signin' passHref>
               <Button
                 variant='outlined'
                 size='sm'
-                className='hidden br-secondary-50 lg:inline-block rounded-2xl tx-wlight capitalize font-medium text-sm'
+                className='hidden br-white-03 lg:inline-block rounded-2xl tx-wlight capitalize font-medium text-sm'
                 ripple
               >
                 Iniciar Sesión
