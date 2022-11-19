@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth';
+import NextAuth, { DefaultSession } from 'next-auth';
 
 declare module 'next-auth' {
   /**
@@ -13,17 +13,27 @@ declare module 'next-auth' {
       image?: string | null | undefined;
       creator?: string | null | undefined;
       email?: string | null | undefined;
-    };
+    } & DefaultSession['user'];
     expires?: string | null | undefined;
   }
 
   interface User {
-    csrfToken?: string | null | undefined;
+    _id?: string | null | undefined;
+    creator?: string | null | undefined;
     name?: string | null | undefined;
+    lastMame?: string | null | undefined;
     image?: string | null | undefined;
     email?: string | null | undefined;
-    json?: string | null | undefined;
-    callbackUrl?: string | null | undefined;
-    redirect?: string | null | undefined;
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    _id?: string | null | undefined;
+    creator?: string | null | undefined;
+    name?: string | null | undefined;
+    lastName?: string | null | undefined;
+    image?: string | null | undefined;
+    email?: string | null | undefined;
   }
 }

@@ -3,6 +3,8 @@ import { connectToDatabase } from 'libs/mongodb';
 import { compare } from 'bcryptjs';
 import { ObjectId } from 'mongodb';
 
+const DBNAME = process.env.MONGODB_NAME;
+
 interface User {
   creator: ObjectId;
   name: string;
@@ -37,7 +39,7 @@ const credentialsAuth: NextApiHandler<User | { msg: string }> = async (
 
   let _password;
   const { email, password } = req.body;
-  const db = connection?.database;
+  const db = connection.db(DBNAME);
 
   const user = await db
     ?.collection<User>(DBCOLLECTION)

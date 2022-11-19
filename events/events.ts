@@ -1,4 +1,4 @@
-import { IMessage, INamespace } from '../interfaces/store.interfaces';
+import { IMessage, INamespace } from '../interfaces/store';
 
 interface Error {
   data: MessageID;

@@ -1,4 +1,4 @@
-import { INamespace, IServer } from './store.interfaces';
+import { INamespace, IServer } from './store';
 
 interface IServerContext {
   servers: IServer[];

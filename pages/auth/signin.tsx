@@ -2,20 +2,18 @@ import type { NextPage } from 'next';
 import { Button, Input, Typography } from '@material-tailwind/react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/router';
-import { useSession, signIn } from 'next-auth/client';
-import { useEffect } from 'react';
+import { signIn } from 'next-auth/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { TypeSession } from '@interfaces/sign.interface';
+import { TypeSession } from '@interfaces/signin';
+import { useRouter } from 'next/router';
 
 const SignInPage: NextPage = () => {
-  const [session, status] = useSession();
   const {
     register,
     handleSubmit,
     formState: { errors }
   } = useForm<TypeSession>();
-  const { push } = useRouter();
+  const { code_invitation: codeInvitation } = useRouter().query;
 
   const handleOAuthSignIn = (provider: string) => () => signIn(provider);
 
@@ -30,12 +28,6 @@ const SignInPage: NextPage = () => {
       window.alert(error);
     }
   };
-
-  useEffect(() => {
-    if (session) push('/home');
-  }, [session]);
-
-  if (typeof window !== 'undefined' && status) return null;
 
   return (
     <div className='w-full h-screen flex items-center justify-center tx-wlight bg-light-blue-50'>
@@ -117,7 +109,13 @@ const SignInPage: NextPage = () => {
                   <div className='text-xs flex'>
                     <p className='text-xs mr-2'>¿No tienes una cuenta?</p>
                     <p className='text-cyan-600 text-xs'>
-                      <Link href='/auth/signup'>Resgistrarse</Link>
+                      <Link
+                        href={`/auth/signup${
+                          codeInvitation ? `?code_server=${codeInvitation}` : ''
+                        }`}
+                      >
+                        Resgistrarse
+                      </Link>
                     </p>
                   </div>
                   <Typography className='text-xs'>

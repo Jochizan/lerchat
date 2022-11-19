@@ -1,7 +1,11 @@
 import { NextPage } from 'next';
 
 const ServerPage: NextPage = () => {
-  return <div className='tx-wlight'>terrible</div>;
+  return (
+    <div>
+      <h1 className='tx-wlight'>Cargando Chat Principal...</h1>
+    </div>
+  );
 };
 
 export default ServerPage;

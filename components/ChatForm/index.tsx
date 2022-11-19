@@ -2,24 +2,23 @@ import { Button, Typography } from '@material-tailwind/react';
 import { KeyboardEvent } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-interface Message {
-  message: string;
-}
-
 const ChatForm = ({
-  addMessage
+  createMessage,
+  scrollToLastIndex
 }: {
-  addMessage: (message: string) => void;
+  createMessage: (content: string) => void;
+  scrollToLastIndex: () => void;
 }) => {
   const {
     reset,
     register,
     handleSubmit,
     formState: { errors }
-  } = useForm<Message>();
+  } = useForm<{ content: string }>();
 
-  const onSubmit: SubmitHandler<Message> = (data) => {
-    addMessage(data.message);
+  const onSubmit: SubmitHandler<{ content: string }> = (data) => {
+    createMessage(data.content);
+    scrollToLastIndex();
     reset();
   };
 
@@ -31,17 +30,17 @@ const ChatForm = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete='off'>
-      <section className='container'>
+      <section className='w-full'>
         <div className='flex'>
           <input
             type='text'
             placeholder='Send Message'
             className='ml-8 mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-3xl br-white-03 focus:outline-none focus:border-none focus:ring-'
             {...onKeyPress}
-            {...register('message', { required: true })}
+            {...register('content', { required: true })}
           />
           <Button
-            className='mx-2 text-center flex justify-center bg-primary'
+            className='mx-2 mr-8 text-center flex justify-center bg-primary'
             variant='filled'
             type='submit'
           >
@@ -51,7 +50,7 @@ const ChatForm = ({
 
         <div className='ml-10 mt-1'>
           <Typography className='tx-nlight'>
-            {!errors.message
+            {!errors.content
               ? 'Never send sensitive data.'
               : 'The message is required to continue.'}
           </Typography>

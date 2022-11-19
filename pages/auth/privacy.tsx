@@ -85,10 +85,11 @@ const PrivacyPage: NextPage = () => {
         de su interés. Una vez que usted de clic en estos enlaces y abandone
         nuestra página, ya no tenemos control sobre al sitio al que es
         redirigido y por lo tanto no somos responsables de los{' '}
-        <Link href='/auth/privacy'>términos o privacidad</Link> ni de la protección
-        de sus datos en esos otros sitios terceros. Dichos sitios están sujetos
-        a sus propias políticas de privacidad por lo cual es recomendable que
-        los consulte para confirmar que usted está de acuerdo con estas.
+        <Link href='/auth/privacy'>términos o privacidad</Link> ni de la
+        protección de sus datos en esos otros sitios terceros. Dichos sitios
+        están sujetos a sus propias políticas de privacidad por lo cual es
+        recomendable que los consulte para confirmar que usted está de acuerdo
+        con estas.
       </p>
       <p>
         <strong>Control de su información personal</strong>

@@ -6,12 +6,12 @@ import {
   Button,
   IconButton
 } from '@material-tailwind/react';
-import { useSession, signOut } from 'next-auth/client';
+import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 
 const MainNavbar: FC = ({ children }) => {
   const [openNav, setOpenNav] = useState(false);
-  const [session, status] = useSession();
+  const { data: session } = useSession();
 
   useEffect(() => {
     window.addEventListener(
@@ -27,17 +27,17 @@ const MainNavbar: FC = ({ children }) => {
           as='li'
           variant='paragraph'
           color='blue-gray'
-          className='p-1 font-normal tx-wlight'
+          className='p-1 font-normal tx-wlight cursor-pointer'
         >
           <span className='flex items-center'>Servicios</span>
         </Typography>
       </Link>
-      <Link href='/@me' passHref>
+      <Link href='profile/@me' passHref>
         <Typography
           as='li'
           variant='paragraph'
           color='blue-gray'
-          className='p-1 font-normal tx-wlight'
+          className='p-1 font-normal tx-wlight cursor-pointer'
         >
           <span className='flex items-center'>Cuenta</span>
         </Typography>
@@ -47,7 +47,7 @@ const MainNavbar: FC = ({ children }) => {
           as='li'
           variant='paragraph'
           color='blue-gray'
-          className='p-1 font-normal tx-wlight'
+          className='p-1 font-normal tx-wlight cursor-pointer'
         >
           <span className='flex items-center'>Sobre Nosotros</span>
         </Typography>
@@ -57,7 +57,7 @@ const MainNavbar: FC = ({ children }) => {
           as='li'
           variant='paragraph'
           color='blue-gray'
-          className='p-1 font-normal tx-wlight'
+          className='p-1 font-normal tx-wlight cursor-pointer'
         >
           <span className='flex items-center'>Documentación</span>
         </Typography>
@@ -81,16 +81,16 @@ const MainNavbar: FC = ({ children }) => {
           </Link>
           <div className='hidden lg:block'>{navList}</div>
           {session ? (
-            <Button
-              variant='outlined'
-              size='sm'
-              className='hidden br-secondary-50 lg:inline-block rounded-2xl tx-wlight capitalize font-medium text-sm'
-              onClick={() => signOut()}
-            >
-              Cerrar Sesión
-            </Button>
-          ) : status ? (
-            <div className='tx-wlight'>Cargando...</div>
+            <Link href='/channels/@me' passHref>
+              <Button
+                variant='outlined'
+                size='sm'
+                className='hidden br-secondary-50 lg:inline-block rounded-2xl tx-wlight capitalize font-medium text-sm'
+                ripple
+              >
+                Home
+              </Button>
+            </Link>
           ) : (
             <Link href='/auth/signin' passHref>
               <Button

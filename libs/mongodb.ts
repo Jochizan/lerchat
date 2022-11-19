@@ -1,41 +1,40 @@
 import { MongoClient } from 'mongodb';
-import type { MongoClientOptions, Db } from 'mongodb';
+import type { MongoClientOptions } from 'mongodb';
+import global from 'types';
 
 const uri = process.env.MONGODB_URI + '';
-const dbname = process.env.MONGODB_NAME + '';
 const options: MongoClientOptions = {
   useUnifiedTopology: true,
   useNewUrlParser: true
 } as MongoClientOptions;
 
 let mongoClient: MongoClient | null = null;
-let database: Db | null = null;
 
 if (!process.env.MONGODB_URI) {
   throw new Error('Please add your Mongo URI to .env.local');
 }
 
-export async function connectToDatabase() {
+export const connectToDatabase: () => Promise<MongoClient> = async () => {
   try {
-    if (mongoClient && database) {
-      return { mongoClient, database };
+    if (mongoClient) {
+      return mongoClient;
     }
     if (process.env.NODE_ENV === 'development') {
-      if (!global._mongoClient) {
+      if (!globalThis._mongoClient) {
         mongoClient = await new MongoClient(uri, options).connect();
-        global._mongoClient = mongoClient;
+        globalThis._mongoClient = mongoClient;
       } else {
-        mongoClient = global._mongoClient;
+        mongoClient = globalThis._mongoClient;
       }
     } else {
       mongoClient = await new MongoClient(uri, options).connect();
     }
 
     if (mongoClient) {
-      database = await mongoClient.db(dbname);
-      return { mongoClient, database };
+      return mongoClient;
     }
+
   } catch (e) {
     console.error(e);
   }
-}
+};

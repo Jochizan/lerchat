@@ -8,7 +8,11 @@
       "@interfaces/*": ["interfaces/*"],
       "@services/*": ["services/*"],
       "@store/*": ["store/*"],
-      "@styles/*": ["styles/*"]
+      "@styles/*": ["styles/*"],
+      "@layouts/*": ["layouts/*"],
+      "@libs/*": ["libs/*"],
+      "@hooks/*": ["hooks/*"],
+      "@events/*": ["events/*"]
     },
     "allowJs": true,
     "skipLibCheck": true,

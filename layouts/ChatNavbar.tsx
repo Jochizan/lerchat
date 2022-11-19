@@ -5,15 +5,14 @@ import {
   Typography,
   Button,
   IconButton,
-  Input,
   Avatar
 } from '@material-tailwind/react';
-import { useSession, signOut } from 'next-auth/client';
+import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 
 const ChatNavbar: FC = ({ children }) => {
   const [openNav, setOpenNav] = useState(false);
-  const [session, status] = useSession();
+  const { data: session } = useSession();
 
   useEffect(() => {
     window.addEventListener(
@@ -22,18 +21,10 @@ const ChatNavbar: FC = ({ children }) => {
     );
   }, []);
 
-  useEffect(() => {
-    // console.log(session);
-  }, [session]);
-
-  if (!session?.user) {
-    return <div className='tx-wlight'>Cargando datos del usuario...</div>;
-  }
-
   return (
     <>
-      <Navbar className='mx-auto max-w-none py-1 px-3 lg:px-6 lg:py-3 rounded-none bg-dark-01'>
-        <div className='container mx-auto flex items-center justify-between tx-wlight'>
+      <Navbar className='mx-auto max-w-none py-0.5 px-2 lg:px-4 lg:py-2 rounded-none bg-dark-01'>
+        <div className='mx-auto flex items-center justify-between tx-wlight'>
           <label className='hidden lg:block relative w-5/12'>
             <input
               placeholder='Server, persons and links'
@@ -47,28 +38,33 @@ const ChatNavbar: FC = ({ children }) => {
               </svg>
             </span>
           </label>
-          <Button
-            variant='outlined'
-            size='sm'
-            className='hidden br-secondary-50 rounded-2xl tx-wlight capitalize font-medium text-sm
-              br-dark-01 lg:flex justify-center items-center'
-            onClick={() =>
-              signOut({
-                redirect: true,
-                callbackUrl: '/'
-              })
-            }
-          >
-            <Avatar
-              src='/default.png'
-              alt='Foto de perfil'
+          {session?.user ? (
+            <Button
+              variant='outlined'
               size='sm'
-              variant='circular'
-            />
-            <Typography variant='paragraph' className='ml-3'>
-              {session?.user.name}
-            </Typography>
-          </Button>
+              className='hidden br-secondary-50 rounded-2xl tx-wlight capitalize font-medium text-sm
+              br-dark-01 lg:flex justify-center items-center'
+              onClick={() =>
+                signOut({
+                  redirect: true,
+                  callbackUrl: '/'
+                })
+              }
+            >
+              <Avatar
+                src='/default.png'
+                alt='Foto de perfil'
+                size='sm'
+                variant='circular'
+              />
+              <Typography variant='paragraph' className='ml-3'>
+                {session?.user.name}
+              </Typography>
+            </Button>
+          ) : (
+            <div>Cargando datos del usuario...</div>
+          )}
+
           <IconButton
             variant='text'
             className='ml-auto h-6 w-6 text-inherit hover:bg-transparent focus:bg-transparent active:bg-transparent lg:hidden'

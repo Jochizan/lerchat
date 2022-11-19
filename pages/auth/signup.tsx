@@ -3,41 +3,32 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { Button, Input, Typography } from '@material-tailwind/react';
 import Link from 'next/link';
 import Image from 'next/image';
-import Router, { useRouter } from 'next/router';
-import { useSession, signIn } from 'next-auth/client';
-import { useEffect } from 'react';
-import type { TypeUser } from '@interfaces/sign.interface';
+import { useRouter } from 'next/router';
+import { signIn } from 'next-auth/react';
+import type { TypeUser } from '@interfaces/signin';
+import axios from 'axios';
 
 const SignInPage: NextPage = () => {
-  const [session, status] = useSession();
   const {
     register,
     handleSubmit,
     formState: { errors }
   } = useForm<TypeUser>();
-  const { push } = useRouter();
+  const { push, query } = useRouter();
+  const { code_invitation: codeInvitation } = query;
 
   const handleOAuthSignIn = (provider: string) => () => signIn(provider);
 
   const onSubmit: SubmitHandler<TypeUser> = async (data) => {
-    const res = await fetch('/api/user', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
+    const res = await axios.post('/api/user', data);
 
-    const newUser = await res.json();
-    // console.log(newUser);
-    push('/auth/signin');
+    console.log(res);
+    push(
+      `/auth/signin?${
+        codeInvitation ? 'code_invitation=' : ''
+      }code_invitation=${codeInvitation}`
+    );
   };
-
-  useEffect(() => {
-    if (session) push('/home');
-  }, [session]);
-
-  if (typeof window !== 'undefined' && status) return null;
 
   return (
     <div className='w-full h-screen flex items-center justify-center tx-wlight bg-light-blue-50'>
@@ -136,7 +127,13 @@ const SignInPage: NextPage = () => {
                   <div className='text-xs flex'>
                     <p className='text-xs mr-2'>¿Ya tienes una cuenta?</p>
                     <p className='text-cyan-600 text-xs'>
-                      <Link href='/auth/signin'>Iniciar Sesión</Link>
+                      <Link
+                        href={`/auth/signin${
+                          codeInvitation ? `?code_server=${codeInvitation}` : ''
+                        }`}
+                      >
+                        Resgistrarse
+                      </Link>
                     </p>
                   </div>
                   <Typography className='text-xs'>
