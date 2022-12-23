@@ -1,4 +1,6 @@
-import { IMessage, INamespace } from '../interfaces/store';
+import { INamespace } from 'store/types/namespace.types';
+import { IMessage } from 'store/types/message.types';
+import { IServer } from 'store/types/server.types';
 
 interface Error {
   data: MessageID;

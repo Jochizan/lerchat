@@ -1,15 +1,20 @@
 import { createContext, FC, useEffect, Dispatch, useReducer } from 'react';
 import { IServer, ServerActions, ServerTypes } from './types/server.types';
-import { EXPRESS } from '@services/enviroments';
+import { EXPRESS, SOCKET } from '@services/enviroments';
 import { useSession } from 'next-auth/react';
 import { serverReducer } from './reducers/server.reducer';
 import axios from 'axios';
 import { useRouter } from 'next/router';
+import { io, Socket } from 'socket.io-client';
+import { ServerEvents, UserID } from '@events/events';
+import { ClientEvents } from '@events/events';
+// import { IUser } from './types/user.types';
 
 export type InitialServerState = {
   id: string | null | undefined;
   servers: IServer[];
   mapServers: { [key: string]: IServer };
+  users: UserID[];
   change?: boolean;
   loading?: boolean;
   error?: boolean;
@@ -21,6 +26,7 @@ export const initialState = {
     typeof window !== 'undefined' ? localStorage.getItem('id-server') + '' : '',
   servers: [] as IServer[],
   mapServers: {} as { [key: string]: IServer },
+  users: [] as string[],
   change: false,
   loading: false,
   error: false,
@@ -52,6 +58,11 @@ export const ServerProvider: FC = ({ children }) => {
     ...route
   } = useRouter();
   const { data: session } = useSession();
+  // const socket: Socket<ServerEvents, ClientEvents> = io(
+  //   `${SOCKET}/servers/${server}`
+  // );
+
+  const socket: Socket<ServerEvents | ClientEvents> = io(`${SOCKET}/servers`);
 
   const handleIdServer = (server: string) => {
     localStorage.setItem('id-server', server);
@@ -121,6 +132,47 @@ export const ServerProvider: FC = ({ children }) => {
       console.error(err);
     }
   };
+
+  // useEffect(() => {
+  //   // socket.on('user:connect', (userID: UserID) => {
+  //   //   dispatch({ type: ServerTypes.CONNECT, payload: userID });
+  //   // });
+
+  //   // socket.on('user:disconnect', (userID: UserID) => {
+  //   //   dispatch({ type: ServerTypes.DISCONNECT, payload: userID});
+  //   // });
+
+
+
+  //   // console.log(state);
+
+  //   return () => {
+  //     // socket.off('user:connect');
+  //   };
+
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [state]);
+
+  useEffect(() => {
+    // socket.emit('user:connect', session?.user._id as UserID, (res) => {
+    //   dispatch({ type: ServerTypes.CONNECT, payload: session?.user._id });
+    // });
+
+    return () => {
+      // socket.emit(
+      //   'user:disconnect',
+      //   session?.user._id as UserID,
+      //   (res: any) => {
+      //     console.log(res);
+      //   }
+      // );
+      // socket.on('user:disconnect', (server: IServer) => {
+      //   dispatch({ type: ServerTypes.UPDATE, payload: server });
+      // });
+      // socket.off('user:connect');
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!(state.id !== server)) return;

@@ -3,11 +3,11 @@ import { KeyboardEvent } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 const ChatForm = ({
-  createMessage,
-  scrollToLastIndex
-}: {
+  createMessage
+}: // scrollToLastIndex
+{
   createMessage: (content: string) => void;
-  scrollToLastIndex: () => void;
+  // scrollToLastIndex: () => void;
 }) => {
   const {
     reset,
@@ -18,7 +18,7 @@ const ChatForm = ({
 
   const onSubmit: SubmitHandler<{ content: string }> = (data) => {
     createMessage(data.content);
-    scrollToLastIndex();
+    // scrollToLastIndex();
     reset();
   };
 

@@ -1,5 +1,10 @@
 import { FC, useEffect, useContext, useState, SyntheticEvent } from 'react';
-import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu';
+import {
+  ContextMenu,
+  ContextMenuTrigger,
+  hideMenu,
+  MenuItem
+} from 'react-contextmenu';
 import ServerContext from '@store/server.store';
 import NamespaceContext from '@store/namespace.store';
 import {
@@ -16,6 +21,8 @@ import { useSession } from 'next-auth/react';
 import { IServer } from '@store/types/server.types';
 import ModalForm from '@components/Modal';
 import ButtonServer from '@components/ButtonServer';
+import { INamespace } from '@store/types/namespace.types';
+import UsersContext from '@store/user.store';
 
 const Aside: FC = ({ children }) => {
   const {
@@ -26,25 +33,37 @@ const Aside: FC = ({ children }) => {
     handleIdServer,
     getCodeInvitation
   } = useContext(ServerContext);
+  const {
+    state: { users }
+  } = useContext(UsersContext);
   const { data: session } = useSession();
   const {
-    state: { namespaces, mapNamespaces },
-    readNamespaces
+    state: { namespaces },
+    readNamespaces,
+    createNamespace
   } = useContext(NamespaceContext);
   const [copied, setCopied] = useState(false);
   const [openServer, setOpenServer] = useState(false);
   const [openCreate, setOpenCreate] = useState(false);
+  const [openNamespace, setOpenNamespace] = useState(false);
   const [click, setClick] = useState(false);
   const [ID, setID] = useState('');
   const router = useRouter();
   const id = router.query;
   const {
-    register,
-    handleSubmit,
-    formState: { errors }
+    register: registerServer,
+    handleSubmit: handleSubmitServer,
+    formState: { errors: errorsServer }
   } = useForm<IServer>();
 
+  const {
+    register: registerNamespace,
+    handleSubmit: handleSubmitNamespace,
+    formState: { errors: errorsNamespace }
+  } = useForm<INamespace>();
+
   const handleOpenServer = () => setOpenServer(!openServer);
+  const handleOpenNamespace = () => setOpenNamespace(!openNamespace);
   const handleOpenCreate = () => setOpenCreate(!openCreate);
 
   useEffect(() => {
@@ -56,7 +75,7 @@ const Aside: FC = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idServer, servers, click]);
 
-  const onSubmit: SubmitHandler<IServer> = async (data) => {
+  const handleCreateServer: SubmitHandler<IServer> = async (data) => {
     createServer(data);
     handleOpenCreate();
   };
@@ -66,9 +85,17 @@ const Aside: FC = ({ children }) => {
   };
 
   const handleGetAndShareLinkInvitation = (e: SyntheticEvent, data: any) => {
+    handleOpenServer();
     setID(data._id);
     setCopied(false);
+
+    if (mapServers[data._id].invitation) return;
+
     getCodeInvitation(data._id);
+  };
+
+  const handleCreateNamespace: SubmitHandler<INamespace> = (data) => {
+    createNamespace({ ...data, server: idServer as string });
     handleOpenServer();
   };
 
@@ -90,12 +117,29 @@ const Aside: FC = ({ children }) => {
               description={
                 'Solo necesitamos un nombre para el servidor para continuar'
               }
-              handleSubmit={handleSubmit(onSubmit)}
+              handleSubmit={handleSubmitServer(handleCreateServer)}
             >
               <input
                 required
                 placeholder='Nombre del servidor'
-                {...register('name')}
+                {...registerServer('name')}
+                className='mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-3xl br-white-03 focus:outline-none focus:border-none focus:ring-1'
+              />
+            </ModalForm>
+            <ModalForm
+              open={openNamespace}
+              handler={handleOpenNamespace}
+              title={'Creación de espacio de trabajo'}
+              button={'Crear espacio de trabajo'}
+              description={
+                'Solo necesitamos un nombre del espacio para continuar'
+              }
+              handleSubmit={handleSubmitNamespace(handleCreateNamespace)}
+            >
+              <input
+                required
+                placeholder='Nombre del servidor'
+                {...registerNamespace('name')}
                 className='mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-3xl br-white-03 focus:outline-none focus:border-none focus:ring-1'
               />
             </ModalForm>
@@ -106,7 +150,7 @@ const Aside: FC = ({ children }) => {
                     <ButtonServer
                       className={`bg-${
                         image !== 'default.png' ? 'transparent' : 'primary'
-                      } p-0.5 py-1 w-10 h-10 group static z-0`}
+                      } p-0.5 py-1 w-10 h-10 group static z-0 tx-wlight rounded-lg hover:rounded-md ease-out transition-all  uppercase`}
                       submit={() => {
                         setClick(true);
                         handleIdServer(_id);
@@ -120,8 +164,8 @@ const Aside: FC = ({ children }) => {
                           src={`/${image}`}
                           alt='Logo del servidor'
                           className='rounded-2xl hover:rounded-xl ease-out transition-all'
-                          width={40}
-                          height={40}
+                          width={20}
+                          height={20}
                         />
                       ) : (
                         <div className='rounded-2xl text-xl hover:rounded-xl ease-out transition-all'>
@@ -203,28 +247,106 @@ const Aside: FC = ({ children }) => {
               </div>
             </DialogBody>
           </Dialog>
-          <div className='pt-16 bg-gray-900 block w-40 overflow-hidden'>
-            {Object.keys(id).length && namespaces.length ? (
-              namespaces?.map(({ _id, name }) => (
-                <Link key={_id} href={`/channels/${idServer}/${_id}`} passHref>
-                  <div className='w-full pl-1.5'>
-                    <span className='tx-nlight cursor-pointer align-middle'>
-                      -&gt; {name}
-                    </span>
-                  </div>
-                </Link>
-              ))
-            ) : (
-              <span className='tx-nlight truncate'>
-                {router.route === '/channels' && 'Sin espacios para chatear'}
-              </span>
-            )}
-          </div>
+          <ContextMenuTrigger id={(idServer as string) + '#'}>
+            <div
+              className='pt-16 bg-gray-900 block w-40 overflow-hidden h-full'
+              onClick={() => hideMenu()}
+            >
+              {Object.keys(id).length && namespaces.length ? (
+                namespaces?.map(({ _id, name }) => (
+                  <Link
+                    key={_id}
+                    href={`/channels/${idServer}/${_id}`}
+                    passHref
+                  >
+                    <div className='w-full pl-1.5'>
+                      <span className='tx-nlight cursor-pointer align-middle'>
+                        -&gt; {name}
+                      </span>
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                <span className='tx-nlight truncate'>
+                  {router.route === '/channels' && 'Sin espacios para chatear'}
+                </span>
+              )}
+            </div>
+          </ContextMenuTrigger>
+          <ContextMenu id={(idServer as string) + '#'}>
+            <MenuItem
+              onClick={handleGetAndShareLinkInvitation}
+              data={{ _id: idServer }}
+            >
+              Obtener link de grupo
+            </MenuItem>
+            <MenuItem divider />
+            <MenuItem onClick={setOpenNamespace} data={{ _id: idServer }}>
+              Crear espacio de chat
+            </MenuItem>
+          </ContextMenu>
         </div>
       </aside>
       <main className='grow flex max-h-screen flex-col h-full'>{children}</main>
+      <section className='w-40 bg-ndark'>
+        <div className='flex flex-col items-start justify-start h-full'>
+          <div className='pt-16' />
+          {users.length ? (
+            users.map((el) => (
+              <div
+                key={el._id}
+                className='flex justify-center items-center gap-2 p-2'
+              >
+                <Image
+                  src={`/${el.image}`}
+                  alt='Imagen de perfil'
+                  width={35}
+                  height={35}
+                  className='rounded-full'
+                />
+                <div className='flex flex-col'>
+                  <span className='tx-wlight'>{el.name}</span>
+                  <span
+                    className={`${
+                      el.state === 'connected'
+                        ? 'text-green-600'
+                        : 'text-gray-800'
+                    }`}
+                  >
+                    * {el.state}
+                  </span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div></div>
+          )}
+        </div>
+      </section>
     </section>
   );
 };
 
 export default Aside;
+
+
+        {/* <Virtuoso
+          className='tx-wlight mb-3'
+          style={{ overscrollBehavior: 'contain', overflowY: 'scroll' }}
+          data={internalMessages}
+          ref={virtuoso}
+          startReached={startReached}
+          firstItemIndex={Math.max(0, firstItemIndex)}
+          totalCount={internalMessages.length}
+          followOutput={followOutput}
+          initialTopMostItemIndex={internalMessages.length - 1}
+          itemContent={(idx, data) => (
+            <CardMessage
+              key={idx}
+              msg={data}
+              scrollToLastIndex={scrollToLastIndex}
+              // reinitializeToLastIndex={reinitializeToLastIndex}
+            />
+          )}
+          alignToBottom
+        /> */}

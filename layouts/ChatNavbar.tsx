@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react';
+import { useState, useEffect, FC, useContext } from 'react';
 import {
   Navbar,
   MobileNav,
@@ -9,9 +9,11 @@ import {
 } from '@material-tailwind/react';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
+import UsersContext from '@store/user.store';
 
 const ChatNavbar: FC = ({ children }) => {
   const [openNav, setOpenNav] = useState(false);
+  const { disconnectUser } = useContext(UsersContext);
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -44,22 +46,23 @@ const ChatNavbar: FC = ({ children }) => {
               size='sm'
               className='hidden br-secondary-50 rounded-2xl tx-wlight capitalize font-medium text-sm
               br-dark-01 lg:flex justify-center items-center'
-              onClick={() =>
+              onClick={() => {
+                disconnectUser();
                 signOut({
                   redirect: true,
                   callbackUrl: '/'
-                })
-              }
+                });
+              }}
             >
+              <Typography variant='paragraph' className='mr-3'>
+                {session?.user.name}
+              </Typography>
               <Avatar
                 src='/default.png'
                 alt='Foto de perfil'
-                size='sm'
+                size='xs'
                 variant='circular'
               />
-              <Typography variant='paragraph' className='ml-3'>
-                {session?.user.name}
-              </Typography>
             </Button>
           ) : (
             <div>Cargando datos del usuario...</div>

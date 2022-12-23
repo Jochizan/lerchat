@@ -1,4 +1,4 @@
-import { Button, ButtonProps } from '@material-tailwind/react';
+import { ButtonProps } from '@material-tailwind/react';
 import { FC } from 'react';
 
 const ButtonServer: FC<any> = ({
@@ -10,9 +10,9 @@ const ButtonServer: FC<any> = ({
   submit: () => void;
 }) => {
   return (
-    <Button onClick={submit} className={className}>
+    <button onClick={submit} className={className}>
       {children}
-    </Button>
+    </button>
   );
 };
 

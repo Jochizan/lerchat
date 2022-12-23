@@ -15,6 +15,8 @@ export enum UserTypes {
   UPDATE = 'UPDATE_USER',
   DELETE = 'DELETE_USER',
   ERROR = 'ERROR_USERS',
+  CONNECT = 'CONNECT',
+  DISCONNECT = 'DISCONNECT',
   LOADING = 'LOADING_USERS',
   CHANGE_CONTEXT = 'CHANGE_CONTEXT',
   READ_OF_PAGE = 'READ_OF_PAGE'
@@ -27,9 +29,12 @@ export enum UserLocalTypes {
 
 export type IUser = {
   _id: string;
-  names: string;
-  surnames: string;
+  name: string;
+  lastName: string;
+  image: string;
   email: string;
+  state: string;
+  defaultState: string;
 };
 
 type UserPayload = {
@@ -45,9 +50,10 @@ type UserPayload = {
     loading: boolean;
     msg: string;
   };
+  [UserTypes.CONNECT]: string | null | undefined;
+  [UserTypes.DISCONNECT]: string | null | undefined;
   [UserTypes.CHANGE_CONTEXT]: UserLocalTypes;
   [UserTypes.READ_OF_PAGE]: IUser[];
 };
 
-export type UserActions =
-  ActionMap<UserPayload>[keyof ActionMap<UserPayload>];
+export type UserActions = ActionMap<UserPayload>[keyof ActionMap<UserPayload>];

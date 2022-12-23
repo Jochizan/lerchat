@@ -18,7 +18,7 @@ export enum ServerTypes {
   LOADING = 'LOADING_SERVER',
   CHANGE = 'CHANGE',
   CHANGE_ID = 'CHANGE_ID_SERVER',
-  GET_LINK = 'GET_LINK'
+  GET_LINK = 'GET_LINK',
 }
 
 export type IServer = {

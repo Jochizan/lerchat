@@ -16,8 +16,10 @@ import axios from 'axios';
 export type InitialMessageState = {
   messages: IMessage[];
   type: MessageLocalTypes;
-  loading?: boolean;
-  error?: boolean;
+  hasNextPage: boolean;
+  page: number;
+  loading: boolean;
+  error: boolean;
   msg?: string;
 };
 
@@ -27,21 +29,25 @@ export const initialState = {
     (typeof window !== 'undefined' &&
       (localStorage.getItem('message-context') as MessageLocalTypes)) ||
     MessageLocalTypes.NAMESPACE,
+  hasNextPage: true,
   loading: false,
   error: false,
+  page: 1,
   msg: ''
 };
 
 export const MessageContext = createContext<{
   state: InitialMessageState;
   dispatch: Dispatch<MessageActions>;
+  readMessages: () => void;
   createMessage: (content: string) => void;
   updateMessage: (_id: string, content: string) => void;
   deleteMessage: (_id: string) => void;
-  readMessagesOfPage: (page: number) => void;
+  readMessagesOfPage: () => void;
 }>({
   state: initialState,
   dispatch: () => null,
+  readMessages: () => null,
   createMessage: () => null,
   updateMessage: () => null,
   deleteMessage: () => null,
@@ -52,14 +58,103 @@ export const MessageProvider: FC = ({ children }) => {
   const [state, dispatch] = useReducer(messageReducer, initialState);
   const { id: namespace } = useRouter().query;
   const socket: Socket<ServerEvents, ClientEvents> = io(
-    `${SOCKET}/${namespace}`
+    `${SOCKET}/namespace-${namespace}`
   );
   const { data: session } = useSession();
 
-  useEffect(() => {
-    readMessages();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [namespace]);
+  const readMessages = async () => {
+    if (!namespace) return;
+    dispatch({
+      type: MessageTypes.LOADING,
+      payload: { loading: true, msg: 'Cargando...' }
+    });
+    const { data }: { data: { msg: string; docs: IMessage[] } } =
+      await axios.get(`${EXPRESS}/api/messages/${namespace}?page=1&size=30`);
+    dispatch({ type: MessageTypes.READ, payload: data.docs });
+    dispatch({ type: MessageTypes.NEXT_PAGE, payload: state.page + 1 });
+    dispatch({
+      type: MessageTypes.LOADING,
+      payload: { loading: false, msg: 'Finalizado' }
+    });
+  };
+
+  const readMessagesOfPage = async () => {
+    if (!namespace) return;
+    dispatch({
+      type: MessageTypes.LOADING,
+      payload: { loading: true, msg: 'Cargando...' }
+    });
+    const { data }: { data: { msg: string; docs: IMessage[] } } =
+      await axios.get(
+        `${EXPRESS}/api/messages/${namespace}?page=${state.page + 1}&size=30`
+      );
+    dispatch({ type: MessageTypes.READ_OF_PAGE, payload: data.docs });
+    if (data.docs.length < 30) {
+      dispatch({ type: MessageTypes.HAS_NEXT_PAGE, payload: false });
+    }
+    dispatch({ type: MessageTypes.NEXT_PAGE, payload: state.page + 1 });
+    dispatch({
+      type: MessageTypes.LOADING,
+      payload: { loading: false, msg: 'Finalizado' }
+    });
+  };
+
+  const createMessage = async (content: string) => {
+    const { data }: { data: { msg: string; _message: IMessage } } =
+      await axios.post(`${EXPRESS}/api/messages`, {
+        content,
+        namespace,
+        author: session?.user._id
+      });
+
+    const _message = {
+      content,
+      namespace,
+      _id: data._message._id,
+      author: session?.user,
+      createdAt: data._message.createdAt
+    };
+
+    socket.emit('message:create', _message as IMessage, (res) => {
+      if ('error' in res) return new Error('Error in create Message');
+
+      dispatch({ type: MessageTypes.CREATE, payload: _message as IMessage });
+    });
+  };
+
+  const updateMessage = async (_id: string, content: string) => {
+    const { data }: { data: { msg: string; _message: IMessage } } =
+      await axios.patch(`${EXPRESS}/api/messages/${_id}`, {
+        content
+      });
+
+    const _message = {
+      _id,
+      content,
+      namespace,
+      author: session?.user,
+      createdAt: data._message.createdAt,
+      updatedAt: data._message.updatedAt
+    };
+
+    socket.emit('message:update', _message as IMessage, (res) => {
+      if ('error' in res) return new Error('Error in update Message');
+
+      dispatch({ type: MessageTypes.UPDATE, payload: _message as IMessage });
+    });
+  };
+
+  const deleteMessage = async (_id: string) => {
+    const { data }: { data: { msg: string; _id: IMessage } } =
+      await axios.delete(`${EXPRESS}/api/messages/${_id}`);
+    // console.log(data);
+
+    socket.emit('message:delete', _id, (res) => {
+      if ('error' in res) return new Error('Error in delete Message');
+
+      dispatch({ type: MessageTypes.DELETE, payload: _id });
+    });
+  };
 
   useEffect(() => {
     socket.on('message:created', (message) => {
@@ -80,81 +175,21 @@ export const MessageProvider: FC = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
-  const readMessages = async () => {
-    if (!namespace) return;
-    const { data }: { data: { msg: string; docs: IMessage[] } } =
-      await axios.get(`${EXPRESS}/api/messages/${namespace}?page=1&size=10`);
-    dispatch({ type: MessageTypes.READ, payload: data.docs });
-  };
+  // useEffect(() => {
+  //   console.log(state.messages);
+  // }, [state]);
 
-  const readMessagesOfPage = async (page: number) => {
-    if (!namespace) return;
-    const { data }: { data: { msg: string; docs: IMessage[] } } =
-      await axios.get(
-        `${EXPRESS}/api/messages/${namespace}?page=${page}&size=10`
-      );
-    dispatch({ type: MessageTypes.READ_OF_PAGE, payload: data.docs });
-  };
-
-  const createMessage = async (content: string) => {
-    const { data }: { data: { msg: string; _message: IMessage } } =
-      await axios.post(`${EXPRESS}/api/messages`, {
-        content,
-        namespace,
-        author: session?.user._id
-      });
-
-    const _message = {
-      content,
-      namespace,
-      _id: data._message._id,
-      author: session?.user
-    };
-
-    socket.emit('message:create', _message, (res) => {
-      if ('error' in res) return new Error('Error in create Message');
-
-      dispatch({ type: MessageTypes.CREATE, payload: _message as IMessage });
-    });
-  };
-
-  const updateMessage = async (_id: string, content: string) => {
-    const { data }: { data: { msg: string; _message: IMessage } } =
-      await axios.patch(`${EXPRESS}/api/messages/${_id}`, {
-        content
-      });
-
-    const _message = {
-      _id,
-      content,
-      namespace,
-      author: session?.user
-    };
-
-    socket.emit('message:update', _message, (res) => {
-      if ('error' in res) return new Error('Error in update Message');
-
-      dispatch({ type: MessageTypes.UPDATE, payload: _message as IMessage });
-    });
-  };
-
-  const deleteMessage = async (_id: string) => {
-    const { data }: { data: { msg: string; _id: IMessage } } =
-      await axios.delete(`${EXPRESS}/api/messages/${_id}`);
-    console.log(data);
-
-    socket.emit('message:delete', _id, (res) => {
-      if ('error' in res) return new Error('Error in delete Message');
-
-      dispatch({ type: MessageTypes.DELETE, payload: _id });
-    });
-  };
+  useEffect(() => {
+    readMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [namespace]);
 
   return (
     <MessageContext.Provider
       value={{
         state,
         dispatch,
+        readMessages,
         createMessage,
         updateMessage,
         deleteMessage,

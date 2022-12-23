@@ -1,9 +1,11 @@
+import { UserID } from '@events/events';
 import { IServer, ServerTypes, ServerActions } from '../types/server.types';
 
 export const serverReducer = (
   state: {
     change: boolean;
     servers: IServer[];
+    users: UserID[];
     mapServers: { [key: string]: IServer };
     id: string | null | undefined;
   },
@@ -11,7 +13,7 @@ export const serverReducer = (
 ) => {
   const { type, payload } = action;
 
-  console.log(state, action);
+  // console.log(state, action);
 
   switch (type) {
     case ServerTypes.CREATE:
@@ -40,7 +42,7 @@ export const serverReducer = (
         mapServers: { ...state.mapServers, [payload._id]: payload }
       };
 
-    case ServerTypes.DELETE:
+    case ServerTypes.DELETE: {
       const newMapServers = state.mapServers;
       delete newMapServers[payload as string];
 
@@ -49,6 +51,7 @@ export const serverReducer = (
         servers: state.servers.filter((el) => el._id !== payload),
         mapServers: newMapServers
       };
+    }
 
     case ServerTypes.GET_LINK: {
       let newMapServers = state.mapServers;

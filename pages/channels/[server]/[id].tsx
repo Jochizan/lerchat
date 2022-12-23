@@ -1,75 +1,147 @@
 import type { NextPage, NextPageContext } from 'next';
-import { useCallback, useContext, useMemo, useRef, useState } from 'react';
+import {
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import { useRouter } from 'next/router';
 import ChatForm from '@components/ChatForm';
 import CardMessage from '@components/CardMessage';
 import NamespaceContext from '@store/namespace.store';
-import { useSession } from 'next-auth/react';
 import ServerContext from '@store/server.store';
 import { MessageContext } from '@store/message.store';
 import usePrevious from '@hooks/usePrevius';
-import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import { IMessage } from '@store/types/message.types';
 import fetch from 'isomorphic-unfetch';
 import { unstable_getServerSession } from 'next-auth';
 import { authOptions } from 'pages/api/auth/[...nextauth]';
 import { IncomingMessage } from 'http';
 import { NextApiRequestCookies } from 'next/dist/server/api-utils';
+import useInfiniteScroll from 'react-infinite-scroll-hook';
+import styled, { keyframes } from 'styled-components';
 
 const savedMessages: { [key: string]: IMessage[] } = {};
 
-const START_INDEX = 500;
+interface ListProps {
+  direction?: 'vertical' | 'horizontal';
+}
+
+const ListContainer = styled.div`
+  max-height: 500px;
+  max-width: 500px;
+  overflow: auto;
+  background-color: #fafafa;
+`;
+
+const List = styled.ul<ListProps>`
+  display: ${({ direction }) =>
+    direction === 'horizontal' ? 'flex' : 'block'};
+  list-style: none;
+  font-size: 16px;
+  margin: 0;
+  padding: 6px;
+`;
+
+const ListItem = styled.li`
+  background-color: #fafafa;
+  border: 1px solid #99b4c0;
+  padding: 8px;
+  margin: 4px;
+`;
+
+const gradientAnimation = keyframes`
+  0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+`;
+
+const LoadingRoot = styled.div`
+  animation: ${gradientAnimation} 2s linear infinite;
+  background: linear-gradient(45deg, #298fee, #11c958, #a120bb, #d6612a);
+  background-size: 600% 600%;
+  color: #fff;
+  padding: 8px;
+`;
+
+function Loading() {
+  return <LoadingRoot>Loading...</LoadingRoot>;
+}
 
 const ChannelsPage: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  const virtuoso = useRef<VirtuosoHandle>(null);
-  const prevChatId = usePrevious(id);
-  const { data: session, status } = useSession({ required: true });
+  // const prevChatId = usePrevious(id);
   const {
-    state: { messages },
+    state: { messages, loading, error, hasNextPage, page },
+    // readMessages,
     createMessage,
     readMessagesOfPage
   } = useContext(MessageContext);
   savedMessages[id as string] = messages;
   const {
-    state: { namespaces, mapNamespaces }
+    state: { mapNamespaces }
   } = useContext(NamespaceContext);
   const {
     state: { mapServers }
   } = useContext(ServerContext);
-  const [firstItemIndex, setFirstItemIndex] = useState(
-    START_INDEX - messages.length
-  );
-  const [page, setPage] = useState(2);
+
+  const [infiniteRef, { rootRef }] = useInfiniteScroll({
+    loading,
+    hasNextPage,
+    onLoadMore: readMessagesOfPage,
+    disabled: !!error,
+    rootMargin: '400px 0px 0px 0px'
+  });
 
   const internalMessages = useMemo(() => {
-    const newFirstItemIndex = START_INDEX - messages.length;
-    setFirstItemIndex(newFirstItemIndex);
     return messages;
   }, [messages]);
 
-  const startReached = useCallback(() => {
-    console.log('Chat: startReached');
-    readMessagesOfPage(page);
-    savedMessages[id as string] = messages;
-    setPage(page + 1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages]);
+  const scrollableRootRef = useRef<HTMLDivElement | null>(null);
+  const lastScrollDistanceToBottomRef = useRef<number>();
 
-  const followOutput = useCallback(
-    (isAtBottom) => (isAtBottom ? 'smooth' : false),
-    []
+  const reversedMessages = useMemo(
+    () => [...internalMessages].reverse(),
+    [internalMessages]
   );
 
-  const scrollToLastIndex = () => {
-    virtuoso.current!.scrollToIndex({
-      index: internalMessages.length - 1,
-      behavior: 'smooth'
-    });
-  };
+  // We keep the scroll position when new items are added etc.
+  useEffect(() => {
+    const scrollableRoot = scrollableRootRef.current;
+    const lastScrollDistanceToBottom =
+      lastScrollDistanceToBottomRef.current ?? 0;
+    if (scrollableRoot) {
+      scrollableRoot.scrollTop = scrollableRoot.scrollHeight;
+    }
+  }, [reversedMessages, rootRef]);
 
-  if (prevChatId !== (id as string)) return null;
+  const rootRefSetter = useCallback(
+    (node: HTMLDivElement) => {
+      rootRef(node);
+      scrollableRootRef.current = node;
+    },
+    [rootRef]
+  );
+
+  const handleRootScroll = useCallback(() => {
+    const rootNode = scrollableRootRef.current;
+    if (rootNode) {
+      const scrollDistanceToBottom = rootNode.scrollHeight - rootNode.scrollTop;
+      lastScrollDistanceToBottomRef.current = scrollDistanceToBottom;
+    }
+  }, []);
+
+  // if (prevChatId !== (id as string)) return null;
 
   if (!Object.keys(mapNamespaces).length || !Object.keys(mapServers).length)
     return <div className='tx-wlight'>Cargando...</div>;
@@ -85,34 +157,30 @@ const ChannelsPage: NextPage = () => {
           <div className='tx-wlight'>Cargando Chat...</div>
         )}
       </h1>
-      <div className='mx-8 flex h-full flex-col' style={{ flex: '1' }}>
+      <div className='mx-8 flex flex-col justify-end h-1 grow'>
         <p className='pr-3 pt-6 m-0 text-lg tx-wlight'>
           Bienvenido al canal general de{' '}
           {mapServers[mapNamespaces[id as string].server].name}
         </p>
-        <hr className='bg-light-chat mt-3 mb-8 flex' />
-        <Virtuoso
-          className='tx-wlight'
+        <hr className='bg-light-chat mt-3 mb-8' />
+        <div
+          className='overflow-auto max-h-min'
+          ref={rootRefSetter}
+          onScroll={handleRootScroll}
           style={{ overscrollBehavior: 'contain' }}
-          data={internalMessages}
-          ref={virtuoso}
-          startReached={startReached}
-          firstItemIndex={Math.max(0, firstItemIndex)}
-          followOutput={followOutput}
-          initialTopMostItemIndex={messages.length - 1}
-          itemContent={(idx, data) => (
-            <CardMessage
-              key={idx}
-              msg={data}
-              nextMsg={internalMessages[idx + 1]}
-            />
-          )}
-          alignToBottom
-        />
-        <ChatForm
-          createMessage={createMessage}
-          scrollToLastIndex={scrollToLastIndex}
-        />
+        >
+          <ul className='m-0 list-none'>
+            {hasNextPage && (
+              <ListItem ref={infiniteRef}>
+                <Loading />
+              </ListItem>
+            )}
+            {reversedMessages.map((msg, idx) => (
+              <CardMessage key={idx} msg={msg} />
+            ))}
+          </ul>
+        </div>
+        <ChatForm createMessage={createMessage} />
       </div>
     </section>
   );

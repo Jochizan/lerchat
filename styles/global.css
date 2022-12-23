@@ -56,7 +56,7 @@ button {
   font-family: var(--font) !important;
 }
 input,
-input:focus,
+/* input:focus, */
 input:active,
 input:target,
 input:hover,
@@ -252,6 +252,23 @@ span {
   color: var(--black-01) !important;
 }
 
+/* [title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  z-index: 40;
+  white-space: nowrap;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #ffffff;
+  background-color: var(--black-03);
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+} */
+
 input.tx-wlight + label {
   color: var(--white-03) !important;
   border: none;
@@ -378,13 +395,13 @@ padding: 0;
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
+/* input:-webkit-autofill:focus, */
 textarea:-webkit-autofill,
 textarea:-webkit-autofill:hover,
-textarea:-webkit-autofill:focus,
+/* textarea:-webkit-autofill:focus, */
 select:-webkit-autofill,
-select:-webkit-autofill:hover,
-select:-webkit-autofill:focus {
+select:-webkit-autofill:hover {
+/* select:-webkit-autofill:focus { */
   /* border: 1px solid #253341; */
   -webkit-text-fill-color: var(--white-03);
   -webkit-box-shadow: 0 0 0px 1000px var(--black-03) inset;

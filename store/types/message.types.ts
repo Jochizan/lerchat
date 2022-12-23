@@ -17,7 +17,9 @@ export enum MessageTypes {
   ERROR = 'ERROR_MESSAGES',
   LOADING = 'LOADING_MESSAGES',
   CHANGE_CONTEXT = 'CHANGE_CONTEXT',
-  READ_OF_PAGE = 'READ_OF_PAGE'
+  READ_OF_PAGE = 'READ_OF_PAGE',
+  NEXT_PAGE = 'NEXT_PAGE',
+  HAS_NEXT_PAGE = 'HAS_NEXT_PAGE'
 }
 
 export enum MessageLocalTypes {
@@ -27,6 +29,8 @@ export enum MessageLocalTypes {
 
 export type IMessage = {
   _id: string | null | undefined;
+  next: boolean | null | undefined;
+  nextTime: boolean | null | undefined;
   author:
     | {
         _id: string | null | undefined;
@@ -39,6 +43,8 @@ export type IMessage = {
     | undefined;
   content: string | null | undefined;
   namespace: string | null | undefined;
+  createdAt: string | null | undefined;
+  updatedAt: string | null | undefined;
 };
 
 type MessagePayload = {
@@ -56,6 +62,8 @@ type MessagePayload = {
   };
   [MessageTypes.CHANGE_CONTEXT]: MessageLocalTypes;
   [MessageTypes.READ_OF_PAGE]: IMessage[];
+  [MessageTypes.NEXT_PAGE]: number;
+  [MessageTypes.HAS_NEXT_PAGE]: boolean;
 };
 
 export type MessageActions =

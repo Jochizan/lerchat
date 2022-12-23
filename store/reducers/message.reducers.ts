@@ -1,3 +1,4 @@
+import { messagesGrouped, messageGrouped } from '@libs/groupedMessages';
 import {
   IMessage,
   MessageTypes,
@@ -9,8 +10,10 @@ export const messageReducer = (
   state: {
     messages: IMessage[];
     type: MessageLocalTypes;
+    hasNextPage: boolean;
     loading: boolean;
     error: boolean;
+    page: number;
   },
   action: MessageActions
 ) => {
@@ -18,26 +21,36 @@ export const messageReducer = (
   console.log(state, action);
   switch (type) {
     case MessageTypes.CREATE:
-      return { ...state, messages: [...state.messages, payload] };
+      return {
+        ...state,
+        messages: messageGrouped([payload, ...state.messages])
+      };
 
     case MessageTypes.READ:
-      return { ...state, messages: payload };
+      return { ...state, messages: messagesGrouped(payload) };
 
     case MessageTypes.READ_OF_PAGE:
-      return { ...state, messages: [...payload, ...state.messages] };
+      return {
+        ...state,
+        messages: messagesGrouped([...state.messages, ...payload])
+      };
 
     case MessageTypes.UPDATE:
       return {
         ...state,
-        messages: state.messages.map((el) =>
-          el._id === action.payload._id ? action.payload : el
+        messages: messagesGrouped(
+          state.messages.map((el) =>
+            el._id === action.payload._id ? action.payload : el
+          )
         )
       };
 
     case MessageTypes.DELETE:
       return {
         ...state,
-        messages: state.messages.filter((el) => el._id !== action.payload)
+        messages: messagesGrouped(
+          state.messages.filter((el) => el._id !== action.payload)
+        )
       };
 
     case MessageTypes.LOADING:
@@ -57,6 +70,18 @@ export const messageReducer = (
         type: MessageLocalTypes.MD
           ? MessageLocalTypes.NAMESPACE
           : MessageLocalTypes.MD
+      };
+
+    case MessageTypes.HAS_NEXT_PAGE:
+      return {
+        ...state,
+        hasNextPage: payload
+      };
+
+    case MessageTypes.NEXT_PAGE:
+      return {
+        ...state,
+        page: payload
       };
     default:
       return state;

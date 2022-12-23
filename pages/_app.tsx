@@ -10,12 +10,19 @@ import { ThemeProvider } from '@material-tailwind/react';
 import MainNavbar from 'layouts/Navbar';
 import ChatNavbar from 'layouts/ChatNavbar';
 import { useRouter } from 'next/router';
+import { UsersProvider } from '@store/user.store';
 
 const AuthProvider = ({ children }: any) => {
   // if `{ required: true }` is supplied, `status` can only be "loading" or "authenticated"
   const { status } = useSession({ required: true });
 
   if (status === 'loading') return <div>Loading...</div>;
+
+  // socket.emit('user:connect', session.user._id as UserID, (res) => {
+  //   console.log(res);
+  // });
+
+  // socket.close();
 
   return children;
 };
@@ -71,22 +78,24 @@ const App = ({
   return (
     <SessionProvider session={session} refetchInterval={5 * 60}>
       <ServerProvider>
-        <NamespaceProvider>
-          <MessageProvider>
-            <Head>
-              <title>LerChat</title>
-            </Head>
-            <ThemeProvider>
-              <AuthProvider>
-                <Aside>
-                  <ChatNavbar>
-                    <Component {...pageProps} />
-                  </ChatNavbar>
-                </Aside>
-              </AuthProvider>
-            </ThemeProvider>
-          </MessageProvider>
-        </NamespaceProvider>
+        <UsersProvider>
+          <NamespaceProvider>
+            <MessageProvider>
+              <Head>
+                <title>LerChat</title>
+              </Head>
+              <ThemeProvider>
+                <AuthProvider>
+                  <Aside>
+                    <ChatNavbar>
+                      <Component {...pageProps} />
+                    </ChatNavbar>
+                  </Aside>
+                </AuthProvider>
+              </ThemeProvider>
+            </MessageProvider>
+          </NamespaceProvider>
+        </UsersProvider>
       </ServerProvider>
     </SessionProvider>
   );
