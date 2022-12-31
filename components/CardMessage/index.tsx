@@ -14,8 +14,10 @@ import { hideMenu } from 'react-contextmenu/modules/actions';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { IServer } from '@store/types/server.types';
 import { checkDate } from '@libs/groupedMessages';
+import { useSession } from 'next-auth/react';
 
 const CardMessage = ({ msg }: { msg: IMessage }) => {
+  const { data: session } = useSession();
   const { deleteMessage, updateMessage } = useContext(MessageContext);
   const {
     register,
@@ -35,6 +37,10 @@ const CardMessage = ({ msg }: { msg: IMessage }) => {
 
   const handleOpenDelete = () => setOpenDelete(!openDelete);
   const handleOpenUpdate = () => setOpenUpdate(!openUpdate);
+
+  if (!msg.author) return null;
+
+  const isAuthor = session?.user._id === msg?.author._id;
 
   const handleDeleteMessage = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -85,29 +91,37 @@ const CardMessage = ({ msg }: { msg: IMessage }) => {
             )}
             <section>
               {showIcons && (
-                <div className='absolute right-0 -top-4'>
-                  <button
-                    className='bg-red-600 text-white p-0.5 rounded-sm'
-                    title='Borrar mensaje'
-                    onClick={() => handleOpenDelete()}
-                  >
-                    <i className='material-icons flex items-center'>delete</i>
-                  </button>
-                  <button
-                    className='bg-yellow-600 text-white p-0.5 rounded-sm'
-                    title='Borrar mensaje'
-                    onClick={() => handleOpenUpdate()}
-                  >
-                    <i className='material-icons flex items-center'>edit</i>
-                  </button>
-                  <button
-                    className='bg-gray-600 text-white p-0.5 rounded-sm'
-                    title='Mostrar más opciones'
-                  >
-                    <i className='material-icons flex items-center'>
-                      more_horiz
-                    </i>
-                  </button>
+                <div className='absolute flex right-0 -top-4'>
+                  {isAuthor && (
+                    <div className='m-0 p-0'>
+                      <button
+                        className='bg-red-600 text-white p-0.5 rounded-sm'
+                        title='Borrar mensaje'
+                        onClick={() => handleOpenDelete()}
+                      >
+                        <i className='material-icons flex items-center'>
+                          delete
+                        </i>
+                      </button>
+                      <button
+                        className='bg-yellow-600 text-white p-0.5 rounded-sm'
+                        title='Editar mensaje'
+                        onClick={() => handleOpenUpdate()}
+                      >
+                        <i className='material-icons flex items-center'>edit</i>
+                      </button>{' '}
+                    </div>
+                  )}
+                  <div className='m-0 p-0'>
+                    <button
+                      className='bg-gray-600 text-white p-0.5 rounded-sm'
+                      title='Mostrar más opciones'
+                    >
+                      <i className='material-icons flex items-center'>
+                        more_horiz
+                      </i>
+                    </button>
+                  </div>
                 </div>
               )}
               {(msg.next || msg.nextTime) && (
@@ -264,9 +278,13 @@ const CardMessage = ({ msg }: { msg: IMessage }) => {
         </form>
       </Dialog>
       <ContextMenu id={ID_MENU}>
-        <MenuItem onClick={handleDeleteMessage}>Borrar</MenuItem>
-        <MenuItem divider />
-        <MenuItem onClick={handleUpdateMessage}>Actualizar</MenuItem>
+        {isAuthor && (
+          <>
+            <MenuItem onClick={handleDeleteMessage}>Borrar</MenuItem>
+            <MenuItem divider />
+            <MenuItem onClick={handleUpdateMessage}>Actualizar</MenuItem>
+          </>
+        )}
       </ContextMenu>
     </>
   );

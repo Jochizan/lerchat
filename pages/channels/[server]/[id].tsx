@@ -1,20 +1,12 @@
 import type { NextPage, NextPageContext } from 'next';
-import {
-  forwardRef,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/router';
 import ChatForm from '@components/ChatForm';
 import CardMessage from '@components/CardMessage';
 import NamespaceContext from '@store/namespace.store';
 import ServerContext from '@store/server.store';
 import { MessageContext } from '@store/message.store';
-import usePrevious from '@hooks/usePrevius';
+// import usePrevious from '@hooks/usePrevius';
 import { IMessage } from '@store/types/message.types';
 import fetch from 'isomorphic-unfetch';
 import { unstable_getServerSession } from 'next-auth';
@@ -22,67 +14,15 @@ import { authOptions } from 'pages/api/auth/[...nextauth]';
 import { IncomingMessage } from 'http';
 import { NextApiRequestCookies } from 'next/dist/server/api-utils';
 import useInfiniteScroll from 'react-infinite-scroll-hook';
-import styled, { keyframes } from 'styled-components';
 
 const savedMessages: { [key: string]: IMessage[] } = {};
-
-interface ListProps {
-  direction?: 'vertical' | 'horizontal';
-}
-
-const ListContainer = styled.div`
-  max-height: 500px;
-  max-width: 500px;
-  overflow: auto;
-  background-color: #fafafa;
-`;
-
-const List = styled.ul<ListProps>`
-  display: ${({ direction }) =>
-    direction === 'horizontal' ? 'flex' : 'block'};
-  list-style: none;
-  font-size: 16px;
-  margin: 0;
-  padding: 6px;
-`;
-
-const ListItem = styled.li`
-  background-color: #fafafa;
-  border: 1px solid #99b4c0;
-  padding: 8px;
-  margin: 4px;
-`;
-
-const gradientAnimation = keyframes`
-  0% {
-		background-position: 0% 50%;
-	}
-	50% {
-		background-position: 100% 50%;
-	}
-	100% {
-		background-position: 0% 50%;
-	}
-`;
-
-const LoadingRoot = styled.div`
-  animation: ${gradientAnimation} 2s linear infinite;
-  background: linear-gradient(45deg, #298fee, #11c958, #a120bb, #d6612a);
-  background-size: 600% 600%;
-  color: #fff;
-  padding: 8px;
-`;
-
-function Loading() {
-  return <LoadingRoot>Loading...</LoadingRoot>;
-}
 
 const ChannelsPage: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
   // const prevChatId = usePrevious(id);
   const {
-    state: { messages, loading, error, hasNextPage, page },
+    state: { messages, loading, error, hasNextPage },
     // readMessages,
     createMessage,
     readMessagesOfPage
@@ -99,9 +39,11 @@ const ChannelsPage: NextPage = () => {
     loading,
     hasNextPage,
     onLoadMore: readMessagesOfPage,
-    disabled: !!error,
-    rootMargin: '400px 0px 0px 0px'
+    disabled: !!error
+    // rootMargin: '100px 0px 0px 0px'
   });
+
+  console.log(error, hasNextPage, loading);
 
   const internalMessages = useMemo(() => {
     return messages;
@@ -141,26 +83,27 @@ const ChannelsPage: NextPage = () => {
     }
   }, []);
 
-  // if (prevChatId !== (id as string)) return null;
-
-  if (!Object.keys(mapNamespaces).length || !Object.keys(mapServers).length)
+  if (!Object.values(mapNamespaces).length || !Object.values(mapServers).length)
     return <div className='tx-wlight'>Cargando...</div>;
 
   if (!mapNamespaces[id as string]) return <div>Cargando Chat</div>;
 
+  const namespaceName = mapNamespaces[id as string]
+    ? mapNamespaces[id as string]?.name
+    : 'Cargando Chat';
+
+  const serverName = mapServers[mapNamespaces[id as string]?.server as string]
+    ? mapServers[mapNamespaces[id as string]?.server as string]?.name
+    : 'Cargando Chat';
+
   return (
     <section className='h-full flex flex-col grow justify-between'>
       <h1 className='text-center m-0 py-3 display-1 fw-normal tx-wlight'>
-        {Object.keys(mapNamespaces).length ? (
-          mapNamespaces[id as string]?.name
-        ) : (
-          <div className='tx-wlight'>Cargando Chat...</div>
-        )}
+        {namespaceName}
       </h1>
       <div className='mx-8 flex flex-col justify-end h-1 grow'>
         <p className='pr-3 pt-6 m-0 text-lg tx-wlight'>
-          Bienvenido al canal general de{' '}
-          {mapServers[mapNamespaces[id as string].server].name}
+          Bienvenido al canal {namespaceName} de {serverName}
         </p>
         <hr className='bg-light-chat mt-3 mb-8' />
         <div
@@ -171,9 +114,11 @@ const ChannelsPage: NextPage = () => {
         >
           <ul className='m-0 list-none'>
             {hasNextPage && (
-              <ListItem ref={infiniteRef}>
-                <Loading />
-              </ListItem>
+              <li ref={infiniteRef}>
+                <div className='tx-wlight flex justify-center'>
+                  <i className='material-icons spin'>refresh</i>
+                </div>
+              </li>
             )}
             {reversedMessages.map((msg, idx) => (
               <CardMessage key={idx} msg={msg} />
@@ -209,7 +154,7 @@ export async function getServerSideProps(context: NextPageContext) {
       const data = await user.json();
 
       if (!data.ok) {
-        const loginUrl = `/channels/notAccess?redirectTo=${encodeURIComponent(
+        const loginUrl = `/channels/noAccess?redirectTo=${encodeURIComponent(
           req?.url || false
         )}`;
         res.writeHead(302, 'Not verify user server', { Location: loginUrl });

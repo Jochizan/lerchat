@@ -1,13 +1,11 @@
 import { createContext, FC, useEffect, Dispatch, useReducer } from 'react';
 import { IServer, ServerActions, ServerTypes } from './types/server.types';
-import { EXPRESS, SOCKET } from '@services/enviroments';
+import { EXPRESS } from '@services/enviroments';
 import { useSession } from 'next-auth/react';
 import { serverReducer } from './reducers/server.reducer';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import { io, Socket } from 'socket.io-client';
-import { ServerEvents, UserID } from '@events/events';
-import { ClientEvents } from '@events/events';
+import { UserID } from '@events/events';
 // import { IUser } from './types/user.types';
 
 export type InitialServerState = {
@@ -54,15 +52,10 @@ const ServerContext = createContext<{
 export const ServerProvider: FC = ({ children }) => {
   const [state, dispatch] = useReducer(serverReducer, initialState);
   const {
-    query: { server },
-    ...route
+    query: { server }
+    // ...route
   } = useRouter();
   const { data: session } = useSession();
-  // const socket: Socket<ServerEvents, ClientEvents> = io(
-  //   `${SOCKET}/servers/${server}`
-  // );
-
-  const socket: Socket<ServerEvents | ClientEvents> = io(`${SOCKET}/servers`);
 
   const handleIdServer = (server: string) => {
     localStorage.setItem('id-server', server);
@@ -141,8 +134,6 @@ export const ServerProvider: FC = ({ children }) => {
   //   // socket.on('user:disconnect', (userID: UserID) => {
   //   //   dispatch({ type: ServerTypes.DISCONNECT, payload: userID});
   //   // });
-
-
 
   //   // console.log(state);
 

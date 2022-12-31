@@ -37,6 +37,14 @@ export type IUser = {
   defaultState: string;
 };
 
+export type IUserServer = {
+  _id: string;
+  user: string;
+  server: string;
+  namespace: string;
+  role: string;
+}
+
 type UserPayload = {
   [UserTypes.CREATE]: IUser;
   [UserTypes.READ]: IUser[];

@@ -24,13 +24,15 @@ export const serverReducer = (
       };
 
     case ServerTypes.READ:
+      const mapServers: { [key: string]: IServer } = {};
+      payload.forEach((el) => {
+        mapServers[el._id] = el;
+      });
+
       return {
         ...state,
         servers: payload,
-        mapServers: payload.reduce<{ [key: string]: IServer }>((acc, el) => {
-          acc[el._id] = el;
-          return acc;
-        }, {})
+        mapServers
       };
 
     case ServerTypes.UPDATE:

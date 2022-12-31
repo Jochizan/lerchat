@@ -1,4 +1,5 @@
 import { INamespace } from 'store/types/namespace.types';
+import { ICategory } from 'store/types/category.types';
 import { IMessage } from 'store/types/message.types';
 import { IServer } from 'store/types/server.types';
 
@@ -15,6 +16,7 @@ interface Success<T> {
 export type MessageID = string | undefined;
 export type ServerID = string | undefined;
 export type UserID = string | undefined;
+export type CategoryID = string | undefined;
 export type NamespaceID = string | undefined;
 
 export type Response<T> = Success<T> | Error;
@@ -27,6 +29,10 @@ export interface ServerEvents {
   'namespace:created': (namespace: INamespace) => void;
   'namespace:updated': (namespace: INamespace) => void;
   'namespace:deleted': (id: NamespaceID) => void;
+
+  'category:created': (category: ICategory) => void;
+  'category:updated': (category: ICategory) => void;
+  'category:deleted': (id: CategoryID) => void;
 
   // 'server:created': (server: IServer) => void;
   // 'server:updated': (server: IServer) => void;
@@ -52,7 +58,7 @@ export interface ClientEvents {
     callback: (res: Response<void>) => void
   ) => void;
   'message:delete': (
-    id: MessageID,
+    payload: { _id: MessageID; namespace: NamespaceID },
     callback: (res: Response<void>) => void
   ) => void;
 
@@ -69,6 +75,32 @@ export interface ClientEvents {
     callback: (res: Response<void>) => void
   ) => void;
   'namespace:delete': (
+    id: NamespaceID,
+    callback: (res: Response<void>) => void
+  ) => void;
+
+  'category:create': (
+    payload: ICategory,
+    callback: (res: Response<void>) => void
+  ) => void;
+  'category:read': (
+    id: CategoryID,
+    callback: (res: Response<void>) => void
+  ) => void;
+  'category:update': (
+    payload: ICategory,
+    callback: (res: Response<void>) => void
+  ) => void;
+  'category:delete': (
+    id: CategoryID,
+    callback: (res: Response<void>) => void
+  ) => void;
+
+  'join:namespace': (
+    id: NamespaceID,
+    callback: (res: Response<void>) => void
+  ) => void;
+  'leave:namespace': (
     id: NamespaceID,
     callback: (res: Response<void>) => void
   ) => void;

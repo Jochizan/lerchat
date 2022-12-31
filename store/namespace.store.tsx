@@ -12,13 +12,13 @@ import {
   Dispatch,
   FC
 } from 'react';
-import { EXPRESS, SOCKET } from '@services/enviroments';
+import { EXPRESS } from '@services/enviroments';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import ServerContext from './server.store';
 import { useSession } from 'next-auth/react';
-import { io, Socket } from 'socket.io-client';
-import { ClientEvents, ServerEvents } from '@events/events';
+import { IUserServer } from './types/user.types';
+import { SocketContext } from './socket.store';
 
 export type InitialNamespaceState = {
   id: string | null | undefined;
@@ -64,19 +64,46 @@ export const NamespaceProvider: FC = ({ children }) => {
   const { query, ...route } = useRouter();
   const { data: session } = useSession();
   const [state, dispatch] = useReducer(namespaceReducer, initialState);
+  const { socket } = useContext(SocketContext);
 
   const {
     state: { id: idServer, change }
-    // dispatch: dispatchServer
   } = useContext(ServerContext);
-  const socket: Socket<ServerEvents, ClientEvents> = io(
-    `${SOCKET}/server-${idServer}`
-  );
 
-  const handleIdNamespace = (namespace: string) => {
-    if (!namespace) return;
-    localStorage.setItem('id-namespace', namespace);
-    dispatch({ type: NamespaceTypes.CHANGE_ID, payload: namespace });
+  const handleIdNamespace = async (namespace: string) => {
+    if (!query.server) return;
+
+    const res = await axios.patch(
+      `${EXPRESS}/api/user-servers/${query.server}/${session?.user._id}`,
+      { namespace }
+    );
+    const { msg, _userServer }: { msg: string; _userServer: IUserServer } =
+      res.data;
+
+    localStorage.setItem('id-namespace', _userServer.namespace);
+    dispatch({
+      type: NamespaceTypes.CHANGE_ID,
+      payload: _userServer.namespace
+    });
+    push(`/channels/${idServer}/${namespace}`);
+  };
+
+  const readIdNamespace = async (idServer: string) => {
+    if (!idServer) return;
+    if (!session?.user) return;
+
+    const res = await axios.get(
+      `${EXPRESS}/api/user-servers/${idServer}/${session?.user._id}`
+    );
+    const { msg, _userServer }: { msg: string; _userServer: IUserServer } =
+      res.data;
+
+    localStorage.setItem('id-namespace', _userServer.namespace);
+    dispatch({
+      type: NamespaceTypes.CHANGE_ID,
+      payload: _userServer.namespace
+    });
+    return _userServer.namespace;
   };
 
   const readNamespaces = async (
@@ -90,12 +117,16 @@ export const NamespaceProvider: FC = ({ children }) => {
         `${EXPRESS}/api/namespaces/@server/${server}`
       );
       const data: { msg: string; docs: INamespace[] } = res.data;
+      const namespace = await readIdNamespace(server);
 
       if (data.docs) {
         dispatch({ type: NamespaceTypes.READ, payload: data.docs });
-        handleIdNamespace(data.docs[0]._id);
-        // dispatchServer({ type: ServerTypes.CHANGE, payload: false });
-        if (change) push(`/channels/${server}/${data.docs[0]._id}`);
+        // console.log(query);
+        if (!namespace) {
+          push(`/channels/${server}/${data.docs[0]._id}`);
+        } else {
+          push(`/channels/${server}/${namespace}`);
+        }
       }
     } catch (err: any) {
       console.error(err);
@@ -113,7 +144,6 @@ export const NamespaceProvider: FC = ({ children }) => {
 
         dispatch({ type: NamespaceTypes.CREATE, payload: data._namespace });
         handleIdNamespace(data._namespace._id);
-        if (change) push(`/channels/${idServer}/${data._namespace._id}`);
       });
     } catch (err: any) {
       console.error(err);
@@ -133,7 +163,6 @@ export const NamespaceProvider: FC = ({ children }) => {
 
         dispatch({ type: NamespaceTypes.UPDATE, payload: data._namespace });
       });
-      // dispatchServer({ type: ServerTypes.CHANGE, payload: false });
     } catch (err: any) {
       console.error(err);
     }
@@ -149,16 +178,10 @@ export const NamespaceProvider: FC = ({ children }) => {
 
         dispatch({ type: NamespaceTypes.DELETE, payload: _id });
       });
-      // dispatchServer({ type: ServerTypes.CHANGE, payload: false });
     } catch (err: any) {
       console.error(err);
     }
   };
-
-  // useEffect(() => {
-  //   readNamespaces(idServer as string, change);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [idServer]);
 
   useEffect(() => {
     socket.on('namespace:created', (namespace) => {
@@ -183,10 +206,33 @@ export const NamespaceProvider: FC = ({ children }) => {
     if (state.namespaces.length !== 0 || route.pathname.includes('@me')) return;
 
     readNamespaces(idServer as string, true);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // console.log(query);
+  useEffect(() => {
+    if (route.pathname.includes('@me')) return;
+    readNamespaces(idServer as string, change);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idServer]);
+
+  useEffect(() => {
+    if (state.namespaces.length !== 0 || !route.pathname.includes('@me')) {
+      // socket.emit('join:namespace', query.id as string, (a) => {
+      //   console.log(a);
+      // });
+      handleIdNamespace(query.id as string);
+    }
+
+    // return () => {
+    //   socket.emit('leave:namespace', query.id as string, (a) => {
+    //     console.log(a);
+    //   });
+    //   socket.disconnect();
+    // };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query.id]);
 
   return (
     <NamespaceContext.Provider

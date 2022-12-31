@@ -1,4 +1,4 @@
-import { useEffect, FC, useReducer, createContext, Dispatch } from 'react';
+import { FC, useEffect, useReducer, createContext, Dispatch } from 'react';
 import {
   MessageLocalTypes,
   MessageActions,
@@ -6,12 +6,12 @@ import {
   IMessage
 } from './types/message.types';
 import { messageReducer } from './reducers/message.reducers';
-import { ClientEvents, ServerEvents } from '../events/events';
 import { EXPRESS, SOCKET } from '@services/enviroments';
-import { io, Socket } from 'socket.io-client';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { ClientEvents, NamespaceID, ServerEvents } from '@events/events';
 import axios from 'axios';
+import { io, Socket } from 'socket.io-client';
 
 export type InitialMessageState = {
   messages: IMessage[];
@@ -57,10 +57,10 @@ export const MessageContext = createContext<{
 export const MessageProvider: FC = ({ children }) => {
   const [state, dispatch] = useReducer(messageReducer, initialState);
   const { id: namespace } = useRouter().query;
+  const { data: session } = useSession();
   const socket: Socket<ServerEvents, ClientEvents> = io(
     `${SOCKET}/namespace-${namespace}`
   );
-  const { data: session } = useSession();
 
   const readMessages = async () => {
     if (!namespace) return;
@@ -71,7 +71,8 @@ export const MessageProvider: FC = ({ children }) => {
     const { data }: { data: { msg: string; docs: IMessage[] } } =
       await axios.get(`${EXPRESS}/api/messages/${namespace}?page=1&size=30`);
     dispatch({ type: MessageTypes.READ, payload: data.docs });
-    dispatch({ type: MessageTypes.NEXT_PAGE, payload: state.page + 1 });
+    dispatch({ type: MessageTypes.NEXT_PAGE, payload: 1 });
+    dispatch({ type: MessageTypes.HAS_NEXT_PAGE, payload: true });
     dispatch({
       type: MessageTypes.LOADING,
       payload: { loading: false, msg: 'Finalizado' }
@@ -149,11 +150,15 @@ export const MessageProvider: FC = ({ children }) => {
       await axios.delete(`${EXPRESS}/api/messages/${_id}`);
     // console.log(data);
 
-    socket.emit('message:delete', _id, (res) => {
-      if ('error' in res) return new Error('Error in delete Message');
+    socket.emit(
+      'message:delete',
+      { _id, namespace } as { namespace: NamespaceID; _id: NamespaceID },
+      (res) => {
+        if ('error' in res) return new Error('Error in delete Message');
 
-      dispatch({ type: MessageTypes.DELETE, payload: _id });
-    });
+        dispatch({ type: MessageTypes.DELETE, payload: _id });
+      }
+    );
   };
 
   useEffect(() => {
@@ -171,14 +176,18 @@ export const MessageProvider: FC = ({ children }) => {
 
     return () => {
       socket.off();
+      // console.log(socket);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
-  // useEffect(() => {
-  //   console.log(state.messages);
-  // }, [state]);
-
+  useEffect(() => {
+    return () => {
+      socket.disconnect();
+      socket.close();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useEffect(() => {
     readMessages();
     // eslint-disable-next-line react-hooks/exhaustive-deps

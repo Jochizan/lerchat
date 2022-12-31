@@ -21,11 +21,15 @@ const ChatNavbar: FC = ({ children }) => {
       'resize',
       () => window.innerWidth >= 960 && setOpenNav(false)
     );
+
+    return () => {
+      window.removeEventListener('resize', () => null);
+    };
   }, []);
 
   return (
     <>
-      <Navbar className='mx-auto max-w-none py-0.5 px-2 lg:px-4 lg:py-2 rounded-none bg-dark-01'>
+      <Navbar className='mx-auto max-w-none py-0.5 px-2 lg:px-4 lg:py-1.5 my-0.5 rounded-none bg-dark-01'>
         <div className='mx-auto flex items-center justify-between tx-wlight'>
           <label className='hidden lg:block relative w-5/12'>
             <input
@@ -47,7 +51,7 @@ const ChatNavbar: FC = ({ children }) => {
               className='hidden br-secondary-50 rounded-2xl tx-wlight capitalize font-medium text-sm
               br-dark-01 lg:flex justify-center items-center'
               onClick={() => {
-                disconnectUser();
+                // disconnectUser();
                 signOut({
                   redirect: true,
                   callbackUrl: '/'

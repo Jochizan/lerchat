@@ -36,7 +36,7 @@ const Aside: FC = ({ children }) => {
   const {
     state: { users }
   } = useContext(UsersContext);
-  const { data: session } = useSession();
+  // const { data: session } = useSession();
   const {
     state: { namespaces },
     readNamespaces,
@@ -96,19 +96,29 @@ const Aside: FC = ({ children }) => {
 
   const handleCreateNamespace: SubmitHandler<INamespace> = (data) => {
     createNamespace({ ...data, server: idServer as string });
-    handleOpenServer();
+    handleOpenNamespace();
   };
 
   return (
     <section className='flex h-screen'>
       <aside className='bg-ndark h-full flex flex-col'>
-        <div className='w-10 max-h-20 h-20 items-center text-center'>
+        <div className='w-10 max-h-20 h-16 items-center text-center'>
           <Link href='/home' passHref>
             <span className='text-base tx-wlight cursor-pointer'>LerChat</span>
           </Link>
         </div>
         <div className='flex h-full'>
           <div className='flex flex-col items-center gap-3 h-full max-h-screen p-0.5 w-16'>
+            <div className='border-b border-gray-700 pb-3'>
+              <Button
+                className='bg-primary p-0.5 py-1 w-10 h-10 group static z-0 rounded-2xl hover:rounded-lg flex justify-center items-center'
+                onClick={() => {
+                  router.push('/channels/@me');
+                }}
+              >
+                <i className='material-icons'>chat_bubble</i>
+              </Button>
+            </div>
             <ModalForm
               open={openCreate}
               handler={handleOpenCreate}
@@ -150,7 +160,7 @@ const Aside: FC = ({ children }) => {
                     <ButtonServer
                       className={`bg-${
                         image !== 'default.png' ? 'transparent' : 'primary'
-                      } p-0.5 py-1 w-10 h-10 group static z-0 tx-wlight rounded-lg hover:rounded-md ease-out transition-all  uppercase`}
+                      } p-0.5 py-1 w-10 h-10 group static z-0 tx-wlight rounded-2xl hover:rounded-lg ease-out transition-all  uppercase`}
                       submit={() => {
                         setClick(true);
                         handleIdServer(_id);
@@ -163,12 +173,12 @@ const Aside: FC = ({ children }) => {
                         <Image
                           src={`/${image}`}
                           alt='Logo del servidor'
-                          className='rounded-2xl hover:rounded-xl ease-out transition-all'
+                          className='rounded-2xl hover:rounded-lg ease-out transition-all'
                           width={20}
                           height={20}
                         />
                       ) : (
-                        <div className='rounded-2xl text-xl hover:rounded-xl ease-out transition-all'>
+                        <div className='rounded-2xl text-xl hover:rounded-lg ease-out transition-all'>
                           {name.slice(0, 2)}
                         </div>
                       )}
@@ -195,13 +205,13 @@ const Aside: FC = ({ children }) => {
             )}
             <div>
               <Button
-                className='bg-primary p-0.5 py-1 w-10 h-10 group static z-0'
+                className='bg-primary p-0.5 py-1 w-10 h-10 group static z-0 rounded-2xl hover:rounded-lg flex justify-center items-center'
                 onClick={handleOpenCreate}
               >
                 <div className='bg-dark-02 text-xs rounded-lg w-fit p-1.5 items-center h-8 ml-12 z-10 hidden group-hover:flex absolute tx-wlight'>
                   Crear Servidor
                 </div>
-                <span className='text-2xl'>+</span>
+                <i className='material-icons'>add</i>
               </Button>
             </div>
           </div>
@@ -281,7 +291,7 @@ const Aside: FC = ({ children }) => {
               Obtener link de grupo
             </MenuItem>
             <MenuItem divider />
-            <MenuItem onClick={setOpenNamespace} data={{ _id: idServer }}>
+            <MenuItem onClick={handleOpenNamespace} data={{ _id: idServer }}>
               Crear espacio de chat
             </MenuItem>
           </ContextMenu>
@@ -329,8 +339,8 @@ const Aside: FC = ({ children }) => {
 
 export default Aside;
 
-
-        {/* <Virtuoso
+{
+  /* <Virtuoso
           className='tx-wlight mb-3'
           style={{ overscrollBehavior: 'contain', overflowY: 'scroll' }}
           data={internalMessages}
@@ -349,4 +359,5 @@ export default Aside;
             />
           )}
           alignToBottom
-        /> */}
+        /> */
+}

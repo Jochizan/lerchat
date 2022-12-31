@@ -2,14 +2,24 @@ import { IMessage } from '@store/types/message.types';
 
 export const messagesGrouped = (payload: IMessage[]) => {
   // const groupedMessages: number[] = [];
-  if (!(payload.length > 0)) return [];
+  if (payload.length < 1) {
+    return payload;
+  }
+
+  if (payload.length < 2) {
+    payload[0].next = true;
+    payload[0].nextTime = false;
+    return payload;
+  }
   let author = payload[payload.length - 1].author?._id;
   payload[payload.length - 1].next = true;
   payload[payload.length - 1].nextTime = true;
   for (let i = payload.length - 2; i >= 0; i--) {
     let beforeAuthor = payload[i + 1].author?._id;
     if (author !== beforeAuthor) {
-      payload[i].next = true;
+      payload[i + 1].next = true;
+      author = beforeAuthor;
+      continue;
     }
 
     if (
@@ -29,6 +39,16 @@ export const messagesGrouped = (payload: IMessage[]) => {
 }; //
 
 export const messageGrouped = (payload: IMessage[]) => {
+  if (payload.length < 1) {
+    return payload;
+  }
+
+  if (payload.length < 2) {
+    payload[0].next = true;
+    payload[0].nextTime = false;
+    return payload;
+  }
+
   if (
     Math.abs(
       new Date(payload[0].createdAt as string).getTime() -
@@ -39,10 +59,7 @@ export const messageGrouped = (payload: IMessage[]) => {
     return payload;
   }
 
-  if (
-    payload[0].author?._id !==
-    payload[1].author?._id
-  ) {
+  if (payload[0].author?._id !== payload[1].author?._id) {
     payload[0].next = true;
     return payload;
   }

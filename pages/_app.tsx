@@ -11,6 +11,7 @@ import MainNavbar from 'layouts/Navbar';
 import ChatNavbar from 'layouts/ChatNavbar';
 import { useRouter } from 'next/router';
 import { UsersProvider } from '@store/user.store';
+import { SocketProvider } from '@store/socket.store';
 
 const AuthProvider = ({ children }: any) => {
   // if `{ required: true }` is supplied, `status` can only be "loading" or "authenticated"
@@ -78,24 +79,26 @@ const App = ({
   return (
     <SessionProvider session={session} refetchInterval={5 * 60}>
       <ServerProvider>
-        <UsersProvider>
-          <NamespaceProvider>
-            <MessageProvider>
-              <Head>
-                <title>LerChat</title>
-              </Head>
-              <ThemeProvider>
-                <AuthProvider>
-                  <Aside>
-                    <ChatNavbar>
-                      <Component {...pageProps} />
-                    </ChatNavbar>
-                  </Aside>
-                </AuthProvider>
-              </ThemeProvider>
-            </MessageProvider>
-          </NamespaceProvider>
-        </UsersProvider>
+        <SocketProvider>
+          <UsersProvider>
+            <NamespaceProvider>
+              <MessageProvider>
+                <Head>
+                  <title>LerChat</title>
+                </Head>
+                <ThemeProvider>
+                  <AuthProvider>
+                    <Aside>
+                      <ChatNavbar>
+                        <Component {...pageProps} />
+                      </ChatNavbar>
+                    </Aside>
+                  </AuthProvider>
+                </ThemeProvider>
+              </MessageProvider>
+            </NamespaceProvider>
+          </UsersProvider>
+        </SocketProvider>
       </ServerProvider>
     </SessionProvider>
   );

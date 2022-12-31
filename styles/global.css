@@ -182,9 +182,11 @@ span {
 }
 
 .bg-primary:hover {
-  box-shadow: var(--primary-color) 0px 6px 7px,
-    var(--primary-75-color) 0px -6px 15px, var(--primary-75-color) 0px 2px 3px,
-    var(--primary-75-color) 0px 6px 7px, var(--primary-50-color) 0px -2px 3px !important;
+  /* box-shadow: var(--primary-color) 0px 6px 7px, */
+  /* var(--primary-75-color) 0px -6px 15px, var(--primary-75-color) 0px 2px 3px, */
+  /* var(--primary-75-color) 0px 6px 7px, var(--primary-50-color) 0px -2px 3px !important; */
+  /* box-shadow: var(--primary-75-color) 0px 1px 4px; */
+  box-shadow: var(--primary-75-color) 0px 5px 15px;
 }
 
 .br-primary {
@@ -316,8 +318,8 @@ input.tx-wdark + label {
 .react-contextmenu {
   background-color: #fff;
   background-clip: padding-box;
-  border: 1px solid rgba(0,0,0,.15);
-  border-radius: .25rem;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
   color: #373a3c;
   font-size: 16px;
   margin: 2px 0 0;
@@ -340,7 +342,7 @@ input.tx-wdark + label {
   background: 0 0;
   border: 0;
   color: #373a3c;
-cursor: pointer;
+  cursor: pointer;
   font-weight: 400;
   line-height: 1.5;
   padding: 3px 20px;
@@ -359,30 +361,31 @@ cursor: pointer;
 .react-contextmenu-item.react-contextmenu-item--disabled,
 .react-contextmenu-item.react-contextmenu-item--disabled:hover {
   background-color: transparent;
-  border-color: rgba(0,0,0,.15);
+  border-color: rgba(0, 0, 0, 0.15);
   color: #878a8c;
 }
 
 .react-contextmenu-item--divider {
-  border-bottom: 1px solid rgba(0,0,0,.15);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
   cursor: inherit;
   margin-bottom: 3px;
   padding: 2px 0;
 }
 .react-contextmenu-item--divider:hover {
   background-color: transparent;
-  border-color: rgba(0,0,0,.15);
+  border-color: rgba(0, 0, 0, 0.15);
 }
 
 .react-contextmenu-item.react-contextmenu-submenu {
-padding: 0;
+  padding: 0;
 }
 
 .react-contextmenu-item.react-contextmenu-submenu > .react-contextmenu-item {
 }
 
-.react-contextmenu-item.react-contextmenu-submenu > .react-contextmenu-item:after {
-  content: "▶";
+.react-contextmenu-item.react-contextmenu-submenu
+  > .react-contextmenu-item:after {
+  content: '▶';
   display: inline-block;
   position: absolute;
   right: 7px;
@@ -401,7 +404,7 @@ textarea:-webkit-autofill:hover,
 /* textarea:-webkit-autofill:focus, */
 select:-webkit-autofill,
 select:-webkit-autofill:hover {
-/* select:-webkit-autofill:focus { */
+  /* select:-webkit-autofill:focus { */
   /* border: 1px solid #253341; */
   -webkit-text-fill-color: var(--white-03);
   -webkit-box-shadow: 0 0 0px 1000px var(--black-03) inset;
@@ -433,4 +436,19 @@ select:-webkit-autofill:hover {
 .danger__btn p {
   opacity: 0.8;
   color: var(--white-03);
+}
+
+/* Define la clase de estilo personalizada */
+.spin {
+  animation: spin 1s ease-out infinite;
+}
+
+/* Define las reglas de la animación */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

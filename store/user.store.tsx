@@ -1,12 +1,19 @@
-import { createContext, FC, useEffect, Dispatch, useReducer, SyntheticEvent } from 'react';
+import {
+  createContext,
+  FC,
+  useEffect,
+  Dispatch,
+  useReducer,
+  useContext
+} from 'react';
 import { IUser, UserActions, UserTypes } from './types/user.types';
-import { EXPRESS, SOCKET } from '@services/enviroments';
+import { EXPRESS } from '@services/enviroments';
 import { useSession } from 'next-auth/react';
 import { usersReducer } from './reducers/user.reducer';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import { Socket, io } from 'socket.io-client';
-import { ClientEvents, ServerEvents, UserID } from '../events/events';
+import { UserID } from '../events/events';
+import { SocketContext } from './socket.store';
 
 export type InitialUserState = {
   users: IUser[];
@@ -46,9 +53,7 @@ export const UsersProvider: FC = ({ children }) => {
     query: { server },
     ...route
   } = useRouter();
-  const socket: Socket<ServerEvents, ClientEvents> = io(
-    `${SOCKET}/users-${server}`
-  );
+  const { socket } = useContext(SocketContext);
   const { data: session } = useSession();
 
   // const handleIdUser = (user: string) => {
@@ -96,7 +101,7 @@ export const UsersProvider: FC = ({ children }) => {
     //   state: 'disconnected'
     // });
     // console.log(res);
-
+    
     socket.emit('user:disconnect', _id as UserID, (res) => {
       console.log(res);
     });

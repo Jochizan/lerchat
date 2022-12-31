@@ -18,13 +18,15 @@ export const usersReducer = (
       };
 
     case UserTypes.READ:
+      const mapUsers: { [key: string]: IUser } = {};
+      payload.forEach((el) => {
+        mapUsers[el._id] = el;
+      });
+
       return {
         ...state,
         users: payload,
-        mapUsers: payload.reduce<{ [key: string]: IUser }>((acc, el) => {
-          acc[el._id] = el;
-          return acc;
-        }, {})
+        mapUsers
       };
 
     case UserTypes.UPDATE:

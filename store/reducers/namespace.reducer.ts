@@ -23,16 +23,15 @@ export const namespaceReducer = (
       };
 
     case NamespaceTypes.READ:
+      const mapNamespaces: { [key: string]: INamespace } = {};
+      payload.forEach((el) => {
+        mapNamespaces[el._id] = el;
+      });
+
       return {
         ...state,
         namespaces: payload,
-        mapNamespaces: payload.reduce<{ [key: string]: INamespace }>(
-          (acc, el) => {
-            acc[el._id] = el;
-            return acc;
-          },
-          {}
-        )
+        mapNamespaces
       };
 
     case NamespaceTypes.UPDATE:
