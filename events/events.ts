@@ -2,6 +2,7 @@ import { INamespace } from 'store/types/namespace.types';
 import { ICategory } from 'store/types/category.types';
 import { IMessage } from 'store/types/message.types';
 import { IServer } from 'store/types/server.types';
+import { IUser } from '@store/types/user.types';
 
 interface Error {
   data: MessageID;

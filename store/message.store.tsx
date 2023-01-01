@@ -188,6 +188,7 @@ export const MessageProvider: FC = ({ children }) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  
   useEffect(() => {
     readMessages();
     // eslint-disable-next-line react-hooks/exhaustive-deps

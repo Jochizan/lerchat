@@ -78,9 +78,9 @@ const App = ({
 
   return (
     <SessionProvider session={session} refetchInterval={5 * 60}>
-      <ServerProvider>
-        <SocketProvider>
-          <UsersProvider>
+      <SocketProvider>
+        <UsersProvider>
+          <ServerProvider>
             <NamespaceProvider>
               <MessageProvider>
                 <Head>
@@ -97,9 +97,9 @@ const App = ({
                 </ThemeProvider>
               </MessageProvider>
             </NamespaceProvider>
-          </UsersProvider>
-        </SocketProvider>
-      </ServerProvider>
+          </ServerProvider>
+        </UsersProvider>
+      </SocketProvider>
     </SessionProvider>
   );
 };

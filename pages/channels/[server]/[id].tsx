@@ -43,8 +43,6 @@ const ChannelsPage: NextPage = () => {
     // rootMargin: '100px 0px 0px 0px'
   });
 
-  console.log(error, hasNextPage, loading);
-
   const internalMessages = useMemo(() => {
     return messages;
   }, [messages]);

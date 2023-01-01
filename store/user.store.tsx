@@ -7,13 +7,14 @@ import {
   useContext
 } from 'react';
 import { IUser, UserActions, UserTypes } from './types/user.types';
-import { EXPRESS } from '@services/enviroments';
+import { EXPRESS, SOCKET } from '@services/enviroments';
 import { useSession } from 'next-auth/react';
 import { usersReducer } from './reducers/user.reducer';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import { UserID } from '../events/events';
+import { ClientEvents, ServerEvents, UserID } from '../events/events';
 import { SocketContext } from './socket.store';
+// import { io, Socket } from 'socket.io-client';
 
 export type InitialUserState = {
   users: IUser[];
@@ -37,7 +38,7 @@ const UsersContext = createContext<{
   state: InitialUserState;
   dispatch: Dispatch<UserActions>;
   readUsers: (_id: string) => void;
-  disconnectUser: (e: BeforeUnloadEvent) => void;
+  disconnectUser: () => void;
   // handleIdUser: (user: string) => void;
 }>({
   state: initialState,
@@ -53,6 +54,7 @@ export const UsersProvider: FC = ({ children }) => {
     query: { server },
     ...route
   } = useRouter();
+  // const socket: Socket<ServerEvents, ClientEvents> = io(`${SOCKET}/lerchat-gn`);
   const { socket } = useContext(SocketContext);
   const { data: session } = useSession();
 
@@ -79,7 +81,7 @@ export const UsersProvider: FC = ({ children }) => {
       });
 
       socket.emit('user:connect', _id as UserID, (res) => {
-        // console.log(res);
+        console.log(res);
       });
     } catch (err) {
       console.error(err);
@@ -94,28 +96,21 @@ export const UsersProvider: FC = ({ children }) => {
     // console.log(res);
   };
 
-  const disconnectUser = (e: BeforeUnloadEvent) => {
-    e.preventDefault();
+  const disconnectUser = () => {
     const _id = session?.user._id;
     // const res = await axios.patch(`${EXPRESS}/api/users/${_id}`, {
     //   state: 'disconnected'
     // });
     // console.log(res);
-    
+
     socket.emit('user:disconnect', _id as UserID, (res) => {
       console.log(res);
     });
   };
 
-  // useEffect(() => {
-  // if (!(state.id !== user)) return;
-
-  // handleIdUser(user as string);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [user]);
   useEffect(() => {
     socket.on('user:connect', (user: UserID) => {
-      // console.log(user);
+      console.log(user);
       dispatch({
         type: UserTypes.CONNECT,
         payload: user
@@ -123,18 +118,24 @@ export const UsersProvider: FC = ({ children }) => {
     });
 
     socket.on('user:disconnect', (user: UserID) => {
-      // console.log(user);
+      console.log(user);
       dispatch({
         type: UserTypes.DISCONNECT,
         payload: user
       });
     });
 
-    console.log(state.users);
-
-    return () => {
-      socket.off();
-    };
+    // window.addEventListener('beforeunload', (e) => {
+    //   e.preventDefault();
+    //   e.returnValue = '';
+    // });
+  
+    // return () => {
+    //   window.removeEventListener('beforeunload', (e) => {
+    //     e.preventDefault();
+    //     e.returnValue = '';
+    //   });
+    // };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
@@ -147,9 +148,9 @@ export const UsersProvider: FC = ({ children }) => {
   }, [session, server]);
 
   useEffect(() => {
-    window.addEventListener('beforeunload', disconnectUser);
     return () => {
-      window.removeEventListener('beforeunload', disconnectUser);
+      socket.disconnect();
+      socket.close();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

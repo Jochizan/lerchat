@@ -51,7 +51,7 @@ const ChatNavbar: FC = ({ children }) => {
               className='hidden br-secondary-50 rounded-2xl tx-wlight capitalize font-medium text-sm
               br-dark-01 lg:flex justify-center items-center'
               onClick={() => {
-                // disconnectUser();
+                disconnectUser();
                 signOut({
                   redirect: true,
                   callbackUrl: '/'

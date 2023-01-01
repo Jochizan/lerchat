@@ -126,45 +126,6 @@ export const ServerProvider: FC = ({ children }) => {
     }
   };
 
-  // useEffect(() => {
-  //   // socket.on('user:connect', (userID: UserID) => {
-  //   //   dispatch({ type: ServerTypes.CONNECT, payload: userID });
-  //   // });
-
-  //   // socket.on('user:disconnect', (userID: UserID) => {
-  //   //   dispatch({ type: ServerTypes.DISCONNECT, payload: userID});
-  //   // });
-
-  //   // console.log(state);
-
-  //   return () => {
-  //     // socket.off('user:connect');
-  //   };
-
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [state]);
-
-  useEffect(() => {
-    // socket.emit('user:connect', session?.user._id as UserID, (res) => {
-    //   dispatch({ type: ServerTypes.CONNECT, payload: session?.user._id });
-    // });
-
-    return () => {
-      // socket.emit(
-      //   'user:disconnect',
-      //   session?.user._id as UserID,
-      //   (res: any) => {
-      //     console.log(res);
-      //   }
-      // );
-      // socket.on('user:disconnect', (server: IServer) => {
-      //   dispatch({ type: ServerTypes.UPDATE, payload: server });
-      // });
-      // socket.off('user:connect');
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   useEffect(() => {
     if (!(state.id !== server)) return;
 
