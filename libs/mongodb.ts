@@ -14,7 +14,9 @@ if (!process.env.MONGODB_URI) {
   throw new Error('Please add your Mongo URI to .env.local');
 }
 
-export const connectToDatabase: () => Promise<MongoClient | undefined> = async () => {
+export const connectToDatabase: () => Promise<
+  MongoClient | undefined
+> = async () => {
   try {
     if (mongoClient) {
       return mongoClient;
@@ -29,6 +31,10 @@ export const connectToDatabase: () => Promise<MongoClient | undefined> = async (
       }
     } else {
       mongoClient = await new MongoClient(uri, options).connect();
+    }
+
+    if (mongoClient) {
+      return mongoClient;
     }
   } catch (e) {
     console.error(e);

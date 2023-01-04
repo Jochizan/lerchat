@@ -178,6 +178,8 @@ export const NamespaceProvider: FC = ({ children }) => {
         if ('error' in res) return new Error('Error in delete namespace');
 
         dispatch({ type: NamespaceTypes.DELETE, payload: _id });
+        if (_id === query.id)
+          push(`/channels/${idServer}/${state.namespaces[0]._id}`);
       });
     } catch (err: any) {
       console.error(err);

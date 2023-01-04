@@ -13,9 +13,6 @@ export const serverReducer = (
 ) => {
   const { type, payload }: { type: any; payload: any } = action;
 
-  if (!payload) {
-    return state;
-  }
   switch (type) {
     case ServerTypes.CREATE:
       return {

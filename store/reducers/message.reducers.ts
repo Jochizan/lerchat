@@ -20,9 +20,6 @@ export const messageReducer = (
 ) => {
   const { type, payload }: { type: any; payload: any } = action;
 
-  if (!payload) {
-    return state;
-  }
   switch (type) {
     case MessageTypes.CREATE:
       return {
@@ -80,6 +77,7 @@ export const messageReducer = (
       };
 
     case MessageTypes.HAS_NEXT_PAGE:
+      console.log(payload);
       return {
         ...state,
         hasNextPage: payload

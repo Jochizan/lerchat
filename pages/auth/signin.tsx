@@ -22,7 +22,7 @@ const SignInPage: NextPage = () => {
       signIn('credentials', {
         ...data,
         redirect: true,
-        callbackUrl: '/home'
+        callbackUrl: codeInvitation ? `/api/${codeInvitation}` : '/channels/@me'
       });
     } catch (error) {
       window.alert(error);

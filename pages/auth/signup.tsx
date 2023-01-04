@@ -25,8 +25,8 @@ const SignInPage: NextPage = () => {
     // console.log(res);
     push(
       `/auth/signin?${
-        codeInvitation ? 'code_invitation=' : ''
-      }code_invitation=${codeInvitation}`
+        codeInvitation ? `code_invitation=${codeInvitation}` : ''
+      }`
     );
   };
 
@@ -79,7 +79,7 @@ const SignInPage: NextPage = () => {
               - OR -
             </Typography>
           </article>
-          <article className='w-auto px-8 ml-8 mt-4'>
+          <article className='w-auto px-8 ml-8 mt-4 bg-input-sign'>
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className='flex justify-center items-center tx-wlight placeholder:text-white'>
                 <Input

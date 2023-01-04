@@ -7,7 +7,7 @@ import { NamespaceProvider } from '@store/namespace.store';
 import { MessageProvider } from '@store/message.store';
 import { SessionProvider, useSession } from 'next-auth/react';
 import { ThemeProvider } from '@material-tailwind/react';
-import MainNavbar from 'layouts/Navbar';
+// import MainNavbar from 'layouts/Navbar';
 import ChatNavbar from 'layouts/ChatNavbar';
 import { useRouter } from 'next/router';
 import { UsersProvider } from '@store/user.store';
@@ -40,31 +40,25 @@ const App = ({
   pageProps: { session, ...pageProps },
   router: { route }
 }: AppProps) => {
-  if (route.includes('/sign') || route.includes('/out')) {
+  if (
+    route.includes('/sign') ||
+    route.includes('/out') ||
+    !route.includes('/channels')
+  ) {
     return (
       <SessionProvider session={session} refetchInterval={5 * 60}>
         <Head>
-          <title>{route.slice(1).toUpperCase() && ' | '}LerChat</title>
+          <title>
+            {route.slice(1).toUpperCase()
+              ? `${route.slice(1).toUpperCase()} | `
+              : ''}
+            LerChat
+          </title>
         </Head>
         <ThemeProvider>
           <AuthSession>
             <Component {...pageProps} />
           </AuthSession>
-        </ThemeProvider>
-      </SessionProvider>
-    );
-  }
-
-  if (!route.includes('/channels')) {
-    return (
-      <SessionProvider session={session} refetchInterval={5 * 60}>
-        <Head>
-          <title>{route.slice(1).toUpperCase() && ' | '}LerChat</title>
-        </Head>
-        <ThemeProvider>
-          <MainNavbar>
-            <Component {...pageProps} />
-          </MainNavbar>
         </ThemeProvider>
       </SessionProvider>
     );

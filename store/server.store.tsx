@@ -14,7 +14,6 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import { ClientEvents, ServerEvents, UserID } from '@events/index';
 import { io, Socket } from 'socket.io-client';
-// import { IUser } from './types/user.types';
 
 export type InitialServerState = {
   id: string | null | undefined;
@@ -64,6 +63,7 @@ export const ServerProvider: FC = ({ children }) => {
   const [socket, setSocket] = useState<Socket<ServerEvents, ClientEvents>>(
     null as any
   );
+  const { push } = useRouter();
   const {
     query: { server }
   } = useRouter();
@@ -109,6 +109,7 @@ export const ServerProvider: FC = ({ children }) => {
 
   const createServer = async (data: IServer) => {
     const newServer = { ...session?.user, name: data.name };
+    delete newServer['state'];
     try {
       const { data }: { data: { msg: string; _server: IServer } } =
         await axios.post(`${EXPRESS}/api/servers`, newServer);
@@ -136,6 +137,7 @@ export const ServerProvider: FC = ({ children }) => {
         await axios.delete(`${EXPRESS}/api/servers/${_id}`);
 
       dispatch({ type: ServerTypes.DELETE, payload: _id });
+      push('/channels/@me');
     } catch (err) {
       console.error(err);
     }

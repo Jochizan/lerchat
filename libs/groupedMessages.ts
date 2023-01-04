@@ -2,6 +2,8 @@ import { IMessage } from '@store/types/message.types';
 
 export const messagesGrouped = (payload: IMessage[]) => {
   // const groupedMessages: number[] = [];
+  if (payload.length < 1) return payload;
+
   if (payload.length < 2) {
     payload[0].next = true;
     payload[0].nextTime = false;

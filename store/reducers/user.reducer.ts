@@ -10,9 +10,6 @@ export const usersReducer = (
 ) => {
   const { type, payload }: { type: any; payload: any } = action;
 
-  if (!payload) {
-    return state;
-  }
   switch (type) {
     case UserTypes.CREATE:
       return {
@@ -22,9 +19,8 @@ export const usersReducer = (
       };
 
     case UserTypes.READ:
-      if (!(payload instanceof Array)) return state;
       const mapUsers: { [key: string]: IUser } = {};
-      payload.forEach((el) => {
+      payload.forEach((el: any) => {
         mapUsers[el._id] = el;
       });
 

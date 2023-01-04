@@ -63,8 +63,8 @@ const Aside: FC = ({ children }) => {
   const [IDCategory, setIDCategory] = useState('');
   const [click, setClick] = useState(false);
   const [ID, setID] = useState('');
-  const router = useRouter();
-  const id = router.query;
+  const { query, ...route } = useRouter();
+  const id = query;
   const isCreator =
     session?.user?._id === mapServers[idServer as string]?.creator;
 
@@ -188,7 +188,7 @@ const Aside: FC = ({ children }) => {
               <Button
                 className='bg-primary p-0.5 py-1 w-10 h-10 group z-0 rounded-2xl hover:rounded-lg flex justify-center items-center relative'
                 onClick={() => {
-                  router.push('/channels/@me');
+                  route.push('/channels/@me');
                 }}
               >
                 <div className='bg-dark-02 text-xs rounded-lg w-fit p-1.5 items-center h-8 ml-12 z-10 hidden group-hover:flex absolute top-1 left-0 tx-wlight whitespace-nowrap'>
@@ -411,9 +411,9 @@ const Aside: FC = ({ children }) => {
                             href={`/channels/${idServer}/${_id}`}
                             passHref
                           >
-                            <div className='w-full pl-1.5'>
+                            <div className='w-full pl-2'>
                               <span className='tx-nlight cursor-pointer align-middle flex items-center'>
-                                <i className='material-icons text-sm pr-1'>
+                                <i className='material-icons text-sm pr-2'>
                                   east
                                 </i>
                                 <p className='truncate text-base'>{name}</p>
@@ -446,17 +446,17 @@ const Aside: FC = ({ children }) => {
                 )
               ) : (
                 <span className='tx-nlight truncate'>
-                  {router.route === '/channels' && 'Sin espacios para chatear'}
+                  {route.route === '/channels' && 'Sin espacios para chatear'}
                 </span>
               )}
               {Object.keys(id).length && categories.length ? (
                 categories?.map(({ _id, name }) => (
                   <div key={_id}>
                     <ContextMenuTrigger id={_id + '#'}>
-                      <div className='w-full pt-1.5 pb-0.5 pl-1.5 text-base'>
+                      <div className='w-full pt-2 pb-1 pl-1 text-base'>
                         <span className='tx-nlight cursor-pointer align-middle flex items-center'>
                           <i className='material-icons text-sm pr-1'>south</i>
-                          <p className='uppercase text-base truncate'>{name}</p>
+                          <p className='uppercase text-sm truncate'>{name}</p>
                         </span>
                       </div>
                     </ContextMenuTrigger>
@@ -494,9 +494,9 @@ const Aside: FC = ({ children }) => {
                                   href={`/channels/${idServer}/${idNamespace}`}
                                   passHref
                                 >
-                                  <div className='w-full pl-2.5'>
+                                  <div className='w-full pl-3.5'>
                                     <span className='tx-nlight cursor-pointer align-middle flex items-center'>
-                                      <i className='material-icons text-sm pr-1'>
+                                      <i className='material-icons text-sm pr-2'>
                                         east
                                       </i>
                                       <p className='truncate text-base'>
@@ -531,7 +531,7 @@ const Aside: FC = ({ children }) => {
                       )
                     ) : (
                       <span className='tx-nlight truncate'>
-                        {router.route === '/channels' &&
+                        {route.route === '/channels' &&
                           'Sin espacios para chatear'}
                       </span>
                     )}
@@ -539,7 +539,7 @@ const Aside: FC = ({ children }) => {
                 ))
               ) : (
                 <div className='tx-nlight truncate'>
-                  {router.route === '/channels' && 'Sin categorías'}
+                  {route.route === '/channels' && 'Sin categorías'}
                 </div>
               )}
             </div>
@@ -569,53 +569,57 @@ const Aside: FC = ({ children }) => {
         </div>
       </aside>
       <main className='grow flex max-h-screen flex-col h-full'>{children}</main>
-      <section className='w-40 bg-ndark'>
-        <div className='flex flex-col items-center justify-start h-full'>
-          <p className='tx-nlight text-base pt-4'>Usuarios</p>
-          <div className='pt-6 tx-nlight' />
-          {users.length ? (
-            users.map((el) => (
-              <div
-                key={el._id}
-                className='flex justify-center items-center gap-2 p-2'
-              >
-                <Image
-                  src={`/${el.image}`}
-                  alt='Imagen de perfil'
-                  width={35}
-                  height={35}
-                  className='rounded-full'
-                />
-                <div className='flex flex-col'>
-                  <span className='tx-wlight truncate'>{el.name}</span>
-                  <div className='w-full flex items-center justify-between'>
-                    <i
-                      className={`material-icons ${
-                        el.state === 'connected'
-                          ? 'text-green-800'
-                          : 'text-gray-800'
-                      } text-sm`}
-                    >
-                      radio_button_checked
-                    </i>
-                    <p
-                      className={`${
-                        el.state === 'connected'
-                          ? 'text-green-700'
-                          : 'text-gray-700'
-                      } text-sm pl-1`}
-                    >
-                      {el.state === 'connected' ? 'conectado' : 'desconectado'}
-                    </p>
+      {!route.pathname.includes('@me') && (
+        <section className='w-40 bg-ndark'>
+          <div className='flex flex-col items-center justify-start h-full'>
+            <p className='tx-nlight text-base pt-4'>Usuarios</p>
+            <div className='pt-6 tx-nlight' />
+            {users.length ? (
+              users.map((el) => (
+                <div
+                  key={el._id}
+                  className='flex justify-center items-center gap-2 p-2'
+                >
+                  <Image
+                    src={`/${el.image}`}
+                    alt='Imagen de perfil'
+                    width={35}
+                    height={35}
+                    className='rounded-full'
+                  />
+                  <div className='flex flex-col'>
+                    <span className='tx-wlight truncate'>{el.name}</span>
+                    <div className='w-full flex items-center justify-between'>
+                      <i
+                        className={`material-icons ${
+                          el.state === 'connected'
+                            ? 'text-green-800'
+                            : 'text-gray-800'
+                        } text-sm`}
+                      >
+                        radio_button_checked
+                      </i>
+                      <p
+                        className={`${
+                          el.state === 'connected'
+                            ? 'text-green-700'
+                            : 'text-gray-700'
+                        } text-sm pl-1`}
+                      >
+                        {el.state === 'connected'
+                          ? 'conectado'
+                          : 'desconectado'}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
-          ) : (
-            <div>...</div>
-          )}
-        </div>
-      </section>
+              ))
+            ) : (
+              <div>...</div>
+            )}
+          </div>
+        </section>
+      )}
     </section>
   );
 };
