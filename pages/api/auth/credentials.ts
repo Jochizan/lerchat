@@ -39,6 +39,7 @@ const credentialsAuth: NextApiHandler<User | { msg: string }> = async (
 
   let _password;
   const { email, password } = req.body;
+  if (!connection) return;
   const db = connection.db(DBNAME);
 
   const user = await db
