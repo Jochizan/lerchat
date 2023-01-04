@@ -8,16 +8,13 @@ export const usersReducer = (
   },
   action: UserActions
 ) => {
-  const { type, payload } = action;
-  // console.log(state, action);
+  const { type, payload }: { type: any; payload: any } = action;
 
   if (!payload) {
     return state;
   }
   switch (type) {
     case UserTypes.CREATE:
-      if (!payload.hasOwnProperty('_id')) return state;
-
       return {
         ...state,
         users: [...state.users, payload],
@@ -38,33 +35,28 @@ export const usersReducer = (
       };
 
     case UserTypes.UPDATE:
-      if (!(payload instanceof Object)) return state;
       return {
         ...state,
-        users: state.users.map((el) =>
-          el._id === action.payload._id ? action.payload : el
-        ),
+        users: state.users.map((el) => (el._id === payload._id ? payload : el)),
         mapUsers: { ...state.mapUsers, [payload._id]: payload }
       };
 
     case UserTypes.DELETE:
-      if (!(typeof payload === 'string')) return state;
       const newMapUsers = state.mapUsers;
-      delete newMapUsers[action.payload as string];
+      delete newMapUsers[payload as string];
 
       return {
         ...state,
-        users: state.users.filter((el) => el._id !== action.payload),
+        users: state.users.filter((el) => el._id !== payload),
         mapUsers: newMapUsers
       };
 
     case UserTypes.CONNECT:
-      if (!(typeof payload === 'string')) return state;
       return {
         ...state,
         users: orderListUsers(
           state.users.map((el) => {
-            if (el._id === action.payload) el.state = 'connected';
+            if (el._id === payload) el.state = 'connected';
 
             return el;
           })
@@ -72,12 +64,11 @@ export const usersReducer = (
       };
 
     case UserTypes.DISCONNECT:
-      if (!(typeof payload === 'string')) return state;
       return {
         ...state,
         users: orderListUsers(
           state.users.map((el) => {
-            if (el._id === action.payload) el.state = 'disconnected';
+            if (el._id === payload) el.state = 'disconnected';
 
             return el;
           })

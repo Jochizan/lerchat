@@ -11,16 +11,14 @@ export const categoryReducer = (
   },
   action: CategoryActions
 ) => {
-  const { type, payload } = action;
-  console.log(state, action);
+  const { type, payload }: { type: any; payload: any } = action;
+  // console.log(state, action);
 
   if (!payload) {
     return state;
   }
   switch (type) {
     case CategoryTypes.CREATE:
-      if (!payload.hasOwnProperty('_id')) return state;
-
       return {
         ...state,
         categories: [...state.categories, payload],
@@ -28,9 +26,8 @@ export const categoryReducer = (
       };
 
     case CategoryTypes.READ:
-      // if (!payload.hasOwnProperty('_id')) return state;
       const mapCategories: { [key: string]: ICategory } = {};
-      payload.forEach((el) => {
+      payload.forEach((el: any) => {
         mapCategories[el._id] = el;
       });
 
@@ -41,7 +38,6 @@ export const categoryReducer = (
       };
 
     case CategoryTypes.UPDATE:
-      // if (!(payload instanceof Object)) return;
       return {
         ...state,
         categories: state.categories.map((el) =>
@@ -51,7 +47,6 @@ export const categoryReducer = (
       };
 
     case CategoryTypes.DELETE: {
-      if (!(typeof payload === 'string')) return;
       const newMapCategories = state.mapCategories;
       delete newMapCategories[payload as string];
 

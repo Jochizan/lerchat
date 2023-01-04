@@ -18,16 +18,13 @@ export const messageReducer = (
   },
   action: MessageActions
 ) => {
-  const { type, payload } = action;
-  // console.log(state, action);
+  const { type, payload }: { type: any; payload: any } = action;
 
   if (!payload) {
     return state;
   }
   switch (type) {
     case MessageTypes.CREATE:
-      if (!payload.hasOwnProperty('_id')) return state;
-
       return {
         ...state,
         create: true,
@@ -35,11 +32,9 @@ export const messageReducer = (
       };
 
     case MessageTypes.READ:
-      if (!(payload instanceof Array)) return state;
       return { ...state, messages: messagesGrouped(payload) };
 
     case MessageTypes.READ_OF_PAGE:
-      if (!(payload instanceof Array)) return state;
       return {
         ...state,
         create: false,
@@ -52,14 +47,11 @@ export const messageReducer = (
         ...state,
         create: false,
         messages: messagesGrouped(
-          state.messages.map((el) =>
-            el._id === action.payload._id ? action.payload : el
-          )
+          state.messages.map((el) => (el._id === payload._id ? payload : el))
         )
       };
 
     case MessageTypes.DELETE:
-      if (!(typeof payload === 'string')) return state;
       return {
         ...state,
         create: false,
@@ -88,14 +80,12 @@ export const messageReducer = (
       };
 
     case MessageTypes.HAS_NEXT_PAGE:
-      if (!(typeof payload === 'boolean')) return state;
       return {
         ...state,
         hasNextPage: payload
       };
 
     case MessageTypes.NEXT_PAGE:
-      if (!(typeof payload === 'number')) return state;
       return {
         ...state,
         page: payload

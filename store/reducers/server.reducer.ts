@@ -11,17 +11,13 @@ export const serverReducer = (
   },
   action: ServerActions
 ) => {
-  const { type, payload } = action;
-
-  // console.log(state, action);
+  const { type, payload }: { type: any; payload: any } = action;
 
   if (!payload) {
     return state;
   }
   switch (type) {
     case ServerTypes.CREATE:
-      if (!payload.hasOwnProperty('_id')) return state;
-
       return {
         ...state,
         servers: [...state.servers, payload],
@@ -29,9 +25,8 @@ export const serverReducer = (
       };
 
     case ServerTypes.READ:
-      // if (!(payload instanceof Array)) return state;
       const mapServers: { [key: string]: IServer } = {};
-      payload.forEach((el) => {
+      payload.forEach((el: any) => {
         mapServers[el._id] = el;
       });
 
@@ -42,7 +37,6 @@ export const serverReducer = (
       };
 
     case ServerTypes.UPDATE:
-      // if (!(payload instanceof Object)) return state;
       return {
         ...state,
         servers: state.servers.map((el) =>
@@ -52,8 +46,6 @@ export const serverReducer = (
       };
 
     case ServerTypes.DELETE: {
-      if (!(typeof payload === 'string')) return state;
-
       const newMapServers = state.mapServers;
       delete newMapServers[payload as string];
 
@@ -65,7 +57,6 @@ export const serverReducer = (
     }
 
     case ServerTypes.GET_LINK: {
-      // if (!(payload instanceof Object)) return state;
       let newMapServers = state.mapServers;
       newMapServers[payload.id as string].invitation = payload.url;
 
@@ -79,7 +70,6 @@ export const serverReducer = (
     }
 
     case ServerTypes.CHANGE_ID:
-      if (!(typeof payload === 'string')) return state;
       return {
         ...state,
         id: payload
@@ -87,7 +77,6 @@ export const serverReducer = (
       };
 
     case ServerTypes.CHANGE:
-      if (!(typeof payload === 'boolean')) return state;
       return {
         ...state,
         change: payload

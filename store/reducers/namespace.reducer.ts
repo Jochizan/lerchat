@@ -13,16 +13,13 @@ export const namespaceReducer = (
   },
   action: NamespaceActions
 ) => {
-  const { type, payload } = action;
-  // console.log(state, action);
+  const { type, payload }: { type: any; payload: any } = action;
 
   if (!payload) {
     return state;
   }
   switch (type) {
     case NamespaceTypes.CREATE:
-      if (!payload.hasOwnProperty('_id')) return state;
-
       return {
         ...state,
         namespaces: [...state.namespaces, payload],
@@ -30,13 +27,12 @@ export const namespaceReducer = (
       };
 
     case NamespaceTypes.READ:
-      if (!(payload instanceof Array)) return;
       const mapNamespaces: { [key: string]: INamespace } = {};
-      payload.forEach((el) => {
+      payload.forEach((el: any) => {
         mapNamespaces[el._id] = el;
       });
 
-      const namespacesWithCategory = payload.filter((el) => {
+      const namespacesWithCategory = payload.filter((el: any) => {
         if (el.category) return el;
       });
 
@@ -48,28 +44,25 @@ export const namespaceReducer = (
       };
 
     case NamespaceTypes.UPDATE:
-      if (!(payload instanceof Object)) return;
       return {
         ...state,
         namespaces: state.namespaces.map((el) =>
-          el._id === action.payload._id ? action.payload : el
+          el._id === payload._id ? payload : el
         ),
         mapNamespaces: { ...state.mapNamespaces, [payload._id]: payload }
       };
 
     case NamespaceTypes.DELETE:
-      if (!(typeof payload === 'string')) return;
       const newMapNamespaces = state.mapNamespaces;
       delete newMapNamespaces[action.payload as string];
 
       return {
         ...state,
-        namespaces: state.namespaces.filter((el) => el._id !== action.payload),
+        namespaces: state.namespaces.filter((el) => el._id !== payload),
         mapNamespaces: newMapNamespaces
       };
 
     case NamespaceTypes.CHANGE_ID:
-      if (!(typeof payload === 'string')) return;
       return {
         ...state,
         id: payload
