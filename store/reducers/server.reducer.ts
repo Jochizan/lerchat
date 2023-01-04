@@ -15,6 +15,9 @@ export const serverReducer = (
 
   // console.log(state, action);
 
+  if (!payload) {
+    return state;
+  }
   switch (type) {
     case ServerTypes.CREATE:
       return {

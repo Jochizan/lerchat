@@ -20,6 +20,10 @@ export const messageReducer = (
 ) => {
   const { type, payload } = action;
   // console.log(state, action);
+
+  if (!payload) {
+    return state;
+  }
   switch (type) {
     case MessageTypes.CREATE:
       return {

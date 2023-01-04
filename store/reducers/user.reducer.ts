@@ -10,6 +10,10 @@ export const usersReducer = (
 ) => {
   const { type, payload } = action;
   // console.log(state, action);
+
+  if (!payload) {
+    return state;
+  }
   switch (type) {
     case UserTypes.CREATE:
       return {

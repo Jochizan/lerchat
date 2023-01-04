@@ -15,6 +15,10 @@ export const namespaceReducer = (
 ) => {
   const { type, payload } = action;
   // console.log(state, action);
+
+  if (!payload) {
+    return state;
+  }
   switch (type) {
     case NamespaceTypes.CREATE:
       return {
