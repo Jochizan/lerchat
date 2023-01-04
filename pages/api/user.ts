@@ -17,6 +17,7 @@ const HandlerUser = async (req: NextApiRequest, res: NextApiResponse) => {
         if (!connection) return;
 
         const db = connection.db('lerchat');
+        if (!db) return; 
         if (db) {
           const checkExisting = await db
             .collection('users')
