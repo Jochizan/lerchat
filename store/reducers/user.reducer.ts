@@ -16,6 +16,7 @@ export const usersReducer = (
   }
   switch (type) {
     case UserTypes.CREATE:
+      if (!(payload instanceof Object)) return state;
       return {
         ...state,
         users: [...state.users, payload],
@@ -23,6 +24,7 @@ export const usersReducer = (
       };
 
     case UserTypes.READ:
+      if (!(payload instanceof Array)) return state;
       const mapUsers: { [key: string]: IUser } = {};
       payload.forEach((el) => {
         mapUsers[el._id] = el;
@@ -35,6 +37,7 @@ export const usersReducer = (
       };
 
     case UserTypes.UPDATE:
+      if (!(payload instanceof Object)) return state;
       return {
         ...state,
         users: state.users.map((el) =>
@@ -44,6 +47,7 @@ export const usersReducer = (
       };
 
     case UserTypes.DELETE:
+      if (!(typeof payload === 'string')) return state;
       const newMapUsers = state.mapUsers;
       delete newMapUsers[action.payload as string];
 
@@ -54,6 +58,7 @@ export const usersReducer = (
       };
 
     case UserTypes.CONNECT:
+      if (!(typeof payload === 'string')) return state;
       return {
         ...state,
         users: orderListUsers(
@@ -66,6 +71,7 @@ export const usersReducer = (
       };
 
     case UserTypes.DISCONNECT:
+      if (!(typeof payload === 'string')) return state;
       return {
         ...state,
         users: orderListUsers(

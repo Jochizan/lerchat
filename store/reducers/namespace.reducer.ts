@@ -21,6 +21,7 @@ export const namespaceReducer = (
   }
   switch (type) {
     case NamespaceTypes.CREATE:
+      if (!(payload instanceof Object)) return;
       return {
         ...state,
         namespaces: [...state.namespaces, payload],
@@ -28,6 +29,7 @@ export const namespaceReducer = (
       };
 
     case NamespaceTypes.READ:
+      if (!(payload instanceof Array)) return;
       const mapNamespaces: { [key: string]: INamespace } = {};
       payload.forEach((el) => {
         mapNamespaces[el._id] = el;
@@ -45,6 +47,7 @@ export const namespaceReducer = (
       };
 
     case NamespaceTypes.UPDATE:
+      if (!(payload instanceof Object)) return;
       return {
         ...state,
         namespaces: state.namespaces.map((el) =>
@@ -54,6 +57,7 @@ export const namespaceReducer = (
       };
 
     case NamespaceTypes.DELETE:
+      if (!(typeof payload === 'string')) return;
       const newMapNamespaces = state.mapNamespaces;
       delete newMapNamespaces[action.payload as string];
 
@@ -64,6 +68,7 @@ export const namespaceReducer = (
       };
 
     case NamespaceTypes.CHANGE_ID:
+      if (!(typeof payload === 'string')) return;
       return {
         ...state,
         id: payload

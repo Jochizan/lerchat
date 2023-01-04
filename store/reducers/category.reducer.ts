@@ -19,6 +19,7 @@ export const categoryReducer = (
   }
   switch (type) {
     case CategoryTypes.CREATE:
+      if (!(payload instanceof Object)) return;
       return {
         ...state,
         categories: [...state.categories, payload],
@@ -26,6 +27,7 @@ export const categoryReducer = (
       };
 
     case CategoryTypes.READ:
+      if (!(payload instanceof Array)) return;
       const mapCategories: { [key: string]: ICategory } = {};
       payload.forEach((el) => {
         mapCategories[el._id] = el;
@@ -38,6 +40,7 @@ export const categoryReducer = (
       };
 
     case CategoryTypes.UPDATE:
+      if (!(payload instanceof Object)) return;
       return {
         ...state,
         categories: state.categories.map((el) =>
@@ -47,6 +50,7 @@ export const categoryReducer = (
       };
 
     case CategoryTypes.DELETE: {
+      if (!(typeof payload === 'string')) return;
       const newMapCategories = state.mapCategories;
       delete newMapCategories[payload as string];
 

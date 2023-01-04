@@ -26,6 +26,7 @@ export const messageReducer = (
   }
   switch (type) {
     case MessageTypes.CREATE:
+      if (!(payload instanceof Object)) return state;
       return {
         ...state,
         create: true,
@@ -33,9 +34,11 @@ export const messageReducer = (
       };
 
     case MessageTypes.READ:
+      if (!(payload instanceof Array)) return state;
       return { ...state, messages: messagesGrouped(payload) };
 
     case MessageTypes.READ_OF_PAGE:
+      if (!(payload instanceof Array)) return state;
       return {
         ...state,
         create: false,
@@ -43,6 +46,7 @@ export const messageReducer = (
       };
 
     case MessageTypes.UPDATE:
+      if (!(payload instanceof Object)) return state;
       return {
         ...state,
         create: false,
@@ -54,6 +58,7 @@ export const messageReducer = (
       };
 
     case MessageTypes.DELETE:
+      if (!(typeof payload === 'string')) return state;
       return {
         ...state,
         create: false,
@@ -82,12 +87,14 @@ export const messageReducer = (
       };
 
     case MessageTypes.HAS_NEXT_PAGE:
+      if (!(typeof payload === 'boolean')) return state;
       return {
         ...state,
         hasNextPage: payload
       };
 
     case MessageTypes.NEXT_PAGE:
+      if (!(typeof payload === 'number')) return state;
       return {
         ...state,
         page: payload
