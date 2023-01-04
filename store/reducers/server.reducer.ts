@@ -1,4 +1,4 @@
-import { UserID } from '@events/events';
+import { UserID } from '@events/index';
 import { IServer, ServerTypes, ServerActions } from '../types/server.types';
 
 export const serverReducer = (

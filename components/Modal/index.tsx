@@ -37,10 +37,11 @@ const ModalForm: FC<any> = ({
             <span className='text-sm'>x</span>
           </Button>
         </DialogHeader>
-        <DialogBody divider className='tx-wlight flex flex-col m-4'>
+        <div className='tx-wlight flex flex-col m-4'>
           <p>{description}</p>
+          <hr className='bg-light-chat mt-3 mb-4' />
           {children}
-        </DialogBody>
+        </div>
         <DialogFooter className='flex justify-center'>
           <Button
             variant='filled'

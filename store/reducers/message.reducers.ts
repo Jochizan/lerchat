@@ -12,17 +12,19 @@ export const messageReducer = (
     type: MessageLocalTypes;
     hasNextPage: boolean;
     loading: boolean;
+    create: boolean;
     error: boolean;
     page: number;
   },
   action: MessageActions
 ) => {
   const { type, payload } = action;
-  console.log(state, action);
+  // console.log(state, action);
   switch (type) {
     case MessageTypes.CREATE:
       return {
         ...state,
+        create: true,
         messages: messageGrouped([payload, ...state.messages])
       };
 
@@ -32,12 +34,14 @@ export const messageReducer = (
     case MessageTypes.READ_OF_PAGE:
       return {
         ...state,
+        create: false,
         messages: messagesGrouped([...state.messages, ...payload])
       };
 
     case MessageTypes.UPDATE:
       return {
         ...state,
+        create: false,
         messages: messagesGrouped(
           state.messages.map((el) =>
             el._id === action.payload._id ? action.payload : el
@@ -48,6 +52,7 @@ export const messageReducer = (
     case MessageTypes.DELETE:
       return {
         ...state,
+        create: false,
         messages: messagesGrouped(
           state.messages.filter((el) => el._id !== action.payload)
         )
@@ -83,6 +88,7 @@ export const messageReducer = (
         ...state,
         page: payload
       };
+
     default:
       return state;
   }

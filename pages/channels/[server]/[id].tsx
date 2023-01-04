@@ -14,6 +14,7 @@ import { authOptions } from 'pages/api/auth/[...nextauth]';
 import { IncomingMessage } from 'http';
 import { NextApiRequestCookies } from 'next/dist/server/api-utils';
 import useInfiniteScroll from 'react-infinite-scroll-hook';
+import { EXPRESS } from '@services/enviroments';
 
 const savedMessages: { [key: string]: IMessage[] } = {};
 
@@ -22,8 +23,7 @@ const ChannelsPage: NextPage = () => {
   const { id } = router.query;
   // const prevChatId = usePrevious(id);
   const {
-    state: { messages, loading, error, hasNextPage },
-    // readMessages,
+    state: { messages, create, loading, error, hasNextPage },
     createMessage,
     readMessagesOfPage
   } = useContext(MessageContext);
@@ -61,8 +61,14 @@ const ChannelsPage: NextPage = () => {
     const lastScrollDistanceToBottom =
       lastScrollDistanceToBottomRef.current ?? 0;
     if (scrollableRoot) {
-      scrollableRoot.scrollTop = scrollableRoot.scrollHeight;
+      if (!create) {
+        scrollableRoot.scrollTop =
+          scrollableRoot.scrollHeight - lastScrollDistanceToBottom;
+      } else {
+        scrollableRoot.scrollTop = scrollableRoot.scrollHeight;
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reversedMessages, rootRef]);
 
   const rootRefSetter = useCallback(
@@ -103,9 +109,9 @@ const ChannelsPage: NextPage = () => {
         <p className='pr-3 pt-6 m-0 text-lg tx-wlight'>
           Bienvenido al canal {namespaceName} de {serverName}
         </p>
-        <hr className='bg-light-chat mt-3 mb-8' />
+        <hr className='bg-light-chat mt-3 mb-4' />
         <div
-          className='overflow-auto max-h-min'
+          className='overflow-auto max-h-min pt-4'
           ref={rootRefSetter}
           onScroll={handleRootScroll}
           style={{ overscrollBehavior: 'contain' }}
@@ -123,13 +129,13 @@ const ChannelsPage: NextPage = () => {
             ))}
           </ul>
         </div>
-        <ChatForm createMessage={createMessage} />
+        <ChatForm createMessage={createMessage} namespace={namespaceName} />
       </div>
     </section>
   );
 };
 
-const verifySessions = {};
+// const verifySessions = {};
 
 export async function getServerSideProps(context: NextPageContext) {
   if (context.req && context.res) {
@@ -146,7 +152,7 @@ export async function getServerSideProps(context: NextPageContext) {
 
     if (params.length > 2 && session?.user && params[2] !== 'data') {
       const user = await fetch(
-        `http://localhost:5000/api/user-servers/@verify?user=${session?.user._id}&server=${params[2]}`,
+        `${EXPRESS}/api/user-servers/@verify?user=${session?.user._id}&server=${params[2]}`,
         {}
       );
       const data = await user.json();

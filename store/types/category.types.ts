@@ -21,9 +21,9 @@ export enum CategoryTypes {
 
 export type ICategory = {
   _id: string;
-  namespace: string;
+  server: string;
   name: string;
-  tipe: string;
+  type: string;
 };
 
 type CategoryPayload = {

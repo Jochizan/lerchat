@@ -18,12 +18,12 @@ import axios from 'axios';
 import ServerContext from './server.store';
 import { useSession } from 'next-auth/react';
 import { IUserServer } from './types/user.types';
-import { SocketContext } from './socket.store';
 
 export type InitialNamespaceState = {
   id: string | null | undefined;
   namespaces: INamespace[];
   mapNamespaces: { [key: string]: INamespace };
+  namespacesWithCategory: INamespace[];
   loading?: boolean;
   error?: boolean;
   msg?: string;
@@ -35,6 +35,7 @@ export const initialState = {
       ? localStorage.getItem('id-namespace') + ''
       : '',
   namespaces: [] as INamespace[],
+  namespacesWithCategory: [] as INamespace[],
   mapNamespaces: {} as { [key: string]: INamespace },
   loading: false,
   error: false,
@@ -64,7 +65,7 @@ export const NamespaceProvider: FC = ({ children }) => {
   const { query, ...route } = useRouter();
   const { data: session } = useSession();
   const [state, dispatch] = useReducer(namespaceReducer, initialState);
-  const { socket } = useContext(SocketContext);
+  const { socket } = useContext(ServerContext);
 
   const {
     state: { id: idServer, change }
@@ -184,6 +185,7 @@ export const NamespaceProvider: FC = ({ children }) => {
   };
 
   useEffect(() => {
+    if (!socket) return;
     socket.on('namespace:created', (namespace) => {
       dispatch({ type: NamespaceTypes.CREATE, payload: namespace });
     });
@@ -218,18 +220,8 @@ export const NamespaceProvider: FC = ({ children }) => {
 
   useEffect(() => {
     if (state.namespaces.length !== 0 || !route.pathname.includes('@me')) {
-      // socket.emit('join:namespace', query.id as string, (a) => {
-      //   console.log(a);
-      // });
       handleIdNamespace(query.id as string);
     }
-
-    // return () => {
-    //   socket.emit('leave:namespace', query.id as string, (a) => {
-    //     console.log(a);
-    //   });
-    //   socket.disconnect();
-    // };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query.id]);

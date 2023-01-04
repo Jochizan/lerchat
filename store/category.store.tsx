@@ -11,12 +11,13 @@ import {
   CategoryActions,
   CategoryTypes
 } from './types/category.types';
-import { EXPRESS } from '@services/enviroments';
+import { EXPRESS, SOCKET } from '@services/enviroments';
 import { useSession } from 'next-auth/react';
 import axios from 'axios';
 // import { CategoryEvents, UserID } from '@events/events';
 import { categoryReducer } from './reducers/category.reducer';
-import { SocketContext } from './socket.store';
+import { useRouter } from 'next/router';
+import ServerContext from './server.store';
 // import { IUser } from './types/user.types';
 
 export type InitialCategoryState = {
@@ -51,15 +52,14 @@ const CategoryContext = createContext<{
 
 export const CategoryProvider: FC = ({ children }) => {
   const [state, dispatch] = useReducer(categoryReducer, initialState);
-  const { socket } = useContext(SocketContext);
-  const { data: session } = useSession();
+  const { server } = useRouter().query;
+  const { socket } = useContext(ServerContext);
 
   const readCategories = async () => {
-    const _id = session?.user._id;
-    if (!_id || state.categories.length !== 0) return;
+    if (!server) return;
 
     try {
-      const res = await axios.get(`${EXPRESS}/api/categories/@me/${_id}`);
+      const res = await axios.get(`${EXPRESS}/api/categories/${server}`);
       const data: { msg: string; _categories: ICategory[] } = res.data;
 
       if (data._categories)
@@ -69,28 +69,27 @@ export const CategoryProvider: FC = ({ children }) => {
     }
   };
 
-  const createCategory = async (data: ICategory) => {
-    const newCategory = { ...session?.user, name: data.name };
+  const createCategory = async (category: ICategory) => {
     try {
-      const { data }: { data: { msg: string; _server: ICategory } } =
-        await axios.post(`${EXPRESS}/api/categories`, newCategory);
+      const { data }: { data: { msg: string; _category: ICategory } } =
+        await axios.post(`${EXPRESS}/api/categories`, category);
 
-      socket.emit('category:create', newCategory as ICategory, (res) => {
-        console.log(res);
-        dispatch({ type: CategoryTypes.CREATE, payload: data._server });
+      socket.emit('category:create', category as ICategory, (res) => {
+        // console.log(res);
+        dispatch({ type: CategoryTypes.CREATE, payload: data._category });
       });
     } catch (err) {
       console.error(err);
     }
   };
 
-  const updateCategory = async (_id: string, server: ICategory) => {
+  const updateCategory = async (_id: string, category: ICategory) => {
     try {
       const { data }: { data: { msg: string; _category: ICategory } } =
-        await axios.patch(`${EXPRESS}/api/categories/${_id}`, server);
+        await axios.patch(`${EXPRESS}/api/categories/${_id}`, category);
 
       socket.emit('category:update', data._category, (res) => {
-        console.log(res);
+        // console.log(res);
         dispatch({ type: CategoryTypes.UPDATE, payload: data._category });
       });
     } catch (err) {
@@ -104,7 +103,7 @@ export const CategoryProvider: FC = ({ children }) => {
         await axios.delete(`${EXPRESS}/api/categories/${_id}`);
 
       socket.emit('category:delete', _id, (res) => {
-        console.log(res);
+        // console.log(res);
         dispatch({ type: CategoryTypes.DELETE, payload: _id });
       });
     } catch (err) {
@@ -113,6 +112,7 @@ export const CategoryProvider: FC = ({ children }) => {
   };
 
   useEffect(() => {
+    if (!socket) return;
     socket.on('category:created', (message) => {
       dispatch({ type: CategoryTypes.CREATE, payload: message });
     });
@@ -132,12 +132,10 @@ export const CategoryProvider: FC = ({ children }) => {
   }, [state]);
 
   useEffect(() => {
-    if (state.categories.length !== 0) return;
-
     readCategories();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session]);
+  }, [server]);
 
   return (
     <CategoryContext.Provider

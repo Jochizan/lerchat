@@ -22,7 +22,7 @@ const SignInPage: NextPage = () => {
   const onSubmit: SubmitHandler<TypeUser> = async (data) => {
     const res = await axios.post('/api/user', data);
 
-    console.log(res);
+    // console.log(res);
     push(
       `/auth/signin?${
         codeInvitation ? 'code_invitation=' : ''

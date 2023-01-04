@@ -12,7 +12,7 @@ const sessionLinkServer = async (req: NextApiRequest, res: NextApiResponse) => {
       const response = await axios.post(
         `${EXPRESS}/api/servers/invitation?invitation=${code_invitation}&user=${session.user._id}`
       );
-      console.log(response.data);
+      // console.log(response.data);
 
       res.redirect(`/channels/${response.data._userServer.server}`);
     } catch (err: any) {

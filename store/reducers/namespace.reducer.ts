@@ -7,6 +7,7 @@ import {
 export const namespaceReducer = (
   state: {
     namespaces: INamespace[];
+    namespacesWithCategory: INamespace[];
     mapNamespaces: { [key: string]: INamespace };
     id: string | null | undefined;
   },
@@ -28,10 +29,15 @@ export const namespaceReducer = (
         mapNamespaces[el._id] = el;
       });
 
+      const namespacesWithCategory = payload.filter((el) => {
+        if (el.category) return el;
+      });
+
       return {
         ...state,
         namespaces: payload,
-        mapNamespaces
+        mapNamespaces,
+        namespacesWithCategory
       };
 
     case NamespaceTypes.UPDATE:

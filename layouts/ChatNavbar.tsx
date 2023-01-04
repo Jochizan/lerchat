@@ -31,7 +31,7 @@ const ChatNavbar: FC = ({ children }) => {
     <>
       <Navbar className='mx-auto max-w-none py-0.5 px-2 lg:px-4 lg:py-1.5 my-0.5 rounded-none bg-dark-01'>
         <div className='mx-auto flex items-center justify-between tx-wlight'>
-          <label className='hidden lg:block relative w-5/12'>
+          {/* <label className='hidden lg:block relative w-5/12'>
             <input
               placeholder='Server, persons and links'
               className='mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-3xl br-white-03 focus:outline-none focus:border-none focus:ring-1'
@@ -43,7 +43,7 @@ const ChatNavbar: FC = ({ children }) => {
                 </g>
               </svg>
             </span>
-          </label>
+          </label> */}
           {session?.user ? (
             <Button
               variant='outlined'
@@ -58,15 +58,15 @@ const ChatNavbar: FC = ({ children }) => {
                 });
               }}
             >
-              <Typography variant='paragraph' className='mr-3'>
-                {session?.user.name}
-              </Typography>
               <Avatar
                 src='/default.png'
                 alt='Foto de perfil'
                 size='xs'
                 variant='circular'
               />
+              <Typography variant='paragraph' className='ml-3'>
+                {session?.user.name}
+              </Typography>
             </Button>
           ) : (
             <div>Cargando datos del usuario...</div>

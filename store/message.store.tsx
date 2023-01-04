@@ -1,4 +1,11 @@
-import { FC, useEffect, useReducer, createContext, Dispatch } from 'react';
+import {
+  FC,
+  useEffect,
+  useReducer,
+  createContext,
+  Dispatch,
+  useState
+} from 'react';
 import {
   MessageLocalTypes,
   MessageActions,
@@ -9,7 +16,7 @@ import { messageReducer } from './reducers/message.reducers';
 import { EXPRESS, SOCKET } from '@services/enviroments';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import { ClientEvents, NamespaceID, ServerEvents } from '@events/events';
+import { ClientEvents, NamespaceID, ServerEvents } from '@events/index';
 import axios from 'axios';
 import { io, Socket } from 'socket.io-client';
 
@@ -18,6 +25,7 @@ export type InitialMessageState = {
   type: MessageLocalTypes;
   hasNextPage: boolean;
   page: number;
+  create: boolean;
   loading: boolean;
   error: boolean;
   msg?: string;
@@ -31,6 +39,7 @@ export const initialState = {
     MessageLocalTypes.NAMESPACE,
   hasNextPage: true,
   loading: false,
+  create: false,
   error: false,
   page: 1,
   msg: ''
@@ -58,9 +67,10 @@ export const MessageProvider: FC = ({ children }) => {
   const [state, dispatch] = useReducer(messageReducer, initialState);
   const { id: namespace } = useRouter().query;
   const { data: session } = useSession();
-  const socket: Socket<ServerEvents, ClientEvents> = io(
-    `${SOCKET}/namespace-${namespace}`
+  const [socket, setSocket] = useState<Socket<ServerEvents, ClientEvents>>(
+    null as any
   );
+  // let socket: Socket<ServerEvents, ClientEvents>;
 
   const readMessages = async () => {
     if (!namespace) return;
@@ -72,7 +82,11 @@ export const MessageProvider: FC = ({ children }) => {
       await axios.get(`${EXPRESS}/api/messages/${namespace}?page=1&size=30`);
     dispatch({ type: MessageTypes.READ, payload: data.docs });
     dispatch({ type: MessageTypes.NEXT_PAGE, payload: 1 });
-    dispatch({ type: MessageTypes.HAS_NEXT_PAGE, payload: true });
+    if (data.docs.length < 30) {
+      dispatch({ type: MessageTypes.HAS_NEXT_PAGE, payload: false });
+    } else {
+      dispatch({ type: MessageTypes.HAS_NEXT_PAGE, payload: true });
+    }
     dispatch({
       type: MessageTypes.LOADING,
       payload: { loading: false, msg: 'Finalizado' }
@@ -162,6 +176,8 @@ export const MessageProvider: FC = ({ children }) => {
   };
 
   useEffect(() => {
+    if (!socket) return;
+
     socket.on('message:created', (message) => {
       dispatch({ type: MessageTypes.CREATE, payload: message });
     });
@@ -176,23 +192,33 @@ export const MessageProvider: FC = ({ children }) => {
 
     return () => {
       socket.off();
-      // console.log(socket);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]);
+  }, [state, socket]);
 
   useEffect(() => {
+    readMessages();
+
+    const manager = io(`${SOCKET}/namespace-${namespace}`);
+    setSocket(manager);
+
     return () => {
-      socket.disconnect();
-      socket.close();
+      manager.close();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [namespace]);
+
+  useEffect(() => {
+    const manager = io(`${SOCKET}/namespace-${namespace}`);
+    setSocket(manager);
+
+    return () => {
+      if (socket) socket.close();
+      manager.close();
+      // setSocket(null as any);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
-  useEffect(() => {
-    readMessages();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [namespace]);
 
   return (
     <MessageContext.Provider

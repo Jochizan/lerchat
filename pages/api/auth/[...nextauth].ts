@@ -134,6 +134,7 @@ export const authOptions: NextAuthOptions = {
         token._id = user._id;
         token.creator = user.creator;
         token.image = user.image;
+        token.state = user.state;
       }
       return token;
     }
