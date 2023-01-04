@@ -26,7 +26,8 @@ export const messageReducer = (
   }
   switch (type) {
     case MessageTypes.CREATE:
-      if (!(payload instanceof Object)) return state;
+      if (!payload.hasOwnProperty('_id')) return state;
+
       return {
         ...state,
         create: true,

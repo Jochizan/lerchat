@@ -19,7 +19,8 @@ export const categoryReducer = (
   }
   switch (type) {
     case CategoryTypes.CREATE:
-      if (!(payload instanceof Object)) return;
+      if (!payload.hasOwnProperty('_id')) return state;
+
       return {
         ...state,
         categories: [...state.categories, payload],
@@ -27,7 +28,7 @@ export const categoryReducer = (
       };
 
     case CategoryTypes.READ:
-      if (!(payload instanceof Array)) return;
+      // if (!payload.hasOwnProperty('_id')) return state;
       const mapCategories: { [key: string]: ICategory } = {};
       payload.forEach((el) => {
         mapCategories[el._id] = el;
@@ -40,7 +41,7 @@ export const categoryReducer = (
       };
 
     case CategoryTypes.UPDATE:
-      if (!(payload instanceof Object)) return;
+      // if (!(payload instanceof Object)) return;
       return {
         ...state,
         categories: state.categories.map((el) =>

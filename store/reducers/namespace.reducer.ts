@@ -21,7 +21,8 @@ export const namespaceReducer = (
   }
   switch (type) {
     case NamespaceTypes.CREATE:
-      if (!(payload instanceof Object)) return;
+      if (!payload.hasOwnProperty('_id')) return state;
+
       return {
         ...state,
         namespaces: [...state.namespaces, payload],

@@ -16,7 +16,8 @@ export const usersReducer = (
   }
   switch (type) {
     case UserTypes.CREATE:
-      if (!(payload instanceof Object)) return state;
+      if (!payload.hasOwnProperty('_id')) return state;
+
       return {
         ...state,
         users: [...state.users, payload],
