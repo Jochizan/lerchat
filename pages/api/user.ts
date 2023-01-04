@@ -13,6 +13,8 @@ const HandlerUser = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(422).json({ message: 'Invalid Data' });
 
       const connection = await connectToDatabase();
+      if (!connection) return;
+
       const db = connection.db('lerchat');
       if (db) {
         const checkExisting = await db

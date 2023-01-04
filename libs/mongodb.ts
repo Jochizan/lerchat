@@ -14,11 +14,12 @@ if (!process.env.MONGODB_URI) {
   throw new Error('Please add your Mongo URI to .env.local');
 }
 
-export const connectToDatabase: () => Promise<MongoClient> = async () => {
+export const connectToDatabase: () => Promise<MongoClient | undefined> = async () => {
   try {
     if (mongoClient) {
       return mongoClient;
     }
+
     if (process.env.NODE_ENV === 'development') {
       if (!globalThis._mongoClient) {
         mongoClient = await new MongoClient(uri, options).connect();
@@ -29,11 +30,6 @@ export const connectToDatabase: () => Promise<MongoClient> = async () => {
     } else {
       mongoClient = await new MongoClient(uri, options).connect();
     }
-
-    if (mongoClient) {
-      return mongoClient;
-    }
-
   } catch (e) {
     console.error(e);
   }

@@ -62,7 +62,7 @@ export const authOptions: NextAuthOptions = {
 
   secret: process.env.SECRET,
 
-  adapter: MongoDBAdapter(connectToDatabase()),
+  adapter: MongoDBAdapter(connectToDatabase() as any),
   // database: process.env.MONGODB_URI,
 
   session: {
