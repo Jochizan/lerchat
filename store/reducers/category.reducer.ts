@@ -12,7 +12,7 @@ export const categoryReducer = (
   action: CategoryActions
 ) => {
   const { type, payload } = action;
-  // console.log(state, action);
+  console.log(state, action);
 
   switch (type) {
     case CategoryTypes.CREATE:

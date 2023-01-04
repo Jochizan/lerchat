@@ -2,23 +2,35 @@ import { IMessage } from '@store/types/message.types';
 
 export const messagesGrouped = (payload: IMessage[]) => {
   // const groupedMessages: number[] = [];
-  if (payload.length < 1) {
-    return payload;
-  }
-
   if (payload.length < 2) {
     payload[0].next = true;
     payload[0].nextTime = false;
     return payload;
   }
-  let author = payload[payload.length - 1].author?._id;
+
+  if (payload.length < 3) {
+    const ok = payload[0].author?._id !== payload[1].author?._id;
+    const time =
+      Math.abs(
+        new Date(payload[0].createdAt as string).getTime() -
+          new Date(payload[1].createdAt as string).getTime()
+      ) > 600000;
+    payload[0].next = ok;
+    payload[0].nextTime = time;
+
+    payload[1].next = ok;
+    payload[1].nextTime = time;
+    return payload;
+  }
+
   payload[payload.length - 1].next = true;
-  payload[payload.length - 1].nextTime = true;
-  for (let i = payload.length - 2; i >= 0; i--) {
-    let beforeAuthor = payload[i + 1].author?._id;
-    if (author !== beforeAuthor) {
-      payload[i + 1].next = true;
-      author = beforeAuthor;
+  payload[payload.length - 1].nextTime = false;
+  for (let i = 1; i <= payload.length - 2; i++) {
+    let author = payload[i].author?._id;
+    let afterAuthor = payload[i + 1].author?._id !== author;
+
+    if (afterAuthor) {
+      payload[i].next = true;
       continue;
     }
 
@@ -35,6 +47,15 @@ export const messagesGrouped = (payload: IMessage[]) => {
     payload[i].next = false;
     payload[i].nextTime = false;
   }
+
+  let ok = payload[0].author?._id !== payload[1].author?._id;
+  let time = Math.abs(
+    new Date(payload[0].createdAt as string).getTime() -
+      new Date(payload[1].createdAt as string).getTime()
+  );
+  payload[0].next = ok;
+  payload[0].nextTime = time > 600000;
+
   return payload;
 }; //
 

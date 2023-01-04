@@ -64,7 +64,9 @@ const CardMessage = ({ msg }: { msg: IMessage }) => {
     <>
       <ContextMenuTrigger id={ID_MENU}>
         <div
-          className={`rounded-lg flex flex-col relative py-0.5`}
+          className={`rounded-lg flex flex-col relative ${
+            msg.next || msg.nextTime ? 'py-0.5 pt-1' : 'pt-0.5'
+          }`}
           onMouseEnter={() => setShowIcons(true)}
           onMouseLeave={() => setShowIcons(false)}
           onClick={() => hideMenu()}
@@ -109,7 +111,7 @@ const CardMessage = ({ msg }: { msg: IMessage }) => {
                         onClick={() => handleOpenUpdate()}
                       >
                         <i className='material-icons flex items-center'>edit</i>
-                      </button>{' '}
+                      </button>
                     </div>
                   )}
                   <div className='m-0 p-0'>

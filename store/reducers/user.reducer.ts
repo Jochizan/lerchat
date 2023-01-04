@@ -1,3 +1,4 @@
+import { orderListUsers } from '@libs/orderUsers';
 import { IUser, UserTypes, UserActions } from '../types/user.types';
 
 export const usersReducer = (
@@ -25,7 +26,7 @@ export const usersReducer = (
 
       return {
         ...state,
-        users: payload,
+        users: orderListUsers(payload),
         mapUsers
       };
 
@@ -51,21 +52,25 @@ export const usersReducer = (
     case UserTypes.CONNECT:
       return {
         ...state,
-        users: state.users.map((el) => {
-          if (el._id === action.payload) el.state = 'connected';
+        users: orderListUsers(
+          state.users.map((el) => {
+            if (el._id === action.payload) el.state = 'connected';
 
-          return el;
-        })
+            return el;
+          })
+        )
       };
 
     case UserTypes.DISCONNECT:
       return {
         ...state,
-        users: state.users.map((el) => {
-          if (el._id === action.payload) el.state = 'disconnected';
+        users: orderListUsers(
+          state.users.map((el) => {
+            if (el._id === action.payload) el.state = 'disconnected';
 
-          return el;
-        })
+            return el;
+          })
+        )
       };
 
     case UserTypes.LOADING:

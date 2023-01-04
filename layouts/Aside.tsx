@@ -16,6 +16,7 @@ import {
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Image from 'next/image';
+import { SERVER } from '@services/enviroments';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
 import { IServer } from '@store/types/server.types';
@@ -23,6 +24,8 @@ import ModalForm from '@components/Modal';
 import ButtonServer from '@components/ButtonServer';
 import { INamespace } from '@store/types/namespace.types';
 import UsersContext from '@store/user.store';
+import { ICategory } from '@store/types/category.types';
+import CategoryContext from '@store/category.store';
 
 const Aside: FC = ({ children }) => {
   const {
@@ -36,20 +39,35 @@ const Aside: FC = ({ children }) => {
   const {
     state: { users }
   } = useContext(UsersContext);
-  // const { data: session } = useSession();
   const {
     state: { namespaces },
     readNamespaces,
-    createNamespace
+    createNamespace,
+    updateNamespace,
+    deleteNamespace
   } = useContext(NamespaceContext);
+  const {
+    state: { categories },
+    createCategory,
+    updateCategory,
+    deleteCategory
+  } = useContext(CategoryContext);
+
+  const { data: session } = useSession();
   const [copied, setCopied] = useState(false);
+  const [update, setUpdate] = useState(false);
   const [openServer, setOpenServer] = useState(false);
   const [openCreate, setOpenCreate] = useState(false);
+  const [openCategory, setOpenCategory] = useState(false);
   const [openNamespace, setOpenNamespace] = useState(false);
+  const [IDCategory, setIDCategory] = useState('');
   const [click, setClick] = useState(false);
   const [ID, setID] = useState('');
   const router = useRouter();
   const id = router.query;
+  const isCreator =
+    session?.user?._id === mapServers[idServer as string]?.creator;
+
   const {
     register: registerServer,
     handleSubmit: handleSubmitServer,
@@ -62,9 +80,16 @@ const Aside: FC = ({ children }) => {
     formState: { errors: errorsNamespace }
   } = useForm<INamespace>();
 
-  const handleOpenServer = () => setOpenServer(!openServer);
-  const handleOpenNamespace = () => setOpenNamespace(!openNamespace);
+  const {
+    register: registerCategory,
+    handleSubmit: handleSubmitCategory,
+    formState: { errors: errosCategory }
+  } = useForm<ICategory>();
+
   const handleOpenCreate = () => setOpenCreate(!openCreate);
+  const handleOpenServer = () => setOpenServer(!openServer);
+  const handleOpenCategory = () => setOpenCategory(!openCategory);
+  const handleOpenNamespace = () => setOpenNamespace(!openNamespace);
 
   useEffect(() => {
     if (!(idServer && servers.length && click && id.server !== idServer))
@@ -80,8 +105,63 @@ const Aside: FC = ({ children }) => {
     handleOpenCreate();
   };
 
+  const handleUpdateServer: SubmitHandler<IServer> = async (data) => {
+    setUpdate(false);
+    updateServer(data._id, data);
+    handleOpenServer();
+  };
+
+  const handleCreateNamespace: SubmitHandler<INamespace> = (data) => {
+    if (!IDCategory) {
+      createNamespace({
+        ...data,
+        server: idServer as string
+      });
+    } else {
+      createNamespace({
+        ...data,
+        server: idServer as string,
+        category: IDCategory
+      });
+      setIDCategory('');
+    }
+    // console.log(data, IDCategory);
+    handleOpenNamespace();
+  };
+
+  const handleUpdateNamespace: SubmitHandler<INamespace> = (data) => {
+    setUpdate(false);
+    updateNamespace(data._id, data);
+    handleOpenNamespace();
+  };
+
+  const handleCreateCategory: SubmitHandler<ICategory> = (data) => {
+    createCategory({ ...data, server: idServer as string });
+    handleOpenCategory();
+  };
+
+  const handleUpdateCategory: SubmitHandler<ICategory> = (data) => {
+    setUpdate(false);
+    updateCategory(data._id, data);
+    handleOpenCategory();
+  };
+
+  const handleDeleteNamespace = (e: SyntheticEvent, data: any) => {
+    deleteNamespace(data._id);
+  };
+
+  const handleDeleteCategory = (e: SyntheticEvent, data: any) => {
+    deleteCategory(data._id);
+  };
+
   const handleDeleteServer = (e: SyntheticEvent, data: any) => {
     deleteServer(data._id);
+  };
+
+  const handleCreateNamespaceOfCategory = (e: SyntheticEvent, data: any) => {
+    setUpdate(false);
+    handleOpenNamespace();
+    setIDCategory(data.category);
   };
 
   const handleGetAndShareLinkInvitation = (e: SyntheticEvent, data: any) => {
@@ -94,67 +174,108 @@ const Aside: FC = ({ children }) => {
     getCodeInvitation(data._id);
   };
 
-  const handleCreateNamespace: SubmitHandler<INamespace> = (data) => {
-    createNamespace({ ...data, server: idServer as string });
-    handleOpenNamespace();
-  };
-
   return (
     <section className='flex h-screen'>
       <aside className='bg-ndark h-full flex flex-col'>
-        <div className='w-10 max-h-20 h-16 items-center text-center'>
-          <Link href='/home' passHref>
-            <span className='text-base tx-wlight cursor-pointer'>LerChat</span>
-          </Link>
-        </div>
-        <div className='flex h-full'>
+        <Link href='/home' passHref>
+          <p className='text-base tx-wlight h-16 text-center cursor-pointer  flex items-center justify-center'>
+            LerChat
+          </p>
+        </Link>
+        <div className='flex h-full grow-1'>
           <div className='flex flex-col items-center gap-3 h-full max-h-screen p-0.5 w-16'>
             <div className='border-b border-gray-700 pb-3'>
               <Button
-                className='bg-primary p-0.5 py-1 w-10 h-10 group static z-0 rounded-2xl hover:rounded-lg flex justify-center items-center'
+                className='bg-primary p-0.5 py-1 w-10 h-10 group z-0 rounded-2xl hover:rounded-lg flex justify-center items-center relative'
                 onClick={() => {
                   router.push('/channels/@me');
                 }}
               >
+                <div className='bg-dark-02 text-xs rounded-lg w-fit p-1.5 items-center h-8 ml-12 z-10 hidden group-hover:flex absolute top-1 left-0 tx-wlight whitespace-nowrap'>
+                  Principal
+                </div>
                 <i className='material-icons'>chat_bubble</i>
               </Button>
             </div>
             <ModalForm
               open={openCreate}
               handler={handleOpenCreate}
-              title={'Creación de servidor'}
-              button={'Crear servidor'}
-              description={
-                'Solo necesitamos un nombre para el servidor para continuar'
+              title={
+                update ? 'Actualización de servidor' : 'Creación de servidor'
               }
-              handleSubmit={handleSubmitServer(handleCreateServer)}
+              button={update ? 'Actualizar servidor' : 'Crear servidor'}
+              description={
+                update
+                  ? 'Actualizamos el nombre para el servidor para continuar'
+                  : 'Solo necesitamos un nombre para el servidor para continuar'
+              }
+              handleSubmit={handleSubmitServer(
+                update ? handleUpdateServer : handleCreateServer
+              )}
             >
               <input
                 required
                 placeholder='Nombre del servidor'
                 {...registerServer('name')}
-                className='mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-3xl br-white-03 focus:outline-none focus:border-none focus:ring-1'
+                className='mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-2xl br-white-03 focus:outline-none focus:border-none focus:ring-1'
               />
             </ModalForm>
             <ModalForm
               open={openNamespace}
               handler={handleOpenNamespace}
-              title={'Creación de espacio de trabajo'}
-              button={'Crear espacio de trabajo'}
-              description={
-                'Solo necesitamos un nombre del espacio para continuar'
+              title={
+                update
+                  ? 'Actualización de espacio de trabajo'
+                  : 'Creación de espacio de trabajo'
               }
-              handleSubmit={handleSubmitNamespace(handleCreateNamespace)}
+              button={
+                update
+                  ? 'Actualizar espacio de trabajo'
+                  : 'Crear espacio de trabajo'
+              }
+              description={
+                update
+                  ? 'Actualizamos el espacio de trabajo'
+                  : 'Solo necesitamos un nombre del espacio para continuar'
+              }
+              handleSubmit={handleSubmitNamespace(
+                update ? handleUpdateNamespace : handleCreateNamespace
+              )}
             >
               <input
                 required
-                placeholder='Nombre del servidor'
+                placeholder='Nombre del espacio'
                 {...registerNamespace('name')}
                 className='mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-3xl br-white-03 focus:outline-none focus:border-none focus:ring-1'
               />
             </ModalForm>
+            <ModalForm
+              open={openCategory}
+              handler={handleOpenCategory}
+              title={
+                update
+                  ? 'Actualizar categoría del servidor'
+                  : 'Creación de categoría del servidor'
+              }
+              button={update ? 'Actualizar categoría' : 'Crear categoría'}
+              description={
+                update
+                  ? 'Actualizamos el nombre de la categoría'
+                  : 'Solo necesitamos el nombre de la categoría'
+              }
+              handleSubmit={handleSubmitCategory(
+                update ? handleUpdateCategory : handleCreateCategory
+              )}
+            >
+              <input
+                required
+                placeholder='Nombre de la categoría'
+                {...registerCategory('name')}
+                className='mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-3xl br-white-03 focus:outline-none focus:border-none focus:ring-1'
+              />
+            </ModalForm>
             {servers.length ? (
-              servers.map(({ _id, name, image }) => (
+              servers.map(({ _id, name, image, creator }) => (
                 <div key={_id}>
                   <ContextMenuTrigger id={_id}>
                     <ButtonServer
@@ -166,7 +287,10 @@ const Aside: FC = ({ children }) => {
                         handleIdServer(_id);
                       }}
                     >
-                      <div className='bg-dark-02 text-xs rounded-lg w-fit p-1.5 items-center h-8 ml-12 z-10 hidden group-hover:flex absolute tx-wlight'>
+                      <div
+                        className='
+                     whitespace-nowrap bg-dark-02 text-xs font-semibold rounded-lg w-fit p-1.5 items-center h-8 ml-12 z-10 hidden group-hover:flex absolute tx-wlight'
+                      >
                         {name}
                       </div>
                       {image !== 'default.png' ? (
@@ -191,10 +315,24 @@ const Aside: FC = ({ children }) => {
                     >
                       Obtener link de grupo
                     </MenuItem>
-                    <MenuItem divider />
-                    <MenuItem onClick={handleDeleteServer} data={{ _id }}>
-                      Borrar Servidor
-                    </MenuItem>
+                    {session?.user._id === creator && (
+                      <>
+                        <MenuItem divider />
+                        <MenuItem onClick={handleDeleteServer} data={{ _id }}>
+                          Borrar Servidor
+                        </MenuItem>
+                        <MenuItem divider />
+                        <MenuItem
+                          onClick={() => {
+                            setUpdate(true);
+                            handleOpenServer();
+                          }}
+                          data={{ _id }}
+                        >
+                          Actualizar Servidor
+                        </MenuItem>
+                      </>
+                    )}
                   </ContextMenu>
                 </div>
               ))
@@ -205,10 +343,10 @@ const Aside: FC = ({ children }) => {
             )}
             <div>
               <Button
-                className='bg-primary p-0.5 py-1 w-10 h-10 group static z-0 rounded-2xl hover:rounded-lg flex justify-center items-center'
+                className='bg-primary p-0.5 py-1 w-10 h-10 group z-0 rounded-2xl hover:rounded-lg flex justify-center items-center relative'
                 onClick={handleOpenCreate}
               >
-                <div className='bg-dark-02 text-xs rounded-lg w-fit p-1.5 items-center h-8 ml-12 z-10 hidden group-hover:flex absolute tx-wlight'>
+                <div className='bg-dark-02 text-xs rounded-lg w-fit p-1.5 items-center h-8 ml-12 z-10 hidden group-hover:flex absolute top-1 left-0 tx-wlight whitespace-nowrap'>
                   Crear Servidor
                 </div>
                 <i className='material-icons'>add</i>
@@ -235,7 +373,7 @@ const Aside: FC = ({ children }) => {
               <p>Amigos al server: </p>
               <div className='flex items-center'>
                 <span className='m-2 py-0.5 w-full font-semibold text-sm bg-dark-03 br-dark-02 tx-wlight rounded-xs focus:outline-none focus:border-none focus:ring-1 overflow-auto'>
-                  http://localhost:3000/api/
+                  {SERVER}/api/
                   {mapServers[ID]?.invitation}
                 </span>
                 {/* Incertar código de lista de amigos y el vinculo para invitar a personas */}
@@ -248,7 +386,7 @@ const Aside: FC = ({ children }) => {
                   onClick={() => {
                     setCopied(true);
                     navigator.clipboard.writeText(
-                      `http://localhost:3000/api/${mapServers[ID]?.invitation}`
+                      `${SERVER}/api/${mapServers[ID]?.invitation}`
                     );
                   }}
                 >
@@ -263,23 +401,146 @@ const Aside: FC = ({ children }) => {
               onClick={() => hideMenu()}
             >
               {Object.keys(id).length && namespaces.length ? (
-                namespaces?.map(({ _id, name }) => (
-                  <Link
-                    key={_id}
-                    href={`/channels/${idServer}/${_id}`}
-                    passHref
-                  >
-                    <div className='w-full pl-1.5'>
-                      <span className='tx-nlight cursor-pointer align-middle'>
-                        -&gt; {name}
-                      </span>
-                    </div>
-                  </Link>
-                ))
+                namespaces?.map(
+                  ({ _id, name, category }) =>
+                    !category && (
+                      <div key={_id}>
+                        <ContextMenuTrigger id={_id + '#'}>
+                          <Link
+                            key={_id}
+                            href={`/channels/${idServer}/${_id}`}
+                            passHref
+                          >
+                            <div className='w-full pl-1.5'>
+                              <span className='tx-nlight cursor-pointer align-middle flex items-center'>
+                                <i className='material-icons text-sm pr-1'>
+                                  east
+                                </i>
+                                <p className='truncate text-base'>{name}</p>
+                              </span>
+                            </div>
+                          </Link>
+                        </ContextMenuTrigger>
+                        {isCreator && (
+                          <ContextMenu id={_id + '#'}>
+                            <MenuItem
+                              onClick={() => {
+                                setUpdate(true);
+                                handleOpenNamespace();
+                              }}
+                              data={{ _id }}
+                            >
+                              Actualizar espacio
+                            </MenuItem>
+                            <MenuItem divider />
+                            <MenuItem
+                              onClick={handleDeleteNamespace}
+                              data={{ _id }}
+                            >
+                              Borrar espacio
+                            </MenuItem>
+                          </ContextMenu>
+                        )}
+                      </div>
+                    )
+                )
               ) : (
                 <span className='tx-nlight truncate'>
                   {router.route === '/channels' && 'Sin espacios para chatear'}
                 </span>
+              )}
+              {Object.keys(id).length && categories.length ? (
+                categories?.map(({ _id, name }) => (
+                  <div key={_id}>
+                    <ContextMenuTrigger id={_id + '#'}>
+                      <div className='w-full pt-1.5 pb-0.5 pl-1.5 text-base'>
+                        <span className='tx-nlight cursor-pointer align-middle flex items-center'>
+                          <i className='material-icons text-sm pr-1'>south</i>
+                          <p className='uppercase text-base truncate'>{name}</p>
+                        </span>
+                      </div>
+                    </ContextMenuTrigger>
+                    {isCreator && (
+                      <ContextMenu id={_id + '#'}>
+                        <MenuItem
+                          onClick={() => {
+                            setUpdate(true);
+                            handleOpenCategory;
+                          }}
+                          data={{ _id }}
+                        >
+                          Actualizar categoría
+                        </MenuItem>
+                        <MenuItem divider />
+                        <MenuItem onClick={handleDeleteCategory} data={{ _id }}>
+                          Borrar categoría
+                        </MenuItem>
+                        <MenuItem divider />
+                        <MenuItem
+                          onClick={handleCreateNamespaceOfCategory}
+                          data={{ category: _id }}
+                        >
+                          Crear espacio de esta categoría
+                        </MenuItem>
+                      </ContextMenu>
+                    )}
+                    {Object.keys(id).length && namespaces.length ? (
+                      namespaces?.map(
+                        ({ _id: idNamespace, name, category }) =>
+                          category === _id && (
+                            <div key={idNamespace}>
+                              <ContextMenuTrigger id={idNamespace + '#'}>
+                                <Link
+                                  href={`/channels/${idServer}/${idNamespace}`}
+                                  passHref
+                                >
+                                  <div className='w-full pl-2.5'>
+                                    <span className='tx-nlight cursor-pointer align-middle flex items-center'>
+                                      <i className='material-icons text-sm pr-1'>
+                                        east
+                                      </i>
+                                      <p className='truncate text-base'>
+                                        {name}
+                                      </p>
+                                    </span>
+                                  </div>
+                                </Link>
+                              </ContextMenuTrigger>
+                              {isCreator && (
+                                <ContextMenu id={idNamespace + '#'}>
+                                  <MenuItem
+                                    onClick={() => {
+                                      setUpdate(true);
+                                      handleOpenNamespace();
+                                    }}
+                                    data={{ _id: idNamespace }}
+                                  >
+                                    Actualizar espacio
+                                  </MenuItem>
+                                  <MenuItem divider />
+                                  <MenuItem
+                                    onClick={handleDeleteNamespace}
+                                    data={{ _id: idNamespace }}
+                                  >
+                                    Borrar espacio
+                                  </MenuItem>
+                                </ContextMenu>
+                              )}
+                            </div>
+                          )
+                      )
+                    ) : (
+                      <span className='tx-nlight truncate'>
+                        {router.route === '/channels' &&
+                          'Sin espacios para chatear'}
+                      </span>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className='tx-nlight truncate'>
+                  {router.route === '/channels' && 'Sin categorías'}
+                </div>
               )}
             </div>
           </ContextMenuTrigger>
@@ -290,17 +551,28 @@ const Aside: FC = ({ children }) => {
             >
               Obtener link de grupo
             </MenuItem>
-            <MenuItem divider />
-            <MenuItem onClick={handleOpenNamespace} data={{ _id: idServer }}>
-              Crear espacio de chat
-            </MenuItem>
+            {isCreator && (
+              <>
+                <MenuItem divider />
+                <MenuItem
+                  onClick={handleOpenNamespace}
+                  data={{ _id: idServer }}
+                >
+                  Crear espacio de chat
+                </MenuItem>
+                <MenuItem onClick={handleOpenCategory} data={{ _id: idServer }}>
+                  Crear categoría
+                </MenuItem>
+              </>
+            )}
           </ContextMenu>
         </div>
       </aside>
       <main className='grow flex max-h-screen flex-col h-full'>{children}</main>
       <section className='w-40 bg-ndark'>
-        <div className='flex flex-col items-start justify-start h-full'>
-          <div className='pt-16' />
+        <div className='flex flex-col items-center justify-start h-full'>
+          <p className='tx-nlight text-base pt-4'>Usuarios</p>
+          <div className='pt-6 tx-nlight' />
           {users.length ? (
             users.map((el) => (
               <div
@@ -315,21 +587,32 @@ const Aside: FC = ({ children }) => {
                   className='rounded-full'
                 />
                 <div className='flex flex-col'>
-                  <span className='tx-wlight'>{el.name}</span>
-                  <span
-                    className={`${
-                      el.state === 'connected'
-                        ? 'text-green-600'
-                        : 'text-gray-800'
-                    }`}
-                  >
-                    * {el.state}
-                  </span>
+                  <span className='tx-wlight truncate'>{el.name}</span>
+                  <div className='w-full flex items-center justify-between'>
+                    <i
+                      className={`material-icons ${
+                        el.state === 'connected'
+                          ? 'text-green-800'
+                          : 'text-gray-800'
+                      } text-sm`}
+                    >
+                      radio_button_checked
+                    </i>
+                    <p
+                      className={`${
+                        el.state === 'connected'
+                          ? 'text-green-700'
+                          : 'text-gray-700'
+                      } text-sm pl-1`}
+                    >
+                      {el.state === 'connected' ? 'conectado' : 'desconectado'}
+                    </p>
+                  </div>
                 </div>
               </div>
             ))
           ) : (
-            <div></div>
+            <div>...</div>
           )}
         </div>
       </section>
@@ -338,26 +621,3 @@ const Aside: FC = ({ children }) => {
 };
 
 export default Aside;
-
-{
-  /* <Virtuoso
-          className='tx-wlight mb-3'
-          style={{ overscrollBehavior: 'contain', overflowY: 'scroll' }}
-          data={internalMessages}
-          ref={virtuoso}
-          startReached={startReached}
-          firstItemIndex={Math.max(0, firstItemIndex)}
-          totalCount={internalMessages.length}
-          followOutput={followOutput}
-          initialTopMostItemIndex={internalMessages.length - 1}
-          itemContent={(idx, data) => (
-            <CardMessage
-              key={idx}
-              msg={data}
-              scrollToLastIndex={scrollToLastIndex}
-              // reinitializeToLastIndex={reinitializeToLastIndex}
-            />
-          )}
-          alignToBottom
-        /> */
-}

@@ -32,7 +32,7 @@ const MainNavbar: FC = ({ children }) => {
           <span className='flex items-center'>Servicios</span>
         </Typography>
       </Link>
-      <Link href='profile/@me' passHref>
+      <Link href='/channels/@me' passHref>
         <Typography
           as='li'
           variant='paragraph'

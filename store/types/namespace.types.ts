@@ -24,6 +24,7 @@ export type INamespace = {
   _id: string;
   name: string;
   server: string;
+  category: string;
 };
 
 type NamespacePayload = {

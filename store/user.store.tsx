@@ -4,7 +4,7 @@ import {
   useEffect,
   Dispatch,
   useReducer,
-  useContext
+  useState
 } from 'react';
 import { IUser, UserActions, UserTypes } from './types/user.types';
 import { EXPRESS, SOCKET } from '@services/enviroments';
@@ -12,9 +12,8 @@ import { useSession } from 'next-auth/react';
 import { usersReducer } from './reducers/user.reducer';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import { ClientEvents, ServerEvents, UserID } from '../events/events';
-import { SocketContext } from './socket.store';
-// import { io, Socket } from 'socket.io-client';
+import { ClientEvents, ServerEvents, UserID } from '../events';
+import { io, Socket } from 'socket.io-client';
 
 export type InitialUserState = {
   users: IUser[];
@@ -37,7 +36,7 @@ export const initialState = {
 const UsersContext = createContext<{
   state: InitialUserState;
   dispatch: Dispatch<UserActions>;
-  readUsers: (_id: string) => void;
+  readUsers: () => void;
   disconnectUser: () => void;
   // handleIdUser: (user: string) => void;
 }>({
@@ -50,12 +49,14 @@ const UsersContext = createContext<{
 
 export const UsersProvider: FC = ({ children }) => {
   const [state, dispatch] = useReducer(usersReducer, initialState);
+  const [connect, setConnect] = useState(false);
+  const [socket, setSocket] = useState<Socket<ServerEvents, ClientEvents>>(
+    null as any
+  );
   const {
     query: { server },
     ...route
   } = useRouter();
-  // const socket: Socket<ServerEvents, ClientEvents> = io(`${SOCKET}/lerchat-gn`);
-  const { socket } = useContext(SocketContext);
   const { data: session } = useSession();
 
   // const handleIdUser = (user: string) => {
@@ -65,23 +66,19 @@ export const UsersProvider: FC = ({ children }) => {
 
   const readUsers = async () => {
     const _id = session?.user._id;
-    if (!_id || state.users.length !== 0 || !server) return;
+    // console.log(_id, state.users.length, server);
+    if (!_id || !server) return;
 
     try {
-      connectUser();
       const res = await axios.get(
         `${EXPRESS}/api/user-servers/@server/${server}`
       );
       const data: { msg: string; _users: IUser[] } = res.data;
 
-      console.log(data._users);
+      // console.log(data._users);
       dispatch({
         type: UserTypes.READ,
         payload: data._users
-      });
-
-      socket.emit('user:connect', _id as UserID, (res) => {
-        console.log(res);
       });
     } catch (err) {
       console.error(err);
@@ -90,27 +87,26 @@ export const UsersProvider: FC = ({ children }) => {
 
   const connectUser = async () => {
     const _id = session?.user._id;
-    const res = await axios.patch(`${EXPRESS}/api/users/${_id}`, {
+    await axios.patch(`${EXPRESS}/api/users/${_id}`, {
       state: 'connected'
     });
-    // console.log(res);
+    setConnect(true);
+    socket.emit('user:connect', _id as UserID, (res) => {});
   };
 
-  const disconnectUser = () => {
+  const disconnectUser = async () => {
     const _id = session?.user._id;
-    // const res = await axios.patch(`${EXPRESS}/api/users/${_id}`, {
-    //   state: 'disconnected'
-    // });
-    // console.log(res);
-
-    socket.emit('user:disconnect', _id as UserID, (res) => {
-      console.log(res);
+    await axios.patch(`${EXPRESS}/api/users/${_id}`, {
+      state: 'disconnected'
     });
+
+    socket.emit('user:disconnect', _id as UserID, (res) => {});
   };
 
   useEffect(() => {
+    if (!socket) return;
+
     socket.on('user:connect', (user: UserID) => {
-      console.log(user);
       dispatch({
         type: UserTypes.CONNECT,
         payload: user
@@ -118,42 +114,44 @@ export const UsersProvider: FC = ({ children }) => {
     });
 
     socket.on('user:disconnect', (user: UserID) => {
-      console.log(user);
       dispatch({
         type: UserTypes.DISCONNECT,
         payload: user
       });
     });
 
-    // window.addEventListener('beforeunload', (e) => {
-    //   e.preventDefault();
-    //   e.returnValue = '';
-    // });
-  
-    // return () => {
-    //   window.removeEventListener('beforeunload', (e) => {
-    //     e.preventDefault();
-    //     e.returnValue = '';
-    //   });
-    // };
+    return () => {
+      socket.off();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]);
+  }, [state, socket]);
 
   useEffect(() => {
-    if (state.users.length !== 0 && !server) return;
+    if (!server || !socket) return;
 
     readUsers();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session, server]);
+  }, [server, socket]);
 
   useEffect(() => {
+    const manager = io(`${SOCKET}/lerchat-gn`);
+    setSocket(manager);
+
     return () => {
-      socket.disconnect();
-      socket.close();
+      if (socket) socket.close();
+      manager.close();
+      // setSocket(null as any);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!socket || !session || session.user.state === 'connected' || connect)
+      return;
+
+    connectUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket, session]);
 
   return (
     <UsersContext.Provider

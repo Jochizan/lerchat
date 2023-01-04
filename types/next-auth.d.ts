@@ -13,6 +13,7 @@ declare module 'next-auth' {
       image?: string | null | undefined;
       creator?: string | null | undefined;
       email?: string | null | undefined;
+      state?: string | null | undefined;
     } & DefaultSession['user'];
     expires?: string | null | undefined;
   }
@@ -24,6 +25,7 @@ declare module 'next-auth' {
     lastMame?: string | null | undefined;
     image?: string | null | undefined;
     email?: string | null | undefined;
+    state?: string | null | undefined;
   }
 }
 

@@ -6,9 +6,11 @@ import { ContextMenu, ContextMenuTrigger } from 'react-contextmenu';
 import { showMenu } from 'react-contextmenu/modules/actions';
 
 const ChatForm = ({
-  createMessage
+  createMessage,
+  namespace
 }: {
   createMessage: (content: string) => void;
+  namespace: string;
 }) => {
   const {
     reset,
@@ -42,7 +44,7 @@ const ChatForm = ({
             <div className='relative w-full'>
               <input
                 type='text'
-                placeholder='Envia un mensaje'
+                placeholder={`Enviar mensaje a ${namespace}`}
                 className='py-2 w-full pl-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-xl br-white-03 focus:outline-none focus:border-none focus:ring-'
                 {...onKeyPress}
                 {...register('content', { required: true })}
@@ -50,17 +52,17 @@ const ChatForm = ({
               <div className='flex items-center justify-end absolute right-0 -top-0 space-x-2 pr-8 m-0'>
                 <ContextMenuTrigger id={'ChatForm'}>
                   <i
-                    className='material-icons text-gray-800 hover:text-blue-gray-700 cursor-pointer w-9 text-4xl'
+                    className='material-icons text-gray-800 hover:text-blue-gray-700 cursor-pointer w-9 mr-2 text-4xl'
                     onClick={() => showMenu()}
                   >
                     mood
                   </i>
-                  <i
+                  {/* <i
                     className='material-icons text-gray-800 hover:text-blue-gray-700 cursor-pointer w-9 text-4xl'
                     onClick={() => showMenu()}
                   >
                     gif_box
-                  </i>
+              </i>*/}
                 </ContextMenuTrigger>
               </div>
             </div>

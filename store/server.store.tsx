@@ -1,11 +1,19 @@
-import { createContext, FC, useEffect, Dispatch, useReducer } from 'react';
+import {
+  createContext,
+  FC,
+  useEffect,
+  Dispatch,
+  useReducer,
+  useState
+} from 'react';
 import { IServer, ServerActions, ServerTypes } from './types/server.types';
-import { EXPRESS } from '@services/enviroments';
+import { EXPRESS, SOCKET } from '@services/enviroments';
 import { useSession } from 'next-auth/react';
 import { serverReducer } from './reducers/server.reducer';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import { UserID } from '@events/events';
+import { ClientEvents, ServerEvents, UserID } from '@events/index';
+import { io, Socket } from 'socket.io-client';
 // import { IUser } from './types/user.types';
 
 export type InitialServerState = {
@@ -33,6 +41,7 @@ export const initialState = {
 
 const ServerContext = createContext<{
   state: InitialServerState;
+  socket: Socket<ServerEvents, ClientEvents>;
   dispatch: Dispatch<ServerActions>;
   createServer: (server: IServer) => void;
   updateServer: (_id: string, server: IServer) => void;
@@ -41,6 +50,7 @@ const ServerContext = createContext<{
   getCodeInvitation: (_id: string) => void;
 }>({
   state: initialState,
+  socket: null as any,
   dispatch: () => null,
   createServer: () => null,
   updateServer: () => null,
@@ -51,11 +61,16 @@ const ServerContext = createContext<{
 
 export const ServerProvider: FC = ({ children }) => {
   const [state, dispatch] = useReducer(serverReducer, initialState);
+  const [socket, setSocket] = useState<Socket<ServerEvents, ClientEvents>>(
+    null as any
+  );
   const {
     query: { server }
-    // ...route
   } = useRouter();
   const { data: session } = useSession();
+  // const socket: Socket<ServerEvents, ClientEvents> = io(
+  // `${SOCKET}/server-${server}`
+  // );
 
   const handleIdServer = (server: string) => {
     localStorage.setItem('id-server', server);
@@ -130,6 +145,13 @@ export const ServerProvider: FC = ({ children }) => {
     if (!(state.id !== server)) return;
 
     handleIdServer(server as string);
+
+    const manager = io(`${SOCKET}/server-${server}`);
+    setSocket(manager);
+
+    return () => {
+      manager.close();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [server]);
 
@@ -141,10 +163,23 @@ export const ServerProvider: FC = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
+  useEffect(() => {
+    const manager = io(`${SOCKET}/server-${server}`);
+    setSocket(manager);
+
+    return () => {
+      if (socket) socket.close();
+      manager.close();
+      // setSocket(null as any);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <ServerContext.Provider
       value={{
         state,
+        socket,
         dispatch,
         handleIdServer,
         getCodeInvitation,
