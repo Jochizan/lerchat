@@ -16,7 +16,7 @@ import { NextApiRequestCookies } from 'next/dist/server/api-utils';
 import useInfiniteScroll from 'react-infinite-scroll-hook';
 import { EXPRESS } from '@services/enviroments';
 
-const savedMessages: { [key: string]: IMessage[] } = {};
+// const savedMessages: { [key: string]: IMessage[] } = {};
 
 const ChannelsPage: NextPage = () => {
   const router = useRouter();
@@ -27,7 +27,7 @@ const ChannelsPage: NextPage = () => {
     createMessage,
     readMessagesOfPage
   } = useContext(MessageContext);
-  savedMessages[id as string] = messages;
+  // savedMessages[id as string] = messages;
   const {
     state: { mapNamespaces }
   } = useContext(NamespaceContext);
@@ -39,8 +39,8 @@ const ChannelsPage: NextPage = () => {
     loading,
     hasNextPage,
     onLoadMore: readMessagesOfPage,
-    disabled: !!error
-    // rootMargin: '100px 0px 0px 0px'
+    disabled: !!error,
+    rootMargin: '200px 0px 0px 0px'
   });
 
   const internalMessages = useMemo(() => {
@@ -117,10 +117,15 @@ const ChannelsPage: NextPage = () => {
           style={{ overscrollBehavior: 'contain' }}
         >
           <ul className='m-0 list-none'>
-            {hasNextPage && (
+            {(hasNextPage || loading) && (
               <li ref={infiniteRef}>
                 <div className='tx-wlight flex justify-center'>
-                  <i className='material-icons spin'>refresh</i>
+                  <i
+                    className='material-icons spin'
+                    style={{ fontSize: '48px' }}
+                  >
+                    refresh
+                  </i>
                 </div>
               </li>
             )}

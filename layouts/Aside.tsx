@@ -246,7 +246,7 @@ const Aside: FC = ({ children }) => {
                 required
                 placeholder='Nombre del espacio'
                 {...registerNamespace('name')}
-                className='mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-3xl br-white-03 focus:outline-none focus:border-none focus:ring-1'
+                className='mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-xl br-white-03 focus:outline-none focus:border-none focus:ring-1'
               />
             </ModalForm>
             <ModalForm
@@ -271,7 +271,7 @@ const Aside: FC = ({ children }) => {
                 required
                 placeholder='Nombre de la categoría'
                 {...registerCategory('name')}
-                className='mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-3xl br-white-03 focus:outline-none focus:border-none focus:ring-1'
+                className='mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-xl br-white-03 focus:outline-none focus:border-none focus:ring-1'
               />
             </ModalForm>
             {servers.length ? (
@@ -413,7 +413,12 @@ const Aside: FC = ({ children }) => {
                           >
                             <div className='w-full pl-2'>
                               <span className='tx-nlight cursor-pointer align-middle flex items-center'>
-                                <i className='material-icons text-sm pr-2'>
+                                <i
+                                  className='material-icons text-sm pr-2'
+                                  style={{
+                                    fontSize: '14px'
+                                  }}
+                                >
                                   east
                                 </i>
                                 <p className='truncate text-base'>{name}</p>
@@ -445,9 +450,14 @@ const Aside: FC = ({ children }) => {
                     )
                 )
               ) : (
-                <span className='tx-nlight truncate'>
-                  {route.route === '/channels' && 'Sin espacios para chatear'}
-                </span>
+                <div className='tx-wlight flex justify-center'>
+                  <i
+                    className='material-icons spin'
+                    style={{ fontSize: '36px' }}
+                  >
+                    refresh
+                  </i>
+                </div>
               )}
               {Object.keys(id).length && categories.length ? (
                 categories?.map(({ _id, name }) => (
@@ -455,7 +465,16 @@ const Aside: FC = ({ children }) => {
                     <ContextMenuTrigger id={_id + '#'}>
                       <div className='w-full pt-2 pb-1 pl-1 text-base'>
                         <span className='tx-nlight cursor-pointer align-middle flex items-center'>
-                          <i className='material-icons text-sm pr-1'>south</i>
+                          <i
+                            className='material-icons text-sm pr-1'
+                            style={{
+                              fontSize: '14px',
+                              width: '14px',
+                              height: '14px'
+                            }}
+                          >
+                            south
+                          </i>
                           <p className='uppercase text-sm truncate'>{name}</p>
                         </span>
                       </div>
@@ -496,7 +515,12 @@ const Aside: FC = ({ children }) => {
                                 >
                                   <div className='w-full pl-3.5'>
                                     <span className='tx-nlight cursor-pointer align-middle flex items-center'>
-                                      <i className='material-icons text-sm pr-2'>
+                                      <i
+                                        className='material-icons pr-2'
+                                        style={{
+                                          fontSize: '14px'
+                                        }}
+                                      >
                                         east
                                       </i>
                                       <p className='truncate text-base'>
@@ -530,16 +554,15 @@ const Aside: FC = ({ children }) => {
                           )
                       )
                     ) : (
-                      <span className='tx-nlight truncate'>
-                        {route.route === '/channels' &&
-                          'Sin espacios para chatear'}
-                      </span>
+                      <div>
+                        <p className='tx-nlight'>espacios...</p>
+                      </div>
                     )}
                   </div>
                 ))
               ) : (
-                <div className='tx-nlight truncate'>
-                  {route.route === '/channels' && 'Sin categorías'}
+                <div>
+                  <p className='tx-nlight'>categorías...</p>
                 </div>
               )}
             </div>
@@ -569,57 +592,62 @@ const Aside: FC = ({ children }) => {
         </div>
       </aside>
       <main className='grow flex max-h-screen flex-col h-full'>{children}</main>
-      {!route.pathname.includes('@me') && (
-        <section className='w-40 bg-ndark'>
-          <div className='flex flex-col items-center justify-start h-full'>
-            <p className='tx-nlight text-base pt-4'>Usuarios</p>
-            <div className='pt-6 tx-nlight' />
-            {users.length ? (
-              users.map((el) => (
-                <div
-                  key={el._id}
-                  className='flex justify-center items-center gap-2 p-2'
-                >
-                  <Image
-                    src={`/${el.image}`}
-                    alt='Imagen de perfil'
-                    width={35}
-                    height={35}
-                    className='rounded-full'
-                  />
-                  <div className='flex flex-col'>
-                    <span className='tx-wlight truncate'>{el.name}</span>
-                    <div className='w-full flex items-center justify-between'>
-                      <i
-                        className={`material-icons ${
-                          el.state === 'connected'
-                            ? 'text-green-800'
-                            : 'text-gray-800'
-                        } text-sm`}
-                      >
-                        radio_button_checked
-                      </i>
-                      <p
-                        className={`${
-                          el.state === 'connected'
-                            ? 'text-green-700'
-                            : 'text-gray-700'
-                        } text-sm pl-1`}
-                      >
-                        {el.state === 'connected'
-                          ? 'conectado'
-                          : 'desconectado'}
-                      </p>
-                    </div>
+      <section
+        className={`w-40 bg-ndark left-to-right transition-all ${
+          !route.pathname.includes('@me') ? 'block' : 'hidden'
+        }`}
+      >
+        <div className='flex flex-col items-center justify-start h-full'>
+          <p className='tx-nlight text-base pt-4'>Usuarios</p>
+          <div className='pt-6 tx-nlight' />
+          {users.length ? (
+            users.map((el) => (
+              <div
+                key={el._id}
+                className='flex justify-center items-center gap-2 p-2'
+              >
+                <Image
+                  src={`/${el.image}`}
+                  alt='Imagen de perfil'
+                  width={35}
+                  height={35}
+                  className='rounded-full'
+                />
+                <div className='flex flex-col'>
+                  <span className='tx-wlight truncate'>{el.name}</span>
+                  <div className='w-full flex items-center justify-between'>
+                    <i
+                      className={`material-icons ${
+                        el.state === 'connected'
+                          ? 'text-green-800'
+                          : 'text-gray-800'
+                      }`}
+                      style={{ fontSize: '14px' }}
+                    >
+                      radio_button_checked
+                    </i>
+                    <p
+                      className={`${
+                        el.state === 'connected'
+                          ? 'text-green-700'
+                          : 'text-gray-700'
+                      } text-sm pl-1`}
+                    >
+                      {el.state === 'connected' ? 'conectado' : 'desconectado'}
+                    </p>
                   </div>
                 </div>
-              ))
-            ) : (
-              <div>...</div>
-            )}
-          </div>
-        </section>
-      )}
+              </div>
+            ))
+          ) : (
+            <div className='tx-wlight flex justify-center'>
+              <i className='material-icons spin' style={{ fontSize: '36px' }}>
+                refresh
+              </i>
+            </div>
+          )}
+        </div>
+      </section>
     </section>
   );
 };

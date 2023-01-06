@@ -70,7 +70,6 @@ export const MessageProvider: FC = ({ children }) => {
   const [socket, setSocket] = useState<Socket<ServerEvents, ClientEvents>>(
     null as any
   );
-  // let socket: Socket<ServerEvents, ClientEvents>;
 
   const readMessages = async () => {
     if (!namespace) return;
@@ -78,6 +77,7 @@ export const MessageProvider: FC = ({ children }) => {
       type: MessageTypes.LOADING,
       payload: { loading: true, msg: 'Cargando...' }
     });
+    dispatch({ type: MessageTypes.CLEAR, payload: [] });
     const { data }: { data: { msg: string; docs: IMessage[] } } =
       await axios.get(`${EXPRESS}/api/messages/${namespace}?page=1&size=30`);
     dispatch({ type: MessageTypes.READ, payload: data.docs });

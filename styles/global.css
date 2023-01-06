@@ -418,6 +418,10 @@ input.tx-wdark + label {
 
 /* utilities tailwindcss */
 
+.left-to-right {
+  animation: animate-bounce-left-in-sm ease-in-out 0.5s;
+}
+
 .primary__btn,
 .secondary__btn,
 .danger__btn {

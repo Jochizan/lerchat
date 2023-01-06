@@ -20,7 +20,7 @@ export const messagesGrouped = (payload: IMessage[]) => {
     payload[0].next = ok;
     payload[0].nextTime = time;
 
-    payload[1].next = ok;
+    payload[1].next = !ok;
     payload[1].nextTime = time;
     return payload;
   }

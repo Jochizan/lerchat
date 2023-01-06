@@ -14,7 +14,6 @@ const HomePage: NextPage = () => {
   } = useForm<TypeSession>();
   const { code_invitation: codeInvitation } = useRouter().query;
 
-
   const onSubmit: SubmitHandler<TypeSession> = async (data) => {
     try {
       signIn('credentials', {
@@ -42,10 +41,10 @@ const HomePage: NextPage = () => {
           <div className='text-center text-2xl font-bold tx-wlight mb-4'>
             Bienvenido
           </div>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className='mb-4'>
+          <form onSubmit={handleSubmit(onSubmit)} className='bg-input-sign'>
+            <div className='mb-4 '>
               <input
-                className='w-full py-2 px-3 border-b-2 border-gray-500 hover:gray-blue-700  bg-transparent leading-tight focus:outline-none focus:shadow-outline text-brown-50'
+                className='w-full py-2 px-3 border-b-2 border-gray-500 hover:border-gray-700  bg-transparent leading-tight focus:outline-none focus:shadow-outline text-brown-50'
                 type='text'
                 {...register('email', {
                   required: 'El correo electrónico es requerido',
@@ -59,7 +58,7 @@ const HomePage: NextPage = () => {
             </div>
             <div className='mb-4'>
               <input
-                className='w-full py-2 px-3 border-b-2 border-gray-500 hover:gray-blue-700 leading-tight bg-transparent focus:outline-none focus:shadow-outline text-brown-50'
+                className='w-full py-2 px-3 border-b-2 border-gray-500 hover:border-gray-700 leading-tight bg-transparent focus:outline-none focus:shadow-outline text-brown-50'
                 type='password'
                 {...register('password', {
                   required: 'La contraseña es requerida',

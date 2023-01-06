@@ -54,7 +54,7 @@ const HomePage = () => {
           required
           placeholder='Nombre del servidor'
           {...registerServer('name')}
-          className='mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-3xl br-white-03 focus:outline-none focus:border-none focus:ring-1'
+          className='mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-xl br-white-03 focus:outline-none focus:border-none focus:ring-1'
         />
       </ModalForm>
     </div>

@@ -17,9 +17,8 @@ const AuthProvider = ({ children }: any) => {
   // if `{ required: true }` is supplied, `status` can only be "loading" or "authenticated"
   const { status } = useSession({ required: true });
 
-  if (status === 'loading') return <div>Loading...</div>;
-
-  return children;
+  if (status === 'authenticated') return children;
+  else return null;
 };
 
 const AuthSession = ({ children }: any) => {
@@ -66,28 +65,28 @@ const App = ({
 
   return (
     <SessionProvider session={session} refetchInterval={5 * 60}>
-      <UsersProvider>
-        <ServerProvider>
-          <CategoryProvider>
-            <NamespaceProvider>
-              <MessageProvider>
-                <Head>
-                  <title>LerChat</title>
-                </Head>
-                <ThemeProvider>
-                  <AuthProvider>
+      <AuthProvider>
+        <UsersProvider>
+          <ServerProvider>
+            <CategoryProvider>
+              <NamespaceProvider>
+                <MessageProvider>
+                  <Head>
+                    <title>LerChat</title>
+                  </Head>
+                  <ThemeProvider>
                     <Aside>
                       <ChatNavbar>
                         <Component {...pageProps} />
                       </ChatNavbar>
                     </Aside>
-                  </AuthProvider>
-                </ThemeProvider>
-              </MessageProvider>
-            </NamespaceProvider>
-          </CategoryProvider>
-        </ServerProvider>
-      </UsersProvider>
+                  </ThemeProvider>
+                </MessageProvider>
+              </NamespaceProvider>
+            </CategoryProvider>
+          </ServerProvider>
+        </UsersProvider>
+      </AuthProvider>
     </SessionProvider>
   );
 };

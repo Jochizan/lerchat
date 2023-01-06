@@ -57,6 +57,12 @@ export const messageReducer = (
         )
       };
 
+    case MessageTypes.CLEAR:
+      return {
+        ...state,
+        messages: []
+      };
+
     case MessageTypes.LOADING:
       return {
         ...state,

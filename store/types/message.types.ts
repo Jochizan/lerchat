@@ -10,6 +10,7 @@ type ActionMap<M extends { [index: string]: any }> = {
 };
 
 export enum MessageTypes {
+  CLEAR = 'CLEAR_MESSAGE',
   CREATE = 'CREATE_MESSAGE',
   READ = 'READ_MESSAGE',
   UPDATE = 'UPDATE_MESSAGE',
@@ -48,6 +49,7 @@ export type IMessage = {
 };
 
 type MessagePayload = {
+  [MessageTypes.CLEAR]: IMessage[];
   [MessageTypes.CREATE]: IMessage;
   [MessageTypes.READ]: IMessage[];
   [MessageTypes.UPDATE]: IMessage;

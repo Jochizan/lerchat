@@ -169,6 +169,11 @@ const CardMessage = ({ msg }: { msg: IMessage }) => {
         open={openUpdate}
         handler={handleOpenUpdate}
         className='bg-dark-03'
+        size='xs'
+        animate={{
+          mount: { scale: 1, y: 0 },
+          unmount: { scale: 0.8, y: +50 }
+        }}
       >
         <form onSubmit={handleSubmit(onSubmitUpdate)}>
           <DialogHeader className='tx-wlight flex justify-between p-2 ml-4'>
@@ -187,7 +192,7 @@ const CardMessage = ({ msg }: { msg: IMessage }) => {
             <input
               required
               {...register('name')}
-              className='mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-3xl br-white-03 focus:outline-none focus:border-none focus:ring-1'
+              className='mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-xl br-white-03 focus:outline-none focus:border-none focus:ring-1'
             />
           </DialogBody>
           <DialogFooter className='flex justify-center'>
@@ -207,6 +212,11 @@ const CardMessage = ({ msg }: { msg: IMessage }) => {
         open={openDelete}
         handler={handleOpenDelete}
         className='bg-dark-03'
+        size='xs'
+        animate={{
+          mount: { scale: 1, y: 0 },
+          unmount: { scale: 0.8, y: +50 }
+        }}
       >
         <form onSubmit={handleSubmit(onSubmitDelete)}>
           <DialogHeader className='tx-wlight flex justify-between p-2 ml-4'>
@@ -224,7 +234,7 @@ const CardMessage = ({ msg }: { msg: IMessage }) => {
             <p className='text-base pb-2'>
               Esta seguro de borrar el siguiente mensaje:{' '}
             </p>
-            <div className='tx-wlight flex items-center group hover:bg-gray-700 py-0.5 rounded-sm'>
+            <div className='tx-wlight flex items-center bg-gray-700 group hover:bg-red-500 py-0.5 rounded-sm'>
               <section className='mx-4'>
                 <Avatar
                   src='/default.png'

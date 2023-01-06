@@ -6,8 +6,7 @@ import {
   DialogHeader,
   DialogProps
 } from '@material-tailwind/react';
-import { FC, useState } from 'react';
-import { SubmitHandler, UseFormHandleSubmit } from 'react-hook-form';
+import { FC } from 'react';
 
 const ModalForm: FC<any> = ({
   open,
@@ -24,7 +23,16 @@ const ModalForm: FC<any> = ({
   handleSubmit: () => Promise<any>;
 }) => {
   return (
-    <Dialog open={open} handler={handler} className='bg-dark-03'>
+    <Dialog
+      open={open}
+      handler={handler}
+      className='bg-dark-03'
+      size='xs'
+      animate={{
+        mount: { scale: 1, y: 0 },
+        unmount: { scale: 0.8, y: +50 }
+      }}
+    >
       <form onSubmit={handleSubmit}>
         <DialogHeader className='tx-wlight flex justify-between p-2 ml-4'>
           {title}
@@ -37,10 +45,9 @@ const ModalForm: FC<any> = ({
             <span className='text-sm'>x</span>
           </Button>
         </DialogHeader>
-        <DialogBody>
+        <DialogBody divider className='flex justify-center'>
           <div className='tx-wlight flex flex-col m-4'>
             <p>{description}</p>
-            <hr className='bg-light-chat mt-3 mb-4' />
             {children}
           </div>
         </DialogBody>
@@ -61,10 +68,3 @@ const ModalForm: FC<any> = ({
 };
 
 export default ModalForm;
-
-// <input
-//   required
-//   placeholder='Nombre del servidor'
-//   {...register('name')}
-//   className='mr-4 py-1.5 w-full px-2.5 font-medium bg-white-03 br-white-01 tx-wdark rounded-3xl br-white-03 focus:outline-none focus:border-none focus:ring-1'
-// />

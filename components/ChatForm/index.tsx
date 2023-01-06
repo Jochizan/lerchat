@@ -52,7 +52,8 @@ const ChatForm = ({
               <div className='flex items-center justify-end absolute right-0 -top-0 space-x-2 pr-8 m-0'>
                 <ContextMenuTrigger id={'ChatForm'}>
                   <i
-                    className='material-icons text-gray-800 hover:text-blue-gray-700 cursor-pointer w-9 mr-2 text-4xl'
+                    className='material-icons text-gray-800 hover:text-blue-gray-700 cursor-pointer w-9 mr-2'
+                    style={{ fontSize: '2.5rem' }}
                     onClick={() => showMenu()}
                   >
                     mood

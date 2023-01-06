@@ -78,7 +78,7 @@ const SignInPage: NextPage = () => {
               - OR -
             </Typography>
           </article>
-          <article className='w-auto px-8 ml-8 mt-8'>
+          <article className='w-auto px-8 ml-8 mt-8 bg-input-sign'>
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className='mt-6'>
                 <Input

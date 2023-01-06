@@ -60,7 +60,7 @@ export const authOptions: NextAuthOptions = {
   // It is used to sign cookies and to sign and encrypt JSON Web Tokens, unless
   // a separate secret is defined explicitly for encrypting the JWT.
 
-  secret: process.env.SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
 
   adapter: MongoDBAdapter(connectToDatabase() as any),
   // database: process.env.MONGODB_URI,
