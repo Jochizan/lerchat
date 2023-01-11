@@ -397,7 +397,9 @@ const Aside: FC = ({ children }) => {
           </Dialog>
           <ContextMenuTrigger id={(idServer as string) + '#'}>
             <div
-              className='pt-16 bg-gray-900 block w-40 overflow-hidden h-full'
+              className={`pt-16 bg-gray-900 block w-40 overflow-hidden h-full ${
+                !route.pathname.includes('@me') ? 'block' : 'hidden'
+              }`}
               onClick={() => hideMenu()}
             >
               {Object.keys(id).length && namespaces.length ? (
