@@ -6,8 +6,6 @@ import CardMessage from '@components/CardMessage';
 import NamespaceContext from '@store/namespace.store';
 import ServerContext from '@store/server.store';
 import { MessageContext } from '@store/message.store';
-// import usePrevious from '@hooks/usePrevius';
-import { IMessage } from '@store/types/message.types';
 import fetch from 'isomorphic-unfetch';
 import { unstable_getServerSession } from 'next-auth';
 import { authOptions } from 'pages/api/auth/[...nextauth]';
@@ -16,7 +14,6 @@ import { NextApiRequestCookies } from 'next/dist/server/api-utils';
 import useInfiniteScroll from 'react-infinite-scroll-hook';
 import { EXPRESS } from '@services/enviroments';
 
-// const savedMessages: { [key: string]: IMessage[] } = {};
 
 const ChannelsPage: NextPage = () => {
   const router = useRouter();
@@ -140,8 +137,6 @@ const ChannelsPage: NextPage = () => {
   );
 };
 
-// const verifySessions = {};
-
 export async function getServerSideProps(context: NextPageContext) {
   if (context.req && context.res) {
     const { req, res } = context;
@@ -174,7 +169,5 @@ export async function getServerSideProps(context: NextPageContext) {
     return { props: {} };
   }
 }
-
-// requireVerifyUserServer(ChannelsPage);
 
 export default ChannelsPage;
