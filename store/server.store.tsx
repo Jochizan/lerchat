@@ -99,8 +99,6 @@ export const ServerProvider: FC = ({ children }) => {
       `${EXPRESS}/api/servers/invitation/${_id}`
     );
 
-    console.log(data);
-
     dispatch({
       type: ServerTypes.GET_LINK,
       payload: { url: data.url, id: _id }

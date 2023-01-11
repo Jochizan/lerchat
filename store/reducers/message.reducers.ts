@@ -83,7 +83,6 @@ export const messageReducer = (
       };
 
     case MessageTypes.HAS_NEXT_PAGE:
-      console.log(payload);
       return {
         ...state,
         hasNextPage: payload
